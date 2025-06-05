@@ -16,6 +16,14 @@ module.exports = {
           loader: 'babel-loader',
         },
       },
+      {
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader'],
+      },
+      {
+        test: /\.(png|jpe?g|svg|webp|webm)$/i, 
+        type: 'asset/resource',
+      },
     ],
   },
   resolve: {

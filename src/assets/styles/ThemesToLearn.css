@@ -1,0 +1,33 @@
+.StatsCards{
+    position: relative;
+    left: 5%;
+    width: 90%;
+    height: 12vh;
+
+    display: -webkit-inline-box;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-color: #4d4d4d #e1ebe100;
+}
+
+.ThemeCard{
+    height: 90%;
+    width: 112px;
+    
+    border: solid 2px;
+    border-color: var(--border-dark);
+    border-radius: 8px;
+    margin-right: 5%;
+}
+
+.ThemeInfoWrapper{
+    position: relative;
+    left: 10%;
+    top: 10%;
+    width: 80%;
+    height: 80%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}

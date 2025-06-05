@@ -1,0 +1,19 @@
+.UserIconDefault{
+    position: relative;
+    width: 17vh;
+    height: 17vh;
+    border-radius: 50%;
+    background-size: 110% 110%;
+    background-position: center;
+    background-repeat: no-repeat;
+    /* background-color: aliceblue; */
+}
+.UserInfoDefault{
+    position: relative;
+    margin-left: 2%;
+    height: 100%;
+    width: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
