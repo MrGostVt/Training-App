@@ -1,0 +1,19 @@
+.Question{
+    position: relative;
+    left: 5%;
+    width: 90%;
+    
+    color: var(--main-text-dark-color);
+    font-size: 22px;
+    line-height: 28px;
+
+    /* display: flex; */
+}
+
+.AnswersList{
+    position: relative;
+    left: 5%;
+    width: 90%;
+
+    color: var(--main-text-dark-color);
+}

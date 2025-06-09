@@ -1,0 +1,28 @@
+.GameBlock{
+    position: relative;
+    left: 5%;
+    width: 90%;
+    height: 24vh;
+    margin-bottom: 5%;
+}
+
+.InfoInGameBlock{
+    position: relative;
+    width: 100%;
+    height: calc(100% - 22px - 14%);
+}
+
+.InGameIcon{
+    height: 100%;
+    width: 38%;
+    position: absolute;
+
+    right: 0%;
+    bottom: 0%;
+    border-radius: 8px;
+
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: calc(15vh - 2vw) 15vh;
+    background-color: var(--functional-dark-color);
+}

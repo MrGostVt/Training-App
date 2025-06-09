@@ -4,7 +4,7 @@ import '../assets/styles/ThemesToLearn.css';
 
 let lastChosenCallback = () => {};
 
-export const ThemesToLearnBlock = ({themesList = [{themeName: 'test', points: 0, id: 0,}], choosedThemeID = -1}) => {
+export const ThemesToLearnBlock = ({themesList = [{themeName: 'test', points: 0, id: 0,}], choosedThemeID = 0, setTheme = () => {}}) => {
     const [themes, setThemes] = useState(themesList);
     const [chosenTheme, setChoosedTheme] = useState(choosedThemeID);
     
@@ -13,10 +13,12 @@ export const ThemesToLearnBlock = ({themesList = [{themeName: 'test', points: 0,
         lastChosenCallback = callback;
         
         if(chosenTheme === id){
-            setChoosedTheme(-1);
+            setChoosedTheme(0);
+            setTheme(0);
             return false;
         }
         setChoosedTheme(id);
+        setTheme(id);
         return true;
     }
 
