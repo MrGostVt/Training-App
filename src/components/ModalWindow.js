@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import '../assets/styles/ModalWindow.css';
 import { DefaultButton } from "./DefaultButton";
 
-export const ModalWindow = ({children, title = 'undefined', closeCallback = () => {}}) => {
+export const ModalWindow = ({children, title = 'undefined', closeCallback}) => {
     const [isLoading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -20,7 +20,7 @@ export const ModalWindow = ({children, title = 'undefined', closeCallback = () =
     
     return(
         <div className="ModalWindowBase" onClick={() => {
-            if(isLoading ){
+            if(isLoading && typeof closeCallback === 'function'){
                 setLoading(false); 
                 setTimeout(() => closeCallback(), 200);
             }}} style={{backdropFilter}}>
@@ -68,6 +68,18 @@ export const SignModal = ({}) => {
                 backgroundColor: `var(--main-button-dark-color)`, color: 'var(--main-text-dark-color)'}} text="SIGN IN"
             />
             {signMessage}
+        </ModalWindow>
+    );
+}
+
+export const ResultsModal = ({type, results, closeCallback = () => {}}) => {
+    
+    return(
+        <ModalWindow title={type} closeCallback={closeCallback}>
+            <DefaultButton styles={{width: '90%', height: '8vh', left: '5%', bottom: '5%', fontWeight: '700',
+            backgroundColor: `var(--main-button-dark-color)`, color: 'var(--main-text-dark-color)'}} text="Claim"
+            onClick={() => {closeCallback()}} //closing without an animation
+            />
         </ModalWindow>
     );
 }

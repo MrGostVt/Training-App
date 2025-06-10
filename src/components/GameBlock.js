@@ -3,7 +3,8 @@ import { DefaultButton } from "./DefaultButton";
 import "../assets/styles/GameBlock.css"
 import { LoadedImages } from "../application/ImageLoad";
 
-export const GameBlock = ({GameInfo = {type: 'undefined', description: 'undefined', typeDescripe: 'undefined', iconUrl: 'undefined'}}) => {
+export const GameBlock = ({GameInfo = {type: 'undefined', description: 'undefined', typeDescripe: 'undefined', iconUrl: 'undefined', typeId: 0}, 
+moveToGame = () => {}}) => {
     return(
         <div className="GameBlock">
             <div className="DefaultFont" style={{color: `var(--main-text-dark-color)`, fontSize: '22px', marginBottom: '3%'}}>
@@ -19,7 +20,9 @@ export const GameBlock = ({GameInfo = {type: 'undefined', description: 'undefine
                 <div className="DefaultFont" style={{color: `var(--secondary-text-dark-color)`, fontSize: '14px', width: '60%'}}>
                     {GameInfo.description}
                 </div>
-                <DefaultButton text="Play" styles={{left: '0%', bottom: '0%', color: `var(--main-text-dark-color)`}}/>
+                <DefaultButton text="Play" styles={{left: '0%', bottom: '0%', color: `var(--main-text-dark-color)`}} 
+                onClick={() => {moveToGame(GameInfo.typeId)}}
+                />
                 <InGameIcon iconUrl={GameInfo.iconUrl}/>
             </div>
         </div>

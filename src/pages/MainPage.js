@@ -5,9 +5,26 @@ import { ThemesToLearnBlock } from "../components/ThemesToLearnBlock";
 import { GameBlock } from "../components/GameBlock";
 import { LoadedImages } from "../application/ImageLoad";
 
-export const MainPage = ({}) =>{
+export const MainPage = ({moveToGame = () => {}}) =>{
     const [chosenTheme, setTheme] = useState(0);
     
+    let barrier;
+    if(chosenTheme <= 0){
+        barrier = <div className="DefaultFont" style={{
+            position: 'absolute', 
+            left: '4%', 
+            width: '92%', 
+            height: 'calc(48vh + 5%)',
+            zIndex: '10',
+            backdropFilter: 'blur(3px)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            fontSize: '24px',
+            color: 'var(--main-text-dark-color)',
+        }}>Choose theme first</div>
+    }
     return(
         <>
             <ThemesToLearnBlock themesList={[
@@ -18,18 +35,21 @@ export const MainPage = ({}) =>{
                 {themeName: '...', points: 0, id: 5,}]}
                 setTheme={setTheme}
             />
+            {barrier}
             <GameBlock GameInfo={{
                 type: 'Practice',
                 typeDescripe: 'Quick game',
                 description: 'Play a quick practice to improve your skills',
                 iconUrl: LoadedImages['Practice.png'],
-            }}/>;
+                typeId: 1,
+            }} moveToGame={moveToGame}/>
             <GameBlock GameInfo={{
                 type: 'Tournament',
                 typeDescripe: 'Tournament match',
                 description: 'Join to tournament and show your skills',
                 iconUrl: LoadedImages['Tournament.png'],
-            }}/>
+                typeId: 2,
+            }} moveToGame={moveToGame}/>
         </>
     );
 }

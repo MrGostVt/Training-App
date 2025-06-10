@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import './assets/styles/App.css';
 import { MainPage } from "./pages/MainPage";
-import { ModalWindow, SettingsModal, SignModal } from "./components/ModalWindow";
+import { ModalWindow, ResultsModal, SettingsModal, SignModal } from "./components/ModalWindow";
 import { PagePreview } from "./components/PagePreview";
 import { ProfileBlock } from "./components/ProfileBlock";
 import { InGamePage } from "./pages/InGamePage";
@@ -15,25 +15,36 @@ const App = ({}) => {
     const [modal, setModal] = useState(0);
     let page;
     switch(pageId){
-        case 1: page = <InGamePage />; break;
-        case 0: page = <MainPage />; break;
+        case 1: page = <InGamePage moveOut = {moveOutFromGame}/>; break;
+        case 0: page = <MainPage moveToGame={moveToGame}/>; break;
         default: page = null;
     }
 
     let modalWindow;
     switch(modal){
-        case 1: modalWindow = <SettingsModal closeCallback={SavedInstance[1]} />; break;
+        case 1: modalWindow = <SettingsModal closeCallback={SavedInstance[1].callback} />; break;
         case 2: modalWindow = <SignModal />; break;
+        case 3: modalWindow = <ResultsModal type={"Practice"}  closeCallback={SavedInstance[3].callback}/>; break;
         default: modalWindow = null; break;
     }
 
-    function openModal(id, callback){
-        SavedInstance[id] = () =>{
-            setModal(0);
-            callback();
+    function openModal(id, callback, others){
+        SavedInstance[id] = {
+            callback: () =>{
+                setModal(0);
+                callback();
+            }
         };
+        SavedInstance[id].others = others;
 
         setModal(id);
+    }
+    function moveToGame(id){
+        setPage(1);
+    }
+    function moveOutFromGame(results){
+        setPage(0);
+        openModal(3, () => {console.log(results);}, results);
     }
 
     return(
