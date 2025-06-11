@@ -22,6 +22,7 @@ export class Question{
             answers: this.questionData.answers,
             maxPoints: this.questionData.maxPoints,
             id: this.questionData.id,
+            correctCount: this.questionData.correctAnswerIds.length,
         };
 
         return data;
@@ -58,13 +59,19 @@ export class Question{
     checkAnswerWithOrder(){
         const question = this.questionData;
 
+        if(this.chosenAnswers.length !== this.questionData.correctAnswerIds.length){
+            this.earnedPoints = 0;
+            return this.earnedPoints;
+        }
         for(let i = 0; i < question.correctAnswerIds.length; i++){
-            if(this.chosenAnswers[i] !== this.correctAnswerIds[i]){
-                return false;
+            if(this.chosenAnswers[i] !== question.correctAnswerIds[i]){
+                this.earnedPoints = 0;
+                return this.earnedPoints;
             }
         }
 
-        return question.maxPoints;
+        this.earnedPoints = question.maxPoints;
+        return this.earnedPoints;
     }
 
     checkAnswers(){

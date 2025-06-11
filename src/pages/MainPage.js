@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ProfileBlock } from "../components/ProfileBlock";
 import { PagePreview } from "../components/PagePreview";
 import { ThemesToLearnBlock } from "../components/ThemesToLearnBlock";
 import { GameBlock } from "../components/GameBlock";
 import { LoadedImages } from "../application/ImageLoad";
+import serverController from "../application/ServerController";
 
 export const MainPage = ({moveToGame = () => {}}) =>{
-    const [chosenTheme, setTheme] = useState(0);
+    const [chosenTheme, setTheme] = useState(serverController.currentTheme);
     
     let barrier;
     if(chosenTheme <= 0){
@@ -25,6 +26,10 @@ export const MainPage = ({moveToGame = () => {}}) =>{
             color: 'var(--main-text-dark-color)',
         }}>Choose theme first</div>
     }
+
+    useEffect(() => {
+        serverController.currentTheme = chosenTheme;
+    }, [chosenTheme])
     return(
         <>
             <ThemesToLearnBlock themesList={[
@@ -33,7 +38,7 @@ export const MainPage = ({moveToGame = () => {}}) =>{
                 {themeName: 'Logic', points: 0, id: 3,},
                 {themeName: '...', points: 0, id: 4,},
                 {themeName: '...', points: 0, id: 5,}]}
-                setTheme={setTheme}
+                setTheme={setTheme} choosedThemeID={chosenTheme}
             />
             {barrier}
             <GameBlock GameInfo={{
