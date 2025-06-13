@@ -1,10 +1,23 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { UserIcon, UserInfo } from "./User";
 import { LoadedImages } from "../application/ImageLoad";
+import clientController from "../application/ClientController";
 
 export const ProfileBlock = ({userName, infoToDisplay, openModal = () => {}}) => {
     const [cardState, setCardState] = useState(0);
+    const [chosenTheme, setTheme] = useState(clientController.theme);
+
+    useEffect(() => {
+        function updateTheme(){
+            setTheme(clientController.theme);
+        }
+        clientController.subscribeOn('theme-switch', updateTheme);
+
+        return () => {
+            clientController.unSubscribeOn('theme-switch', updateTheme);
+        }
+    }, []);
 
     return(
         <div style={
@@ -22,7 +35,7 @@ export const ProfileBlock = ({userName, infoToDisplay, openModal = () => {}}) =>
                     name: userName,
                     other: [`Level ${1}`],
                 }
-            } />
+            } theme={chosenTheme}/>
 
             <SettingsButton onClick={openModal} />
         </div>

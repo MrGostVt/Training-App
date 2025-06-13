@@ -3,7 +3,7 @@
     left: 5%;
     width: 90%;
     
-    color: var(--main-text-dark-color);
+    /* color: var(--main-text-dark-color); */
     font-size: 22px;
     line-height: 28px;
 
@@ -15,5 +15,5 @@
     left: 5%;
     width: 90%;
 
-    color: var(--main-text-dark-color);
+    /* color: var(--main-text-dark-color); */
 }

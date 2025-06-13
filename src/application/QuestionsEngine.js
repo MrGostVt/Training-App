@@ -22,7 +22,8 @@ export class QuestionEngine{
     
     answer(){
         const points = this.questions[this.pointer].checkAnswers();
-        this.answerPoints.push(points);
+        const maxPoints = this.questions[this.pointer].getData().maxPoints
+        this.answerPoints.push([points, maxPoints]);
 
         this.pointer = this.pointer+1 !== this.questions.length? this.pointer+1: this.pointer;
         return !!points;

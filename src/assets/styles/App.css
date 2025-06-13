@@ -8,7 +8,16 @@ body{
     --secondary-text-dark-color: #8F99CC;
     --border-dark: #2E386B;
     --border-dark-active: #8F99CC;
-    
+
+    --main-light-color: #FFFFFF;
+    --functional-light-color: #E5E8F5;
+    --functional-active-light-color: #c6cef3;
+    --main-button-light-color: #617AFA;
+    --main-text-light-color: #0D0F1C;
+    --secondary-text-light-color: #47579E;
+    --border-light: #2E386B;
+    --border-light-active: #8F99CC;
+
     background: radial-gradient(circle, rgba(33, 32, 89, 1) 0%, rgba(31, 29, 27, 1) 100%);
 }
 #root{
@@ -39,7 +48,7 @@ body{
 
 .App{
     position: relative;
-    background-color: var(--main-dark-color);
+    /* background-color: var(--main-dark-color); */
 }
 
 .DefaultFont{
@@ -58,7 +67,6 @@ body{
     font-weight: 500;
     line-height: 24px;
     font-size: 18px;
-    color: var(--main-text-dark-color);
 }
 
 .DefaultButton{

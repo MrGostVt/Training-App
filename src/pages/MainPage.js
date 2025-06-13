@@ -5,12 +5,12 @@ import { ThemesToLearnBlock } from "../components/ThemesToLearnBlock";
 import { GameBlock } from "../components/GameBlock";
 import { LoadedImages } from "../application/ImageLoad";
 import serverController from "../application/ServerController";
+import clientController from "../application/ClientController";
 
 export const MainPage = ({moveToGame = () => {}}) =>{
-    const [chosenTheme, setTheme] = useState(serverController.currentTheme);
-    
+    const [chosenSubject, setSubject] = useState(clientController.subjectTheme);
     let barrier;
-    if(chosenTheme <= 0){
+    if(chosenSubject <= 0){
         barrier = <div className="DefaultFont" style={{
             position: 'absolute', 
             left: '4%', 
@@ -28,8 +28,9 @@ export const MainPage = ({moveToGame = () => {}}) =>{
     }
 
     useEffect(() => {
-        serverController.currentTheme = chosenTheme;
-    }, [chosenTheme])
+        clientController.setSubject(chosenSubject);
+    }, [chosenSubject])
+
     return(
         <>
             <ThemesToLearnBlock themesList={[
@@ -38,7 +39,7 @@ export const MainPage = ({moveToGame = () => {}}) =>{
                 {themeName: 'Logic', points: 0, id: 3,},
                 {themeName: '...', points: 0, id: 4,},
                 {themeName: '...', points: 0, id: 5,}]}
-                setTheme={setTheme} choosedThemeID={chosenTheme}
+                setTheme={setSubject} choosedThemeID={chosenSubject}
             />
             {barrier}
             <GameBlock GameInfo={{

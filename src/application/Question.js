@@ -14,6 +14,7 @@ export class Question{
         this.themeId = themeId;
         this.questionData = questionData;
         this.questionData.id = id;
+        this.questionData.answers = this.shuffleAnswers(this.questionData.answers);
     }
     getData(){
         const data = {
@@ -26,6 +27,29 @@ export class Question{
         };
 
         return data;
+    }
+    shuffleAnswers(answers){
+        let ids = [];
+        const list = [];
+        for(let id in answers){
+            ids.push(id);
+        }
+        // console.log(answers);
+        console.log('yeah yeah')
+        // console.log(ids);
+
+        let count = 0;
+        while(ids.length != 0){
+            const id = parseInt(Math.random() * ids.length);
+            list.push(answers[ids[id]]);
+            ids = ids.filter((val) => val !== ids[id]);
+            
+            count++;
+            if(count == 25){
+                break;
+            }
+        }
+        return list;
     }
 
     pushAnswer(answerId = -1){

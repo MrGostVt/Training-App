@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { DefaultButton } from "../components/DefaultButton";
 import '../assets/styles/InGame.css'
 import { QuestionEngine } from "../application/QuestionsEngine";
+import clientController, { COLORS } from "../application/ClientController";
+
 const LIST = [
     {type: 0, themeId: 0, id: 0, 
         questionData:{question: 'What is the capital of France?', correctAnswerIds:[0], maxPoints: 5,
@@ -24,6 +26,7 @@ const LIST = [
 ];
 
 export const InGamePage = ({moveOut = () => {}}) => {
+    const [chosenTheme, setTheme] = useState(clientController.theme);
     const [question, setQuestion] = useState(null);
     const [currentQuest, setCurrent] = useState(0);
     const [chosenAnswer, setChosen] = useState([]);
@@ -35,22 +38,18 @@ export const InGamePage = ({moveOut = () => {}}) => {
         controllerRef.current = questions;
         const nextQuestion = questions.getQuestion();
         console.log(nextQuestion);
-        
         setCurrent(1);
         setQuestion(nextQuestion);
         setAnswers(nextQuestion.answers);
     }, []);
-    
-    useEffect(() => {
-        console.log("Chosen answers updated !!!!!")
-    }, [chosenAnswer])
 
     return(
         <>
-            <Question question={question}
+            <Question question={question} theme = {chosenTheme}
             number={currentQuest} qty={controllerRef.current? controllerRef.current.getQty(): 0} 
             answers={chosenAnswer}/>
-            <Answers answers={answers} correctCount={question? question.correctCount: 0}
+            <Answers answers={answers} theme = {chosenTheme}
+            correctCount={question? question.correctCount: 0}
             setCurrentAnswer={(id) => {
                 let answers;
                 if(chosenAnswer.includes(id)){
@@ -59,12 +58,10 @@ export const InGamePage = ({moveOut = () => {}}) => {
                 else{
                     answers = controllerRef.current.pushAnswer(id);
                 }
-                console.log('Trying to push');
-                console.log(answers)
                 setChosen([...answers])
             }}/>
             
-            <DefaultButton styles={{bottom: '5%', width: '90%', left: '5%', backgroundColor: `var(--main-button-dark-color)`}} 
+            <DefaultButton styles={{bottom: '5%', width: '90%', left: '5%', backgroundColor: clientController.getColorSetting(chosenTheme, COLORS.button)}} 
             onClick={() => {
                 if(controllerRef.current !== null && chosenAnswer.length == question.correctCount){
                     const isTrue = controllerRef.current.answer();
@@ -88,7 +85,7 @@ export const InGamePage = ({moveOut = () => {}}) => {
     )
 }
 
-const Question = ({question, number, qty, answers}) => {
+const Question = ({question, number, qty, answers, theme}) => {
     const [quest, setQuest] = useState(question);
     const [chosenAnswers, setAnswers] = useState(answers);
 
@@ -116,19 +113,18 @@ const Question = ({question, number, qty, answers}) => {
         setQuest(question);
     },[question]);
     useEffect(() => {
-        console.log('chosen answers updated x2')
         setAnswers(answers);
     }, [answers])
     
     return(
-        <div className="DefaultFont Question">   
+        <div className="DefaultFont Question" style={{color: clientController.getColorSetting(theme, COLORS.text)}}>   
             {`Question ${number}/${qty}. Choose ${answerCount} ${answerCount === 1? 'answer':'answers'}`}
             <p style={{fontSize: '16px', textAlign: 'center'}}>{questionText}</p>
         </div>
     );
 }
 
-const Answers = ({answers = [{title, id}], correctCount, setCurrentAnswer = () => {}}) => {
+const Answers = ({answers = [{title, id}], correctCount, theme, setCurrentAnswer = () => {}}) => {
     const [chosen, setChosen] = useState([]);
     const border = 'solid 2px var(--main-button-dark-color)';
 
@@ -137,12 +133,13 @@ const Answers = ({answers = [{title, id}], correctCount, setCurrentAnswer = () =
     }, [answers])
 
     return(
-        <div className="AnswersList">
+        <div className="AnswersList" style={{color: clientController.getColorSetting(theme, COLORS.text)}}>
             {answers.map((val) => (
                 <DefaultButton text={val.title} key={val.id} styles={{
                     position: 'relative', 
                     marginBottom: '5%', width: '100%', 
                     border: chosen.includes(val.id)? border: '',
+                    backgroundColor: clientController.getColorSetting(theme, COLORS.functional),
                 }}
                 onClick={() => {
                     const isIncludes = chosen.includes(val.id);
