@@ -44,6 +44,8 @@ class ClientController{
     subjectTheme = 0;
     events = {
         'theme-switch': [],
+        'game-start': [],
+        'game-finish': [],
     }
 
     constructor(){
@@ -53,9 +55,9 @@ class ClientController{
         this.theme = !DataStore.checkStored(StoreKeys.theme)? 0: parseInt(DataStore.getStored(StoreKeys.theme));
         this.subjectTheme = !DataStore.checkStored(StoreKeys.subjectTheme)? 0: parseInt(DataStore.getStored(StoreKeys.subjectTheme));
     }
-    // getColorSetting(type){
-    //     return ThemeSettings[this.theme][type];
-    // }
+    getColorSettingDefault(type){
+        return ThemeSettings[this.theme][type];
+    }
     getColorSetting(theme, type){
         return ThemeSettings[theme][type];
     }
@@ -75,10 +77,10 @@ class ClientController{
             this.events[event].push(callback);
         }
     }
-    triggerEvent(event){
+    triggerEvent(event, props){
         if(!!this.events[event]){
             this.events[event].map((callback) => {
-                callback();
+                callback(props);
             });
         }
     }

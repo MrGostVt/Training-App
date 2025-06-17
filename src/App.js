@@ -6,6 +6,7 @@ import { PagePreview } from "./components/PagePreview";
 import { ProfileBlock } from "./components/ProfileBlock";
 import { InGamePage } from "./pages/InGamePage";
 import clientController, { COLORS } from "./application/ClientController";
+import serverController from "./application/ServerController";
 
 const SavedInstance = {
     1: () => {}
@@ -21,8 +22,10 @@ const App = ({}) => {
         function updateTheme(){
             setTheme(clientController.theme);
         }
-        clientController.subscribeOn('theme-switch', updateTheme);
 
+        openModal(2, () => {});
+
+        clientController.subscribeOn('theme-switch', updateTheme);
         return () => {
             clientController.unSubscribeOn('theme-switch', updateTheme);
         }
@@ -38,7 +41,7 @@ const App = ({}) => {
     let modalWindow;
     switch(modal){
         case 1: modalWindow = <SettingsModal closeCallback={SavedInstance[1].callback} />; break;
-        case 2: modalWindow = <SignModal />; break;
+        case 2: modalWindow = <SignModal closeCallback={SavedInstance[2].callback}/>; break;
         case 3: modalWindow = <ResultsModal type={"Practice"} results={SavedInstance[3].others} closeCallback={SavedInstance[3].callback}/>; break;
         default: modalWindow = null; break;
     }
@@ -55,11 +58,12 @@ const App = ({}) => {
         setModal(id);
     }
     function moveToGame(id){
+        serverController.startGame();
         setPage(1);
     }
     function moveOutFromGame(results){
         setPage(0);
-        openModal(3, () => {console.log(results);}, results);
+        openModal(3, () => {serverController.finishGame()}, results);
     }
 
     return(

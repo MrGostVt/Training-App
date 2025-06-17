@@ -1,6 +1,30 @@
+import clientController from "./ClientController";
+
 class ServerController{
     currentTheme = 0;
+    subjectThemes = [
+                    {themeName: 'Math', points: 100, id: 1,},
+                    {themeName: 'English', points: 50, id: 2,},
+                    {themeName: 'Logic', points: 0, id: 3,},
+                    {themeName: '...', points: 0, id: 4,},
+                    {themeName: '...', points: 0, id: 5,}];
 
+    async startGame(){
+
+        clientController.triggerEvent('game-start');
+    }
+    async finishGame(){
+        clientController.triggerEvent('game-finish');
+    }
+
+    loading(time = 2000){
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                console.log('true');
+                resolve(true);
+            }, time)
+        })
+    }
 
     async #makeRequest(endpoint, type = 'GET', body){
         const Headers = {

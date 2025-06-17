@@ -116,3 +116,28 @@ body{
         transform: rotateZ(-180deg);
     }
 }
+
+.InputFieldWrap{
+    position: relative;
+    margin-bottom: 5%;
+    height: 6vh;
+    display: flex;
+    width: 98%;
+    
+    border-radius: 8px;
+    flex-direction: column;
+    justify-content: center;
+    transition: .3s;
+}
+.InputField{
+    position: relative;
+    height: 60%;
+    background-color: rgba(255, 255, 255, 0);
+    border: none;
+    left: 2%;
+    width: 96%;
+}
+
+textarea:focus, input:focus{
+    outline: none;
+}

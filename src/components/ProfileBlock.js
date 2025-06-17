@@ -2,22 +2,44 @@ import React, { useEffect } from "react";
 import { useState } from "react";
 import { UserIcon, UserInfo } from "./User";
 import { LoadedImages } from "../application/ImageLoad";
-import clientController from "../application/ClientController";
+import clientController, { COLORS } from "../application/ClientController";
+import SettingsIcon from "../assets/icons/Settings.svg"
+import serverController from "../application/ServerController";
+ 
 
-export const ProfileBlock = ({userName, infoToDisplay, openModal = () => {}}) => {
+export const ProfileBlock = ({userName, openModal = () => {}}) => {
     const [cardState, setCardState] = useState(0);
     const [chosenTheme, setTheme] = useState(clientController.theme);
+    const [displayInfo, setInfo] = useState([`Level ${1}`]);
 
     useEffect(() => {
         function updateTheme(){
             setTheme(clientController.theme);
         }
-        clientController.subscribeOn('theme-switch', updateTheme);
+        function onGameStart(){
+            const subject = serverController.subjectThemes[clientController.subjectTheme-1];
+            setInfo([`Level ${1}`, `Theme: ${subject.themeName}`, `${subject.points} Points`]);
+            setCardState(1);
+        }
+        function onGameFinish(){
+            setInfo([`Level ${1}`]);
+            setCardState(0);
+        }
 
+        clientController.subscribeOn('theme-switch', updateTheme);
+        clientController.subscribeOn('game-start', onGameStart);
+        clientController.subscribeOn('game-finish', onGameFinish);
         return () => {
             clientController.unSubscribeOn('theme-switch', updateTheme);
+            clientController.unSubscribeOn('game-start', onGameStart);
+            clientController.unSubscribeOn('game-finish', onGameFinish);
         }
     }, []);
+
+    const smallButtons = [];
+    switch(cardState){
+        case 0: smallButtons.push(<SettingsButton onClick={openModal} theme={chosenTheme} key={'Settings'}/>); break;
+    }
 
     return(
         <div style={
@@ -33,16 +55,18 @@ export const ProfileBlock = ({userName, infoToDisplay, openModal = () => {}}) =>
             <UserInfo info={
                 {
                     name: userName,
-                    other: [`Level ${1}`],
+                    other: displayInfo,
                 }
             } theme={chosenTheme}/>
 
-            <SettingsButton onClick={openModal} />
+            {smallButtons.map(val => (
+                val
+            ))}
         </div>
     );
 }
 
-const SettingsButton = ({onClick = () => {}}) => {
+const SettingsButton = ({onClick = () => {}, theme}) => {
     const [animState, setAnimState] = useState(0);
 
     let anim;
@@ -54,7 +78,6 @@ const SettingsButton = ({onClick = () => {}}) => {
 
     return(
         <div className={`SquareButton ${anim}`} style={{
-            backgroundImage: `url(${LoadedImages['Settings.svg']})`,
             right: '0%'
         }}
         onClick={() => {
@@ -62,6 +85,8 @@ const SettingsButton = ({onClick = () => {}}) => {
                 setAnimState(2);
             });
             setAnimState(1);
-        }}></div>
+        }}>
+            <SettingsIcon style={{fill: clientController.getColorSetting(theme, COLORS.text)}}/>
+        </div>
     );
 }

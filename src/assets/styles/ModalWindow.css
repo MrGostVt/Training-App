@@ -93,3 +93,10 @@
     border-radius: 16px;
     transition: .3s;
 }
+
+.SignWrap{
+    position: relative;
+    left: 5%;
+    width: 90%;
+    display: block;
+}

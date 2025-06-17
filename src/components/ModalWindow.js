@@ -2,8 +2,11 @@ import React, { useEffect, useState } from "react";
 import '../assets/styles/ModalWindow.css';
 import { DefaultButton } from "./DefaultButton";
 import clientController, { COLORS } from "../application/ClientController";
+import { InputField } from "./InputField";
+import serverController from "../application/ServerController";
 
-export const ModalWindow = ({children, title = 'undefined', closeCallback, defaultButton = {title: '', function: () => {}, isActive: false}}) => {
+export const ModalWindow = ({children, title = 'undefined', closeCallback, isBackgroundClose = true,
+    defaultButton = {title: '', function: () => {}, isActive: false}}) => {
     const [chosenTheme, setTheme] = useState(clientController.theme);
     const [isLoading, setLoading] = useState(false);
 
@@ -19,8 +22,8 @@ export const ModalWindow = ({children, title = 'undefined', closeCallback, defau
         }
     }, []);
 
-    function exitFunction(){
-        if(isLoading && typeof closeCallback === 'function'){
+    function exitFunction(isBackground){
+        if(isLoading && (isBackgroundClose || !isBackground)){
             setLoading(false); 
             setTimeout(() => closeCallback(), 200);
         }
@@ -39,17 +42,20 @@ export const ModalWindow = ({children, title = 'undefined', closeCallback, defau
     if(defaultButton.isActive){
         button = <DefaultButton styles={{width: '90%', height: '8vh', left: '5%', bottom: '5%', fontWeight: '700',
             backgroundColor: `var(--main-button-dark-color)`, color: 'var(--main-text-dark-color)'}} text={defaultButton.title}
-            onClick={() => {
+            onClick={async () => {
+                let isCanExit = true;
+                
                 if(!!defaultButton.function){
-                    defaultButton.function();
+                    isCanExit = !!(await defaultButton.function());
+                    console.log(isCanExit);
                 }
-                exitFunction();
+                if(isCanExit) exitFunction(false);
             }}
             />
     }
     
     return(
-        <div className="ModalWindowBase" onClick={exitFunction} style={{backdropFilter}}>
+        <div className="ModalWindowBase" onClick={() => exitFunction(true)} style={{backdropFilter}}>
             <div className="ModalWindow" style={modalStyles} onClick={(ev) => {
                     ev.stopPropagation();
                 }}>
@@ -94,25 +100,58 @@ const ThemeSwitch = ({}) => {
 const messageStyles = {
     position: 'absolute',
     left: '5%',
-    bottom: '5%',
-    color: 'var(--main-text-dark-color)',
+    bottom: '28%',
+    color: clientController.getColorSettingDefault(COLORS.text),
     width: '90%',
     textAlign: 'center',
 };
-export const SignModal = ({}) => {
-    const [signType, setSignType] = useState(0);
 
-    let signMessage = <div className="DefaultFont" style={messageStyles} onClick={() => {setSignType(1)}}>New user? Sign Up</div>;
-    if(signType === 1){
-        signMessage = <div className="DefaultFont" style={messageStyles} onClick={() => {setSignType(0)}}>Already have an account? Sign In</div>
+export const SignModal = ({closeCallback = () => {}}) => {
+    const [signType, setSignType] = useState(0);
+    const [passInfo, setPassInfo] = useState({
+        pass: '',
+        state: false,
+    });
+    const [logInfo, setLogInfo] = useState({
+        log: '',
+        state: false,
+    });
+
+    let signMessage = <div className="DefaultFont" style={messageStyles} onClick={() => {setSignType(0)}}>New user? Sign Up</div>;
+    if(signType === 0){
+        signMessage = <div className="DefaultFont" style={messageStyles} onClick={() => {setSignType(1)}}>Already have an account? Sign In</div>
     }
 
+    function onPassChange(val, state){
+        setPassInfo({
+            pass: val,
+            state: state === 2,
+        });     
+    }
+    function onLogChange(val, state){
+        // serverController.isLoginExist(val);
+        setLogInfo({
+            log: val,
+            state: state === 2
+        });
+    }
     return(
-        <ModalWindow title={signType === 0? 'Sign Up': 'Sign In'}  defaultButton={{isActive: true, title: 'SIGN IN'}}>
+        <ModalWindow title={signType === 0? 'Sign In': 'Sign Up'} closeCallback={closeCallback} isBackgroundClose={false}
+        defaultButton={{isActive: true, title:signType === 0? 'SIGN IN': 'SIGN UP', function: async () => {
+                await serverController.loading(1500)
+                return passInfo.state && logInfo.state;
+            }}}>
 
             {/* <DefaultButton styles={{width: '90%', height: '8vh', left: '5%', bottom: '15%', fontWeight: '700',
                 backgroundColor: `var(--main-button-dark-color)`, color: 'var(--main-text-dark-color)'}} text="SIGN IN"
             /> */}
+            <div className="SignWrap">
+                <InputField typeID = {0} defaultValue={'Username'} pattern="login" max={25} min={3}
+                onValueChange={onLogChange}/>
+                <InputField typeID = {1} defaultValue={'Password'} pattern="password" max={30} min={6}
+                onValueChange={onPassChange}/>
+            </div>
+            
             {signMessage}
         </ModalWindow>
     );
@@ -133,7 +172,7 @@ export const ResultsModal = ({type, results, closeCallback = () => {}}) => {
     }, []);
     
     return(
-        <ModalWindow title={type} closeCallback={closeCallback} defaultButton={{isActive: true, title: 'Claim', function: () => {}}}>
+        <ModalWindow title={type} closeCallback={closeCallback} defaultButton={{isActive: true, title: 'Claim', function: () => {return true}}}>
             <ResultsDisplay results={results} theme={chosenTheme}/>
         </ModalWindow>
     );

@@ -33,12 +33,7 @@ export const MainPage = ({moveToGame = () => {}}) =>{
 
     return(
         <>
-            <ThemesToLearnBlock themesList={[
-                {themeName: 'Math', points: 100, id: 1,},
-                {themeName: 'English', points: 50, id: 2,},
-                {themeName: 'Logic', points: 0, id: 3,},
-                {themeName: '...', points: 0, id: 4,},
-                {themeName: '...', points: 0, id: 5,}]}
+            <ThemesToLearnBlock themesList={serverController.subjectThemes}
                 setTheme={setSubject} choosedThemeID={chosenSubject}
             />
             {barrier}

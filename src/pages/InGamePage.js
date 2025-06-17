@@ -15,7 +15,7 @@ const LIST = [
         questionData:{question: 'What is the capital of jewish', correctAnswerIds:[0], maxPoints: 5,
             answers:[ {title: "Ierusalim", id: 0}, {title: "Zhytomyr", id: 1}, {title: "Kyiv", id: 2}]}},
     {type: 0, themeId: 0, id: 3, 
-        questionData:{question: 'Why i do this shit?', correctAnswerIds:[3], maxPoints: 5,
+        questionData:{question: 'Why i do this shit? Lorem ipsum adkhjkflg hklfjg khfjgklhjfg hjlfkgj hlfjgkl hjfklj', correctAnswerIds:[3], maxPoints: 5,
             answers:[{title: "maks loh", id: 0}, {title: "Skibidi tualet", id: 1}, {title: "mayakovskii", id: 2}, {title: "cause i'm trockyy", id: 3}]}},
     {type: 0, themeId: 0, id: 4, 
         questionData:{question: 'Where are my pants?', correctAnswerIds:[0,1], maxPoints: 5,
@@ -97,9 +97,26 @@ const Question = ({question, number, qty, answers, theme}) => {
         quest.question.split("__").map((val, id, array) => {
             // console.log(chosenAnswers[id]);
             const answer = question.answers.filter((val) => val.id === chosenAnswers[id])[0];
-            let selected = id + 1 !== array.length? `${chosenAnswers[id] !== undefined? answer.title: '__'}`: ''
-            return `${val} ${selected}`
-        }).join('');
+            let selected = id + 1 !== array.length? `${chosenAnswers[id] !== undefined? answer.title: '-'}`: ''
+            // return `${val} ${selected}`
+            return(
+                <>
+                    <div style={{
+                        marginRight: '0.5%',
+                        flexShrink: '0',
+                    }}>{val}</div>
+                    <div style={{
+                        backgroundColor: clientController.getColorSettingDefault(COLORS.functional),
+                        marginLeft: '0.5%',
+                        marginRight: '0.5%',
+                        width: '50px',
+                        borderRadius: '8px',
+                        height: '100%',
+                        flexShrink: '0',
+                    }}>{selected}</div>
+                </>
+            );
+        });
     
         answerCount = quest.correctCount;
     }
@@ -119,7 +136,15 @@ const Question = ({question, number, qty, answers, theme}) => {
     return(
         <div className="DefaultFont Question" style={{color: clientController.getColorSetting(theme, COLORS.text)}}>   
             {`Question ${number}/${qty}. Choose ${answerCount} ${answerCount === 1? 'answer':'answers'}`}
-            <p style={{fontSize: '16px', textAlign: 'center'}}>{questionText}</p>
+            <div style={{
+                fontSize: '16px', 
+                textAlign: 'center',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginBottom: '3%',
+                marginTop: '3%',
+            }}>{questionText}</div>
         </div>
     );
 }
