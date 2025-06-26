@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import clientController, { COLORS } from "../application/ClientController";
 
 export const DefaultButton = ({text = 'default', styles = {}, onClick = () => {}}) => {
     const [shadowState, setShadow] = useState(true);
@@ -9,7 +10,10 @@ export const DefaultButton = ({text = 'default', styles = {}, onClick = () => {}
     }
 
     return(
-        <div className={`DefaultButton ${shadow} DefaultFont`} style={{...styles}}
+        <div className={`DefaultButton ${shadow} DefaultFont`} style={{
+            backgroundColor: clientController.getColorSettingDefault(COLORS.button),
+            color: clientController.getColorSettingDefault(COLORS.text),
+            ...styles}}
         onMouseDown={() => {
             setShadow(false)
         }}

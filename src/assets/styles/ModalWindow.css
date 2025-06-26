@@ -12,7 +12,7 @@
 .ModalWindow{
     position: absolute;
     width: 90%;
-    height: 45vh;
+    /* height: 45vh; */
     left: 5%;
     /* top: 27.5vh; */
     border-radius: 8px;
@@ -89,7 +89,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    right: 5%;
+    right: 0%;
     border-radius: 16px;
     transition: .3s;
 }
@@ -99,4 +99,18 @@
     left: 5%;
     width: 90%;
     display: block;
+}
+
+.AnswerOrderPrev{
+    position: relative;
+    width: 3.5vh;
+    height: 3.5vh;
+    border-radius: 8px;
+}
+
+.backLink{
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    top: 10%;
 }

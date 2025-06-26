@@ -51,6 +51,10 @@ body{
     /* background-color: var(--main-dark-color); */
 }
 
+.ScrollBar{
+    scrollbar-color: #4d4d4d #e1ebe100;
+}
+
 .DefaultFont{
     font-family: "Manrope", sans-serif;
     user-select: none;
@@ -90,7 +94,7 @@ body{
 }
 
 .SquareButton{
-    position: absolute;
+    position: relative;
     width: 4vh;
     height: 4vh;
 
@@ -117,10 +121,23 @@ body{
     }
 }
 
+.FileAnim{
+    animation: FileAnim .4s linear;
+}
+
+@keyframes FileAnim {
+    50%{
+        transform: scale(70%) translateY(15%);
+    }
+    100%{
+        transform: scale(100%);
+    }
+}
+
 .InputFieldWrap{
     position: relative;
     margin-bottom: 5%;
-    height: 6vh;
+    /* height: 6vh; */
     display: flex;
     width: 98%;
     
@@ -128,16 +145,25 @@ body{
     flex-direction: column;
     justify-content: center;
     transition: .3s;
+    min-height: 6vh;
+    padding: 2%;
+    box-sizing: border-box; 
 }
 .InputField{
     position: relative;
-    height: 60%;
+    height: auto;
     background-color: rgba(255, 255, 255, 0);
     border: none;
-    left: 2%;
-    width: 96%;
+    /* left: 2%; */
+    /* top: 2%; */
+    /* width: 96%; */
+    flex-shrink: 0;
 }
 
 textarea:focus, input:focus{
     outline: none;
+}
+
+.XIcon{
+    transform: rotate(45deg);
 }

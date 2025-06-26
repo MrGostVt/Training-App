@@ -3,7 +3,8 @@ import { useState } from "react";
 import { UserIcon, UserInfo } from "./User";
 import { LoadedImages } from "../application/ImageLoad";
 import clientController, { COLORS } from "../application/ClientController";
-import SettingsIcon from "../assets/icons/Settings.svg"
+import SettingsIcon from "../assets/icons/Settings.svg";
+import FileIcon from "../assets/icons/File.svg";
 import serverController from "../application/ServerController";
  
 
@@ -38,7 +39,10 @@ export const ProfileBlock = ({userName, openModal = () => {}}) => {
 
     const smallButtons = [];
     switch(cardState){
-        case 0: smallButtons.push(<SettingsButton onClick={openModal} theme={chosenTheme} key={'Settings'}/>); break;
+        case 0: 
+            smallButtons.push(<SettingsButton onClick={openModal} theme={chosenTheme} key={'Settings'}/>);
+            smallButtons.push(<FileButton onClick={openModal} theme={chosenTheme} key={'QuestionConstructor'}/>);
+            break;
     }
 
     return(
@@ -58,14 +62,47 @@ export const ProfileBlock = ({userName, openModal = () => {}}) => {
                     other: displayInfo,
                 }
             } theme={chosenTheme}/>
-
-            {smallButtons.map(val => (
-                val
-            ))}
+            <div style={{
+                position: 'absolute',
+                right: '0%',
+                width: '4.5vh'
+            }}>
+                {smallButtons.map(val => (
+                    val
+                ))}
+            </div>
         </div>
     );
 }
 
+const FileButton = ({onClick = () => {}, theme}) => {
+    const [animState, setAnimState] = useState(0);
+
+    let anim;
+    switch(animState){
+        case 1: anim = 'FileAnim'; break;
+        default: anim = ''; break;
+    }
+
+    return(
+        <div className={`SquareButton ${anim}`} style={{
+            marginBottom: '3%',
+        }}
+        onClick={() => {
+            if(clientController.subjectTheme !== 0){
+                onClick(4, () => {
+                    // setAnimState(1);
+                    // setTimeout(() => {setAnimState(0)}, 400);
+                });
+            }
+            setAnimState(1);
+
+            setTimeout(() => {setAnimState(0)}, 400);
+        }}>
+            <FileIcon stroke={clientController.getColorSetting(theme, COLORS.text)}style={{fill: clientController.getColorSetting(theme, COLORS.main),}}/>
+        </div>
+    );
+}
 const SettingsButton = ({onClick = () => {}, theme}) => {
     const [animState, setAnimState] = useState(0);
 
@@ -78,7 +115,7 @@ const SettingsButton = ({onClick = () => {}, theme}) => {
 
     return(
         <div className={`SquareButton ${anim}`} style={{
-            right: '0%'
+            marginBottom: '3%',
         }}
         onClick={() => {
             onClick(1, () => {

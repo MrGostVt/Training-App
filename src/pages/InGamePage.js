@@ -3,6 +3,7 @@ import { DefaultButton } from "../components/DefaultButton";
 import '../assets/styles/InGame.css'
 import { QuestionEngine } from "../application/QuestionsEngine";
 import clientController, { COLORS } from "../application/ClientController";
+import { QuestionComponent } from "../components/QuestionComponent";
 
 const LIST = [
     {type: 0, themeId: 0, id: 0, 
@@ -45,7 +46,7 @@ export const InGamePage = ({moveOut = () => {}}) => {
 
     return(
         <>
-            <Question question={question} theme = {chosenTheme}
+            <QuestionComponent question={question} theme = {chosenTheme}
             number={currentQuest} qty={controllerRef.current? controllerRef.current.getQty(): 0} 
             answers={chosenAnswer}/>
             <Answers answers={answers} theme = {chosenTheme}
@@ -85,69 +86,7 @@ export const InGamePage = ({moveOut = () => {}}) => {
     )
 }
 
-const Question = ({question, number, qty, answers, theme}) => {
-    const [quest, setQuest] = useState(question);
-    const [chosenAnswers, setAnswers] = useState(answers);
 
-    let questionText;
-    let answerCount;
-    if(!!quest){
-        questionText = quest.type === 0? 
-        quest.question: 
-        quest.question.split("__").map((val, id, array) => {
-            // console.log(chosenAnswers[id]);
-            const answer = question.answers.filter((val) => val.id === chosenAnswers[id])[0];
-            let selected = id + 1 !== array.length? `${chosenAnswers[id] !== undefined? answer.title: '-'}`: ''
-            // return `${val} ${selected}`
-            return(
-                <>
-                    <div style={{
-                        marginRight: '0.5%',
-                        flexShrink: '0',
-                    }}>{val}</div>
-                    <div style={{
-                        backgroundColor: clientController.getColorSettingDefault(COLORS.functional),
-                        marginLeft: '0.5%',
-                        marginRight: '0.5%',
-                        width: '50px',
-                        borderRadius: '8px',
-                        height: '100%',
-                        flexShrink: '0',
-                    }}>{selected}</div>
-                </>
-            );
-        });
-    
-        answerCount = quest.correctCount;
-    }
-    else{
-        questionText = 'Loading.'
-        answerCount = 0;
-    }
-    
-    
-    useEffect(() => {
-        setQuest(question);
-    },[question]);
-    useEffect(() => {
-        setAnswers(answers);
-    }, [answers])
-    
-    return(
-        <div className="DefaultFont Question" style={{color: clientController.getColorSetting(theme, COLORS.text)}}>   
-            {`Question ${number}/${qty}. Choose ${answerCount} ${answerCount === 1? 'answer':'answers'}`}
-            <div style={{
-                fontSize: '16px', 
-                textAlign: 'center',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginBottom: '3%',
-                marginTop: '3%',
-            }}>{questionText}</div>
-        </div>
-    );
-}
 
 const Answers = ({answers = [{title, id}], correctCount, theme, setCurrentAnswer = () => {}}) => {
     const [chosen, setChosen] = useState([]);

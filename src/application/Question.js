@@ -17,6 +17,8 @@ export class Question{
         this.questionData.answers = this.shuffleAnswers(this.questionData.answers);
     }
     getData(){
+        console.log(this.questionData)
+
         const data = {
             question: this.questionData.question,
             type: this.type,
@@ -103,5 +105,9 @@ export class Question{
             case 1: return this.checkAnswerWithOrder();
             default: return this.checkAnswerDefault();
         }
+    }
+
+    getCorrectAnswersIDs(){
+        return this.questionData.correctAnswerIds;
     }
 }

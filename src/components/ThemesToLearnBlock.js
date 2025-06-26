@@ -6,6 +6,8 @@ import clientController, { COLORS } from "../application/ClientController";
 export const ThemesToLearnBlock = ({themesList = [{themeName: 'test', points: 0, id: 0,}], choosedThemeID = 0, setTheme = () => {}}) => {
     const [themes, setThemes] = useState(themesList);
     const [chosenTheme, setChoosedTheme] = useState(choosedThemeID);
+    const [colorTheme, setColorTheme] = useState(clientController.theme);
+    
     function updateChosenTheme(id){
 
         if(chosenTheme === id){
@@ -18,11 +20,29 @@ export const ThemesToLearnBlock = ({themesList = [{themeName: 'test', points: 0,
         return true;
     }
 
-    console.log(chosenTheme);
+    useEffect(() => {
+        function updateTheme(){
+            setColorTheme(clientController.theme);
+        }
+        function updatePoints({subject, points}){
+            const subjects = [...themes];
+
+            const index = subjects.findIndex((val) => val.id === subject);
+            subjects[index].points = parseInt(points) + parseInt(subjects[index].points);
+            setThemes(subjects);
+        }
+        clientController.subscribeOn('game-finish', updatePoints);
+        clientController.subscribeOn('theme-switch', updateTheme);
+
+        return () => {
+            clientController.unSubscribeOn('theme-switch', updateTheme);
+            clientController.unSubscribeOn('game-finish', updatePoints);
+        }
+    }, [])
     return(
         <div className="StatsCards">
             {themes.map(val => (
-                <ThemeCard info={val} name={val.themeName} points={val.points} key={val.id} 
+                <ThemeCard info={val} name={val.themeName} points={val.points} key={val.id} theme={colorTheme}
                 isChosen={val.id === chosenTheme} setChoosedCallback={(callback) => {
                     const res = updateChosenTheme(val.id);
                 }}/>
@@ -31,9 +51,8 @@ export const ThemesToLearnBlock = ({themesList = [{themeName: 'test', points: 0,
     )
 }
 
-const ThemeCard = ({info, name, points, isChosen, setChoosedCallback = () => {}}) => {
+const ThemeCard = ({info, name, points, isChosen, setChoosedCallback = () => {}, theme}) => {
     const [isActive, setIsActive] = useState(isChosen);
-    const [chosenTheme, setTheme] = useState(clientController.theme);
     
     function setActive(){
         setChoosedCallback()
@@ -41,16 +60,6 @@ const ThemeCard = ({info, name, points, isChosen, setChoosedCallback = () => {}}
     if(isChosen){
         console.log("choseeen!")
     }
-    useEffect(() => {
-        function updateTheme(){
-            setTheme(clientController.theme);
-        }
-        clientController.subscribeOn('theme-switch', updateTheme);
-
-        return () => {
-            clientController.unSubscribeOn('theme-switch', updateTheme);
-        }
-    }, []);
 
     useEffect(() => {
         setIsActive(isChosen);
@@ -59,12 +68,12 @@ const ThemeCard = ({info, name, points, isChosen, setChoosedCallback = () => {}}
     return(
         <div className="ThemeCard" onClick={setActive} 
         style={{borderColor: isActive? 
-            clientController.getColorSetting(chosenTheme, COLORS.borderA): 
-            clientController.getColorSetting(chosenTheme, COLORS.border),
+            clientController.getColorSetting(theme, COLORS.borderA): 
+            clientController.getColorSetting(theme, COLORS.border),
         }}>
             <div className="ThemeInfoWrapper">
-                <div className="DefaultFont" style={{color: clientController.getColorSetting(chosenTheme, COLORS.text), fontSize: '24px'}}>{points}</div>
-                <div className="DefaultFont" style={{color:  clientController.getColorSetting(chosenTheme, COLORS.text2), fontSize: '14px'}}>{name}</div>
+                <div className="DefaultFont" style={{color: clientController.getColorSetting(theme, COLORS.text), fontSize: '24px'}}>{points}</div>
+                <div className="DefaultFont" style={{color:  clientController.getColorSetting(theme, COLORS.text2), fontSize: '14px'}}>{name}</div>
             </div>
         </div>
     )

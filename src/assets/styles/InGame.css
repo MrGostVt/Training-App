@@ -14,6 +14,8 @@
     position: relative;
     left: 5%;
     width: 90%;
+    
+    scrollbar-color: #4d4d4d #e1ebe100;
 
     /* color: var(--main-text-dark-color); */
 }

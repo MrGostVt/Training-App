@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from "react";
 import './assets/styles/App.css';
 import { MainPage } from "./pages/MainPage";
-import { ModalWindow, ResultsModal, SettingsModal, SignModal } from "./components/ModalWindow";
 import { PagePreview } from "./components/PagePreview";
 import { ProfileBlock } from "./components/ProfileBlock";
 import { InGamePage } from "./pages/InGamePage";
+import { ProcessQuestionsModal } from "./components/ProcessQuestionsModal";
+import { ResultsModal } from "./components/ResultsModal";
+import { SettingsModal } from "./components/SettingsModal";
 import clientController, { COLORS } from "./application/ClientController";
 import serverController from "./application/ServerController";
+
 
 const SavedInstance = {
     1: () => {}
@@ -23,7 +26,8 @@ const App = ({}) => {
             setTheme(clientController.theme);
         }
 
-        openModal(2, () => {});
+        // openModal(2, () => {});
+        // openModal(4, () => {}); 
 
         clientController.subscribeOn('theme-switch', updateTheme);
         return () => {
@@ -43,6 +47,7 @@ const App = ({}) => {
         case 1: modalWindow = <SettingsModal closeCallback={SavedInstance[1].callback} />; break;
         case 2: modalWindow = <SignModal closeCallback={SavedInstance[2].callback}/>; break;
         case 3: modalWindow = <ResultsModal type={"Practice"} results={SavedInstance[3].others} closeCallback={SavedInstance[3].callback}/>; break;
+        case 4: modalWindow = <ProcessQuestionsModal closeCallback={SavedInstance[4].callback} />; break;
         default: modalWindow = null; break;
     }
 
@@ -63,7 +68,8 @@ const App = ({}) => {
     }
     function moveOutFromGame(results){
         setPage(0);
-        openModal(3, () => {serverController.finishGame()}, results);
+        const sum = results.reduce((acc, curr) => !!acc.length? acc[0]: acc + curr[0]);
+        openModal(3, () => {serverController.finishGame(sum)}, results);
     }
 
     return(

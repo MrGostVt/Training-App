@@ -1,0 +1,60 @@
+.InfoBlock{
+    position: relative;
+    display: block;
+    border-radius: 8px;
+    flex-shrink: 0;
+    margin: 3%;
+    height: 38vh;
+    width: 45%;
+}
+.InfoWrap{
+    position: relative;
+    left: 5%;
+    width: 90%;
+    display: flex;
+    justify-content: center;
+}
+
+
+@media (max-width: 520px) {
+    .InfoBlock{
+        width: 50%;
+    }
+    /* .InfoBlock{
+        width: 90%;
+        height: 19vh;
+    }
+    .InfoWrap{
+        flex-direction: column;
+    }
+    .InfoWrap>.InfoBlock>.InfoIcon{
+        display: none;
+    } */
+}
+
+.InfoIcon{
+    position: relative;
+    width: 90%;
+    left: 5%;
+    height: 8vh;
+    background-size: 40% 110%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.InfoText{
+    position: relative;
+    margin-bottom: 5%;
+    display: inline-block;
+    left: 5%;
+    width: 90%;
+    max-height: 10vh;
+    overflow: hidden;
+}
+.InfoStats{
+    position: relative;
+    margin-bottom: 5%;
+    left: 5%;
+    width: 90%;
+    max-height: 10vh;
+}

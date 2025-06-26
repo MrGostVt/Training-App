@@ -11,10 +11,10 @@ class ServerController{
 
     async startGame(){
 
-        clientController.triggerEvent('game-start');
+        clientController.triggerEvent('game-start', clientController.subjectTheme);
     }
-    async finishGame(){
-        clientController.triggerEvent('game-finish');
+    async finishGame(points){
+        clientController.triggerEvent('game-finish', {subject: clientController.subjectTheme, points: points});
     }
 
     loading(time = 2000){

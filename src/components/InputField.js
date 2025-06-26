@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react"
 import clientController, { COLORS } from "../application/ClientController";
 
 function validateInput(value, pattern, max, min){
-    const dangerousChars = /[<>"'`;(){}[\]\\]/g;
+    const dangerousChars = /[<>"'`;{}\[\]\\]/g;
     let isDanger = value.length > max || value.length < min;
     isDanger = isDanger || dangerousChars.test(value);
     isDanger = isDanger || !patterns[pattern].test(value);
@@ -13,12 +13,17 @@ const patterns = {
     login: /^[a-zA-Z0-9]+$/,
     password: /^[a-zA-Zа-яА-ЯёЁ0-9]+$/, 
     text: /^[a-zA-Zа-яА-ЯёЁ0-9]+$/,
+    question: /^[a-zA-Z0-9\?\,\!\.\#_ \+\*\%\^\:\=\(\)\-]+$/,
 }
 
-export const InputField = ({typeID = 0, defaultValue, max = 30, min = 1, pattern = 'text', onValueChange = () => {}}) => {
+export const InputField = ({typeID = 0, defaultValue, clearFunctionRef = {},
+    max = 30, min = 1, pattern = 'text', styles,
+    onValueChange = () => {}}) => {
     const [type, setType] = useState(typeID);
     const [inputState, setInputState] = useState(0);
+    const [value, setValue] = useState('');
     const lastTimeOutRef = useRef();
+    clearFunctionRef.current = clearField;
 
     let inputType;
     switch(type){
@@ -42,6 +47,9 @@ export const InputField = ({typeID = 0, defaultValue, max = 30, min = 1, pattern
         setInputState(2);
         onValueChange(value, 2);
     }
+    function clearField(){
+        setValue('');
+    }
 
     let stateDisplay;
     switch(inputState){
@@ -52,15 +60,17 @@ export const InputField = ({typeID = 0, defaultValue, max = 30, min = 1, pattern
     return(
         <div className="InputFieldWrap DefaultFont" style={{
             backgroundColor: clientController.getColorSettingDefault(COLORS.functionalA),
-            // border: isWrong? 'solid 2px red': 'none',
             filter: stateDisplay,
+            ...styles
         }}>
             <input className="InputField" type={inputType} required={true} maxLength={max} placeholder={defaultValue}
+            value={value}
             style={{
                 fontSize: '18px',
                 color: clientController.getColorSettingDefault(COLORS.text),
             }}
             onChange={(ev) => {
+                setValue(ev.target.value);
                 clearTimeout(lastTimeOutRef.current);
                 lastTimeOutRef.current = setTimeout(() => {
                     handleChanges(ev.target.value);
