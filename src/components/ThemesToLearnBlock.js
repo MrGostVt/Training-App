@@ -2,8 +2,9 @@ import React, { useEffect } from "react";
 import { useState } from "react";
 import '../assets/styles/ThemesToLearn.css';
 import clientController, { COLORS } from "../application/ClientController";
+import serverController from "../application/ServerController";
 
-export const ThemesToLearnBlock = ({themesList = [{themeName: 'test', points: 0, id: 0,}], choosedThemeID = 0, setTheme = () => {}}) => {
+export const ThemesToLearnBlock = ({themesList = [{title: 'test', grade: 0, id: 0}], choosedThemeID = 0, setTheme = () => {}}) => {
     const [themes, setThemes] = useState(themesList);
     const [chosenTheme, setChoosedTheme] = useState(choosedThemeID);
     const [colorTheme, setColorTheme] = useState(clientController.theme);
@@ -13,10 +14,13 @@ export const ThemesToLearnBlock = ({themesList = [{themeName: 'test', points: 0,
         if(chosenTheme === id){
             setChoosedTheme(0);
             setTheme(0);
+            serverController.chooseTheme(undefined);
             return false;
         }
         setChoosedTheme(id);
         setTheme(id);
+        serverController.chooseTheme(themes[id-1].id);
+        
         return true;
     }
 
@@ -31,18 +35,24 @@ export const ThemesToLearnBlock = ({themesList = [{themeName: 'test', points: 0,
             subjects[index].points = parseInt(points) + parseInt(subjects[index].points);
             setThemes(subjects);
         }
+        function updateSubjectList(){
+            setThemes(serverController.subjectThemes);
+        }
+
         clientController.subscribeOn('game-finish', updatePoints);
         clientController.subscribeOn('theme-switch', updateTheme);
+        clientController.subscribeOn('subjectList-updated', updateSubjectList)
 
         return () => {
             clientController.unSubscribeOn('theme-switch', updateTheme);
             clientController.unSubscribeOn('game-finish', updatePoints);
+            clientController.unSubscribeOn('subjectList-updated', updatePoints);
         }
     }, [])
     return(
         <div className="StatsCards">
             {themes.map(val => (
-                <ThemeCard info={val} name={val.themeName} points={val.points} key={val.id} theme={colorTheme}
+                <ThemeCard name={val.title} points={val.grade} key={val.id} theme={colorTheme}
                 isChosen={val.id === chosenTheme} setChoosedCallback={(callback) => {
                     const res = updateChosenTheme(val.id);
                 }}/>
@@ -51,14 +61,11 @@ export const ThemesToLearnBlock = ({themesList = [{themeName: 'test', points: 0,
     )
 }
 
-const ThemeCard = ({info, name, points, isChosen, setChoosedCallback = () => {}, theme}) => {
+const ThemeCard = ({name, points, isChosen, setChoosedCallback = () => {}, theme}) => {
     const [isActive, setIsActive] = useState(isChosen);
     
     function setActive(){
         setChoosedCallback()
-    }
-    if(isChosen){
-        console.log("choseeen!")
     }
 
     useEffect(() => {

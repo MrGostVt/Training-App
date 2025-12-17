@@ -6,31 +6,45 @@ import clientController, { COLORS } from "../application/ClientController";
 import SettingsIcon from "../assets/icons/Settings.svg";
 import FileIcon from "../assets/icons/File.svg";
 import serverController from "../application/ServerController";
+import { AccessLevels } from "../application/ServerController";
  
 
-export const ProfileBlock = ({userName, openModal = () => {}}) => {
+export const ProfileBlock = ({openModal = () => {}}) => {
     const [cardState, setCardState] = useState(0);
     const [chosenTheme, setTheme] = useState(clientController.theme);
-    const [displayInfo, setInfo] = useState([`Level ${1}`]);
+    const [displayInfo, setInfo] = useState([`Level ${serverController.userData.accessLevel}`]);
+    const [username, setUsername] = useState(serverController.userData.username);
 
     useEffect(() => {
         function updateTheme(){
             setTheme(clientController.theme);
         }
         function onGameStart(){
-            const subject = serverController.subjectThemes[clientController.subjectTheme-1];
-            setInfo([`Level ${1}`, `Theme: ${subject.themeName}`, `${subject.points} Points`]);
+            const subject = serverController.userData.chosenTheme.title;
+            const level = serverController.userData.accessLevel;
+            const points = serverController.userData.currentGrade;
+            console.log(subject);
+            setInfo([`Level ${AccessLevels[level]}`, `Theme: ${subject}`, `${points} Points`]);
             setCardState(1);
         }
         function onGameFinish(){
-            setInfo([`Level ${1}`]);
+            const level = serverController.userData.accessLevel;
+            setInfo([`Level ${AccessLevels[level]}`]);
             setCardState(0);
         }
 
+        function handleUserDataUpdate(){
+            const data = serverController.userData;
+            setUsername(data.username);
+            setInfo([`Level ${AccessLevels[data.accessLevel]}`]);
+        }
+
+        clientController.subscribeOn('userdata-loaded', handleUserDataUpdate);
         clientController.subscribeOn('theme-switch', updateTheme);
         clientController.subscribeOn('game-start', onGameStart);
         clientController.subscribeOn('game-finish', onGameFinish);
         return () => {
+            clientController.unSubscribeOn('userdata-loaded', handleUserDataUpdate);
             clientController.unSubscribeOn('theme-switch', updateTheme);
             clientController.unSubscribeOn('game-start', onGameStart);
             clientController.unSubscribeOn('game-finish', onGameFinish);
@@ -58,7 +72,7 @@ export const ProfileBlock = ({userName, openModal = () => {}}) => {
             <UserIcon />
             <UserInfo info={
                 {
-                    name: userName,
+                    name: username,
                     other: displayInfo,
                 }
             } theme={chosenTheme}/>

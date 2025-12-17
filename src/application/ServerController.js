@@ -1,16 +1,69 @@
 import clientController from "./ClientController";
+import { DataStore } from "./Store";
+
+const API = process.env.REACT_APP_API_URL;
+
+const endpoints = {
+    getUserData: '/user/get-data',
+    chooseTheme: '/user/choose-theme',
+    getThemes: '/theme/get',
+    createTheme: '/theme/create',
+    logIn: '/authorize/logIn',
+    register: '/authorize/register',
+    checkUserName: '/authorize/check-username',
+    createQuestion: '/question/create',
+    getQuestions: '/question/get',
+    answerOnQuestion: '/question/answer',
+    getModerating: '/question/moderating',
+    moderate: '/question/moderate',
+    createGenerationPattern: '/question/create-generation-pattern',
+}
+
+export const AccessLevels = ['Default', 'Creator', 'Moderator', 'Admin'];
 
 class ServerController{
     currentTheme = 0;
-    subjectThemes = [
-                    {themeName: 'Math', points: 100, id: 1,},
-                    {themeName: 'English', points: 50, id: 2,},
-                    {themeName: 'Logic', points: 0, id: 3,},
-                    {themeName: '...', points: 0, id: 4,},
-                    {themeName: '...', points: 0, id: 5,}];
+    userData = {
+        username: '',
+        accessLevel: 0,
+        chosenTheme: {
+            id: '',
+            title: '',
+        },
+        currentGrade: 0,
+        createdQuestions: 0,
+        moderatedQuestions: 0,
+    }
+
+    subjectThemes = [];
+
+    constructor() {
+        this.token = DataStore.getStored('user-token');
+
+        if(DataStore.checkStored('user-data')){
+            const data = DataStore.getStored('user-data');
+            if(data !== null){
+                this.userData = data;
+            }
+        }
+        if(DataStore.checkStored('subject-list')){
+            const subjects_str = DataStore.getStored('subject-list', (data) => {
+                for (const prop of data) {
+                    if(typeof prop === 'object'){
+                        return true;
+                    }
+                }
+            })
+
+            if(subjects_str === null){
+                DataStore.Store('subject-list', null);
+                this.subjectThemes = [];
+                this.getSubjectThemes();
+            }
+        }
+    }
 
     async startGame(){
-
         clientController.triggerEvent('game-start', clientController.subjectTheme);
     }
     async finishGame(points){
@@ -25,10 +78,122 @@ class ServerController{
             }, time)
         })
     }
+    
+    async chooseTheme(themeId){
+        const result = await this.#makeRequest(endpoints.chooseTheme + `?theme=${themeId === undefined? -1: themeId}`, 'POST');
+    }
 
-    async #makeRequest(endpoint, type = 'GET', body){
+
+    async checkUserName(username) {
+        const result = (await this.#makeRequest(endpoints.checkUserName+`?username=${username}`, 'GET'));
+        if(!result){
+            clientController.triggerEvent('show-tip', ['Something went wrong! Try again', clientController.getColorSetting(2,'red')]);
+            return false;
+        }
+        return result.isExist;
+    }
+
+    async signOut(){
+        this.token = null;
+        DataStore.Store('user-token', null);
+        DataStore.Store('user-data', null);
+        DataStore.Store('subject-theme', null);
+        clientController.triggerEvent('unauthorized');
+    }
+
+    async register(login, password){
+        const result = await this.#makeRequest(endpoints.register, 'POST', {
+            userName: login,
+            password: password,
+        }, (status) => {
+            switch(status){
+                // case 401: clientController.triggerEvent('show-tip', ['Wrong password! Try again', clientController.getColorSetting(2,'yellow')]); break;
+                case 404: clientController.triggerEvent('show-tip', ['Wrong request! Check a data.', clientController.getColorSetting(2,'red')]); break;
+                default: clientController.triggerEvent('show-tip', ['Something went wrong! Try again later', clientController.getColorSetting(2,'red')]); break;
+            }
+        });
+
+        if(!result){
+            return false;
+        }
+
+        DataStore.Store('user-token', result.token);
+        this.token = result.token;
+
+        await this.getUserData();
+        await this.getSubjectThemes();
+
+        return true;
+    }
+
+    async logIn(login, password){
+        const result = await this.#makeRequest(endpoints.logIn, 'POST', {
+            userName: login,
+            password: password,
+        }, (status) => {
+            switch(status){
+                case 401: clientController.triggerEvent('show-tip', ['Wrong password! Try again', clientController.getColorSetting(2,'red')]); break;
+                case 404: clientController.triggerEvent('show-tip', ['User does not exits. Create a new account, or check a data', clientController.getColorSetting(2,'red')]); break;
+                default: clientController.triggerEvent('show-tip', ['Something went wrong! Try again later', clientController.getColorSetting(2,'red')]); break;
+            }
+        });
+
+        if(!result){
+            // clientController.triggerEvent('show-tip', 'Wrong data!');
+            return false;
+        }
+
+        DataStore.Store('user-token', result.token);
+        this.token = result.token;
+
+        await this.getUserData();
+        await this.getSubjectThemes();
+
+        return true;
+    }
+
+    async getUserData(){
+        const userData = await this.#makeRequest(endpoints.getUserData, 'GET', undefined, (status) => {
+            if(status > 403){
+                clientController.triggerEvent('show-tip', ['Something went wrong!', clientController.getColorSetting(2,'red')]);
+            }
+        });
+
+        if(userData === null){
+            return null;
+        }
+
+        this.userData = userData;
+
+        DataStore.Store('user-data', userData);
+
+        clientController.triggerEvent('userdata-loaded');
+        return userData;
+    }
+
+    async getSubjectThemes(){
+        const result = await this.#makeRequest(endpoints.getThemes, 'GET', {}, (status) => {
+            if(status > 403){
+                clientController.triggerEvent('show-tip', ['Something went wrong!', clientController.getColorSetting(2,'red')]);
+            } 
+        });
+
+        if(result === null){
+            return null;
+        }
+
+        this.subjectThemes = result;
+        DataStore.Store('subject-list', JSON.stringify(result));
+
+        clientController.triggerEvent('subjectList-updated');
+
+        return result;
+    }
+
+    async #makeRequest(endpoint, type = 'GET', body, onError = (status) => {}){
         const Headers = {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${this.token}`
         }
 
         let request = {
@@ -43,14 +208,27 @@ class ServerController{
         console.log(request);
 
         try{
-            const result = await fetch((ENV.API + endpoint), request);
+            const result = await fetch((API + endpoint), request);
+
             if(result.status >= 400){
-                throw result.status + ' Something wrong';
+                switch(result.status){
+                    case 401: clientController.triggerEvent('unauthorized'); break;
+                    case 403: clientController.triggerEvent('forbidden'); break;
+                    case 404: clientController.triggerEvent('wrong-data'); break;
+                }
+
+                throw {
+                    message: result.status + ' Something wrong',
+                    status: result.status,
+                };
             }
-            return (await result.json()).payload
+            const data = (await result.json());
+            return data;
         }
         catch(err){
-            console.error(err);
+            // console.log(err);
+            // console.error(err.message);
+            onError(err.status);
             return null;
         }
     }

@@ -3,6 +3,7 @@ import { useState } from "react";
 import clientController, {COLORS} from "../application/ClientController";
 import { ModalWindow } from "./ModalWindow";
 import { LinkBlock } from "./LinkBlock";
+import serverController from "../application/ServerController";
 
 const ThemeSwitch = ({}) => {
     const [chosenTheme, setTheme] = useState(clientController.theme);
@@ -25,7 +26,9 @@ const ThemeSwitch = ({}) => {
 export const SettingsModal = ({closeCallback = () => {}}) => {
 
     return(
-        <ModalWindow title="Settings" closeCallback={closeCallback} defaultButton={{isActive: true, title: 'SIGN OUT'}}>
+        <ModalWindow title="Settings" closeCallback={closeCallback} defaultButton={{isActive: true, title: 'SIGN OUT', function: () => {
+            serverController.signOut();
+        }}}>
             <ThemeSwitch />
             <LinkBlock />
         </ModalWindow>

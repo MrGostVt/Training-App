@@ -31,6 +31,7 @@ export const MainPage = ({moveToGame = () => {}}) =>{
         clientController.setSubject(chosenSubject);
     }, [chosenSubject])
 
+
     return(
         <>
             <ThemesToLearnBlock themesList={serverController.subjectThemes}
@@ -50,7 +51,7 @@ export const MainPage = ({moveToGame = () => {}}) =>{
                 description: 'Join to tournament and show your skills',
                 iconUrl: LoadedImages['Tournament.png'],
                 typeId: 2,
-            }} moveToGame={moveToGame}/>
+            }} moveToGame={() => {clientController.triggerEvent('show-tip', ['Coming soon!', clientController.getColorSetting(2, 'yellow')])}}/>
         </>
     );
 }

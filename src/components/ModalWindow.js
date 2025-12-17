@@ -6,7 +6,7 @@ import clientController, { COLORS } from "../application/ClientController";
 
 export const ModalWindow = ({children, title = 'undefined', size = 0,
     closeCallback, isBackgroundClose = true,
-    defaultButton = {title: '', function: () => {}, isActive: false}}) => {
+    defaultButton = {title: '', type: '', function: () => {}, isActive: false}}) => {
     
     const [chosenTheme, setTheme] = useState(clientController.theme);
     const [isLoading, setLoading] = useState(false);
@@ -54,6 +54,7 @@ export const ModalWindow = ({children, title = 'undefined', size = 0,
                 }
                 if(isCanExit) exitFunction(false);
             }}
+            type = {defaultButton.type}
             />
     }
     

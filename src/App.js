@@ -7,17 +7,23 @@ import { InGamePage } from "./pages/InGamePage";
 import { ProcessQuestionsModal } from "./components/ProcessQuestionsModal";
 import { ResultsModal } from "./components/ResultsModal";
 import { SettingsModal } from "./components/SettingsModal";
+import { SignModal } from "./components/SignModal";
 import clientController, { COLORS } from "./application/ClientController";
 import serverController from "./application/ServerController";
+import { Tip } from "./components/Tip";
 
 
 const SavedInstance = {
-    1: () => {}
+    'tip': {callback: () => {}, others: {
+        text: '', color: undefined
+    }, queue: []},
+    1: () => {},
 };
 
 const App = ({}) => {
     const [pageId, setPage] = useState(0);
     const [modal, setModal] = useState(0);
+    const [tipState, setTipState] = useState(false);
 
     const [chosenTheme, setTheme] = useState(clientController.theme);
 
@@ -26,12 +32,36 @@ const App = ({}) => {
             setTheme(clientController.theme);
         }
 
+        function onUnauthorized(){
+            openModal(2, () => {});
+        }
+
+        function onForbidden(){
+
+        }
+
+        clientController.subscribeOn('theme-switch', updateTheme);
+        clientController.subscribeOn('unauthorized', onUnauthorized );
+        clientController.subscribeOn('forbidden', onForbidden);
+        clientController.subscribeOn('show-tip', showTip); // добавить возможность выбирать цвет для подсказки.
+
+        // async function name(params) {
+        //     await serverController.getUserData();
+        // }
+
+
         // openModal(2, () => {});
         // openModal(4, () => {}); 
 
-        clientController.subscribeOn('theme-switch', updateTheme);
+        serverController.getUserData();
+        serverController.getSubjectThemes();
+
         return () => {
             clientController.unSubscribeOn('theme-switch', updateTheme);
+            clientController.unSubscribeOn('unauthorized', onUnauthorized);
+            clientController.unSubscribeOn('forbidden', onForbidden);
+            clientController.unSubscribeOn('show-tip', showTip);
+
         }
     }, []);
 
@@ -49,6 +79,13 @@ const App = ({}) => {
         case 3: modalWindow = <ResultsModal type={"Practice"} results={SavedInstance[3].others} closeCallback={SavedInstance[3].callback}/>; break;
         case 4: modalWindow = <ProcessQuestionsModal closeCallback={SavedInstance[4].callback} />; break;
         default: modalWindow = null; break;
+    }
+
+    let tip;
+    if(tipState){
+        tip = <Tip tip={SavedInstance['tip'].others.text} opacity={SavedInstance['tip'].others.opacity}
+            color={SavedInstance['tip'].others.color}    
+        onClose={() => {setTipState(false); }}/>;
     }
 
     function openModal(id, callback, others){
@@ -71,13 +108,23 @@ const App = ({}) => {
         const sum = results.reduce((acc, curr) => !!acc.length? acc[0]: acc + curr[0]);
         openModal(3, () => {serverController.finishGame(sum)}, results);
     }
+    function showTip([text = '', color = clientController.getColorSettingDefault('mainText')]){
+        if(tipState != true){
+            SavedInstance['tip'].others = {
+                text, color,
+            };
+            // SavedInstance['tip'].queue.push(1); ДОБАВИТЬ ОЧЕРЕДЬ УВЕДОМЛЕНИЙ
+            setTipState(true);
+        }
+    }
 
     return(
         <div className="App" style={{backgroundColor: clientController.getColorSetting(chosenTheme, COLORS.main)}}>
             <PagePreview text="Trainee-App"/>
-            <ProfileBlock userName={"Alex"} openModal = {openModal}/>
+            <ProfileBlock openModal = {openModal}/>
             {page}
             {modalWindow}
+            {tip}
         </div>
     )
 }

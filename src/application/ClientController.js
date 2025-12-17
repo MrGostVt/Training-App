@@ -20,6 +20,11 @@ const ThemeSettings = [
         secondaryText: 'var(--secondary-text-dark-color)',
         border: 'var(--border-dark)',
         borderActive: 'var(--border-dark-active)',
+    },
+    {
+        yellow: 'var(--yellow-exception-color)',
+        red: 'var(--red-error-color)',
+        green: 'var(--green-okay-color)',
     }
 ];
 
@@ -31,7 +36,7 @@ export const COLORS = {
     text: 'mainText',
     text2: 'secondaryText',
     border: 'border',
-    borderA: 'borderActive'
+    borderA: 'borderActive',
 }
 
 const StoreKeys = {
@@ -46,6 +51,13 @@ class ClientController{
         'theme-switch': [],
         'game-start': [],
         'game-finish': [],
+        'unauthorized': [],
+        'forbidden': [],
+        'request-exception': [],
+        'show-tip': [],
+        'userdata-loaded': [],
+        'subjectList-updated': [],
+        'wrong-data': [],
     }
 
     constructor(){
