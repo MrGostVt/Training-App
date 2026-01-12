@@ -11,28 +11,88 @@ import PlusIcon from "../assets/icons/Plus.svg"
 import { QuestionComponent } from "./QuestionComponent";
 import { Question } from "../application/Question";
 import { TextPreview } from "./TextPreview";
+import serverController, { AccessLevels } from "../application/ServerController";
 
 export const ProcessQuestionsModal = ({closeCallback = () => {}}) => {
     const [processType, setProcessType] = useState(0);
 
     let field;
+    let modalTitle;
     const backLink = <a className="backLink DefaultFont" onClick={() => setProcessType(0)} style={{
         color: clientController.getColorSettingDefault(COLORS.text2)
     }}>Move back</a>
     const defaultButton = {
         title: "Exit",
         isActive: true,
-        function: () => {}
+        function: () => true
     };
     switch(processType){
-        case 2: field = <ModerateQuestionField />; defaultButton.isActive = false; break;
-        case 1: field = <CreateQuetionField/>; defaultButton.title = 'Create'; break;
-        default: field = <InfoWrap onClick1={() => setProcessType(1)} onClick2={() => setProcessType(2)} />; break;
+        case 2: field = <ModerateQuestionField />; defaultButton.isActive = false; defaultButton.function = () => {
+            // console.log(clientController.questionData);
+            return false;
+        }; 
+        modalTitle = 'Moderate questions';
+        break;
+        case 1: field = <CreateQuestionField/>; defaultButton.title = 'Create'; defaultButton.function = async () => {
+            const data = {...clientController.questionData};     
+            const wrongProps = [];
+            for (const property in data) {
+                console.log(property);
+                if(data[property] === null || data[property].length === 0){
+                    wrongProps.push(property);
+                }
+            }       
+            if(wrongProps.length !== 0){
+                clientController.triggerEvent('show-tip', [`${wrongProps.join(', ')} must be valid.`, clientController.getColorSetting(2, 'red')]);
+                return false;
+            }
+
+            const answersList = data.answers.map(val => val.title);
+            const rightAnswersList = data.rightAnswers.map(value => data.answers.findIndex(val => value === val.id));
+
+            const formedQuestion = {
+                title: data.title, 
+                level: data.level, 
+                type: data.type <= 1? 0: 1, 
+                answers: answersList, 
+                rightAnswers: rightAnswersList, 
+                theme: 1
+            }
+
+            console.log(formedQuestion);
+            const result = await serverController.createQuestion(formedQuestion);
+            if(result) clientController.triggerEvent('show-tip', ['Success!', clientController.getColorSetting(2, 'green')]);
+            
+            return result;
+        }; 
+        modalTitle = 'Create a question';
+        break;
+        default: field = <InfoWrap onClick1={() => {
+            if(serverController.userData.accessLevel > 0){
+                setProcessType(1);
+                return;
+            }
+            clientController.triggerEvent('show-tip', 
+                [`Improve your topic level to get a ${AccessLevels[1]} access!`, 
+                clientController.getColorSetting(2, 'yellow')]
+            );
+        }} onClick2={() => {
+            if(serverController.userData.accessLevel > 1){
+                setProcessType(2)
+                return;
+            }
+            clientController.triggerEvent('show-tip', 
+                [`Improve your topic level to get a ${AccessLevels[2]} access!`, 
+                clientController.getColorSetting(2, 'yellow')]
+            );
+        }} />; 
+        modalTitle = 'Chose an activity'
+        break;
     }
 
 
     return(
-        <ModalWindow title="Moderation" size={1} closeCallback={closeCallback} defaultButton={defaultButton}>
+        <ModalWindow title={modalTitle} size={1} closeCallback={closeCallback} defaultButton={defaultButton}>
             {processType !== 0? backLink: null}
             {field}
         </ModalWindow>
@@ -41,10 +101,16 @@ export const ProcessQuestionsModal = ({closeCallback = () => {}}) => {
 
 const InfoWrap = ({onClick1 = () => {}, onClick2 = () => {}}) => (
     <div className="InfoWrap">
-            <InfoBlock title="Create Question" button={{title: 'Create', function: onClick1}} icounUrl={LoadedImages['Idea.png']}
-            text={'Create questions on the topic!'} statistics={[{title: 'Created', score: 9}, {title: 'Published', score: 2}]}/>
-            <InfoBlock title="Moderate Question" button={{title: 'Moderate', function: onClick2}} icounUrl={LoadedImages['Practice.png']}
-            text={'Moderate other peoples questions!'} statistics={[{title: 'Published', score: 9}, {title: 'Skipped', score: 2}]}/>
+            <InfoBlock title="Create a Question" button={{title: 'Create', function: onClick1}} icounUrl={LoadedImages['Idea.png']}
+            text={'Create questions on the topic!'} statistics={[
+                {title: 'Created', score: serverController.userData.createdQuestions}, 
+                {title: 'Published', score: serverController.userData.publishedQuestions},
+                {title: 'Discarded', score: serverController.userData.discardedQuestions}]}/>
+            <InfoBlock title="Moderate a Questions" button={{title: 'Moderate', function: onClick2}} icounUrl={LoadedImages['Practice.png']}
+            text={'Moderate other peoples questions!'} statistics={[
+                {title: 'Moderated', score: serverController.userData.moderatedQuestionsCount}, 
+                {title: 'Published', score: serverController.userData.publishedQuestionsCount}, 
+                {title: 'Skipped', score: serverController.userData.skippedQuestionsCount}]}/>
     </div>
 );
 
@@ -57,8 +123,9 @@ function getSquareStyles() {
     };
 }
 
-const CreateQuetionField = ({}) => {
+const CreateQuestionField = ({}) => {
     const [questType, setQuestType] = useState(0);
+    const [questLevel, setQuestLevel] = useState(1);
     const [answers, setAnswers] = useState([]);
     const [rightAnswers, setRightAnswers] = useState([]);
     const answerTitleClearRef = useRef(() => {});
@@ -72,11 +139,26 @@ const CreateQuetionField = ({}) => {
         state: false,
     });
 
+    useEffect(() => {
+        clientController.setQuestionBuilderField('type', questType);
+        clientController.setQuestionBuilderField('theme', serverController.userData.chosenTheme.id);
+        clientController.setQuestionBuilderField('level', questLevel);
+
+        return () => {
+            clientController.setQuestionBuilderField('type', null);
+            clientController.setQuestionBuilderField('title', null);
+            clientController.setQuestionBuilderField('answers', null);
+            clientController.setQuestionBuilderField('rightAnswers', null);
+            clientController.setQuestionBuilderField('level', null);
+        }
+    }, [])
+
     function updateQuestion(title, state){
         setQuestion({
             title,
             state: state === 2,
         });
+        clientController.setQuestionBuilderField('title', state === 2? title: null);
     }
     function removeAnswer(id){
         let list = [...answers];
@@ -86,6 +168,8 @@ const CreateQuetionField = ({}) => {
         if(rightAnswers.includes(id)){
             updateRight(id);
         }
+        clientController.setQuestionBuilderField('answers', list);
+
     }
     function addAnswer(){
         if(answerTitle.state && answers.length < 7){
@@ -93,7 +177,7 @@ const CreateQuetionField = ({}) => {
 
             list.push({
                 title: answerTitle.title,
-                id: list.length,
+                id: `${answerTitle.title}:${list.length}:${new Date().getMilliseconds()}`,
             });
     
             setAnswers(list);
@@ -102,6 +186,7 @@ const CreateQuetionField = ({}) => {
                 state: false,
             });
             answerTitleClearRef.current();
+            clientController.setQuestionBuilderField('answers', list);
         }
     }
     function updateLastAnswer(title, state){
@@ -123,6 +208,7 @@ const CreateQuetionField = ({}) => {
             }
             
             setRightAnswers(correct);
+            clientController.setQuestionBuilderField('rightAnswers', correct);
         }
     }
     function replaceRightAnswers(index){
@@ -132,6 +218,7 @@ const CreateQuetionField = ({}) => {
         correct.splice(index === correct.length? 0: index + 1, 0, answer);
 
         setRightAnswers(correct);
+        clientController.setQuestionBuilderField('rightAnswers', correct);
     }
 
 
@@ -143,27 +230,42 @@ const CreateQuetionField = ({}) => {
             color: clientController.getColorSettingDefault(COLORS.text2),
             textAlign: 'center',
         }}>
-            <Switch title={"Type"} callback={(val) => {setQuestType(val); setRightAnswers([]);}} current={questType}
+            <Switch title={"Type"} callback={(val) => {
+                setQuestType(val); 
+                setRightAnswers([]);
+                clientController.setQuestionBuilderField('rightAnswers', []);
+                clientController.setQuestionBuilderField('type', val);
+            }} current={questType}
             values={[
                 {val: 0, prev: 'Default', descrip: 'One Answer'}, 
                 {val: 1, prev: 'Several', descrip: 'Several answers'}, 
                 {val: 2, prev: 'Order', descrip: 'Use "__" to indicate answers in question'}]}
-            />
-            <InputField min={5} max={50} pattern="question" styles={{left: '5%', width: '90%'}} onValueChange={updateQuestion}
-            defaultValue={`Create a question. Max 50 symbols.`}/>
+            settings={{title: false, reverse: true}}/>
+            <Switch title={""} callback={(val) => {
+                setQuestLevel(val); 
+                clientController.setQuestionBuilderField('level', val);
+            }} current={0}
+            values={[
+                {val: 1, prev: 'Easy', descrip: 'Easy level', buttonStyles: {backgroundColor: clientController.getColorSetting(2, 'green')}}, 
+                {val: 2, prev: 'Middle', descrip: 'Middle level', buttonStyles: {backgroundColor: clientController.getColorSetting(2, 'yellow')}}, 
+                {val: 3, prev: 'Hard', descrip: 'Hard level', buttonStyles: {backgroundColor: clientController.getColorSetting(2, 'red')}}]}
+            settings={{title: false, reverse: true}}/>
+            <InputField min={5} max={150} pattern="question" styles={{left: '5%', width: '90%'}} onValueChange={updateQuestion}
+            defaultValue={`Create a question. Max 150 symbols.`}/>
             <div className="AnswersList" style={{
                 height: '20vh',
                 overflowY: 'auto',
             }}>
                 {answers.map((val, id) => (
                     <AnswerBlock val={val}
-                    onAnswerClick={() => updateRight(val.id)}
-                    onOrderDisplayClick={() => replaceRightAnswers(rightAnswers.indexOf(val.id))}
-                    onDeleteClick={() => removeAnswer(val.id)}
-                    isOrderDisplayed={questType === 2 && rightAnswers.includes(val.id)}
-                    number={rightAnswers.indexOf(val.id) + 1}
-                    isCorrect={rightAnswers.includes(val.id)}
-                    isDeleteDisplayed={true}
+                        onAnswerClick={() => updateRight(val.id)}
+                        onOrderDisplayClick={() => replaceRightAnswers(rightAnswers.indexOf(val.id))}
+                        onDeleteClick={() => removeAnswer(val.id)}
+                        isOrderDisplayed={questType === 2 && rightAnswers.includes(val.id)}
+                        number={rightAnswers.indexOf(val.id) + 1}
+                        isCorrect={rightAnswers.includes(val.id)}
+                        isDeleteDisplayed={true}
+                        key={val.id}
                     />
                     
                 ))}
@@ -207,7 +309,8 @@ const ModerateQuestionField = ({}) => {
         setQuestion(questionData);
         setAnswers(questionData.answers);
         setCorrect(correct);
-    }, [])
+    }, []);
+
 
     if(!question){
         return null;

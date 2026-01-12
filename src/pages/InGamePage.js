@@ -4,6 +4,7 @@ import '../assets/styles/InGame.css'
 import { QuestionEngine } from "../application/QuestionsEngine";
 import clientController, { COLORS } from "../application/ClientController";
 import { QuestionComponent } from "../components/QuestionComponent";
+import serverController from "../application/ServerController";
 
 const LIST = [
     {type: 0, themeId: 0, id: 0, 
@@ -35,13 +36,32 @@ export const InGamePage = ({moveOut = () => {}}) => {
     const controllerRef = useRef(null);
 
     useEffect(() => {
-        const questions = new QuestionEngine(LIST);
-        controllerRef.current = questions;
-        const nextQuestion = questions.getQuestion();
-        console.log(nextQuestion);
-        setCurrent(1);
-        setQuestion(nextQuestion);
-        setAnswers(nextQuestion.answers);
+        // const questions = new QuestionEngine(LIST);
+        async function getQuestionList() {
+            const list = await serverController.getQuestions();
+
+            if(list.length > 0){
+                const questions = new QuestionEngine(list);
+                controllerRef.current = questions;
+                const nextQuestion = questions.getQuestion();
+                console.log(nextQuestion);
+                setCurrent(1);
+                setQuestion(nextQuestion);
+                setAnswers(nextQuestion.answers);
+            }
+            else{
+                setTimeout(() => {
+                    moveOut(0, false);
+                    clientController.triggerEvent('show-tip', ['Questions is not loaded, try again later!', clientController.getColorSetting(2, 'red')])    
+                    serverController.finishGame(0);
+                }, 2000);
+            }
+        } 
+
+        getQuestionList();
+        return () => {
+
+        }
     }, []);
 
     return(
@@ -65,11 +85,15 @@ export const InGamePage = ({moveOut = () => {}}) => {
             <DefaultButton styles={{bottom: '5%', width: '90%', left: '5%', backgroundColor: clientController.getColorSetting(chosenTheme, COLORS.button)}} 
             onClick={() => {
                 if(controllerRef.current !== null && chosenAnswer.length == question.correctCount){
+                    const id = controllerRef.current.getQuestion().id;
+                    const answers = [...chosenAnswer]
+                    serverController.answer(id, answers)
+
                     const isTrue = controllerRef.current.answer();
                     const nextQuestion = controllerRef.current.getQuestion();
                     const pointer = controllerRef.current.getPointer() + 1;
 
-                    console.log(isTrue);
+
                     if(pointer === currentQuest){
                         const results = controllerRef.current.getResults();
                         moveOut(results);

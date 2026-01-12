@@ -224,21 +224,6 @@ textarea:focus, input:focus{
     font-size: larger;
 }
 
-/* .Tip::before{
-    position: absolute;
-    content:"";
-    display:block;
-    height:25%;
-    /* position:relative; */
-    /* top:80px; */
-    /* width: 105%; */
-    /* bottom: 0px; */
-    /* left: -15px; */
-    /* background-image:linear-gradient(to bottom, rgba(255, 255, 255, 0), var(--functional-active-dark-color) 75%) */
-/* } */
-
-.TipAnim{
-}
 
 @keyframes TipAnim {
     20% {

@@ -8,24 +8,31 @@ export class Question{
     chosenAnswers = [];
 
     //type: Question type, 0 - default, 1 - order of answers
-    constructor(type, themeId, id,
-    questionData = {question: '',  correctAnswerIds: [-1], answers: [], maxPoints}){
-        this.type = type;
-        this.themeId = themeId;
+    constructor(
+    questionData = {title: '',  rightAnswers: [-1], answers: [], maxPoints, level, type, id,}){
+        this.type = questionData.type;
         this.questionData = questionData;
-        this.questionData.id = id;
+        this.questionData.answers = this.formAnswers(questionData.answers);
         this.questionData.answers = this.shuffleAnswers(this.questionData.answers);
     }
+
+    formAnswers(answers = []){
+        const formedAnswers = answers.map((val, id) => {
+            return {title: val, id}
+        })
+        return formedAnswers;
+    }
+
     getData(){
         console.log(this.questionData)
 
         const data = {
-            question: this.questionData.question,
+            question: this.questionData.title,
             type: this.type,
             answers: this.questionData.answers,
             maxPoints: this.questionData.maxPoints,
             id: this.questionData.id,
-            correctCount: this.questionData.correctAnswerIds.length,
+            correctCount: this.questionData.rightAnswers.length,
         };
 
         return data;
@@ -57,7 +64,7 @@ export class Question{
     pushAnswer(answerId = -1){
         switch(this.type){
             // case 1:  break;
-            default: if(this.chosenAnswers.length < this.questionData.correctAnswerIds.length) this.chosenAnswers.push(answerId); break;
+            default: if(this.chosenAnswers.length < this.questionData.rightAnswers.length) this.chosenAnswers.push(answerId); break;
         }
         return this.chosenAnswers;
     }
@@ -71,12 +78,12 @@ export class Question{
         let correctAnswers = 0;
         const question = this.questionData;
         
-        for(const correctId of this.questionData.correctAnswerIds){
+        for(const correctId of this.questionData.rightAnswers){
             if(this.chosenAnswers.includes(correctId)){
                 correctAnswers++;
             }
         }
-        const points = parseInt(correctAnswers/question.correctAnswerIds.length * question.maxPoints);
+        const points = parseInt(correctAnswers/question.rightAnswers.length * question.maxPoints);
         this.earnedPoints = points;
         
         return points;
@@ -85,12 +92,12 @@ export class Question{
     checkAnswerWithOrder(){
         const question = this.questionData;
 
-        if(this.chosenAnswers.length !== this.questionData.correctAnswerIds.length){
+        if(this.chosenAnswers.length !== this.questionData.rightAnswers.length){
             this.earnedPoints = 0;
             return this.earnedPoints;
         }
-        for(let i = 0; i < question.correctAnswerIds.length; i++){
-            if(this.chosenAnswers[i] !== question.correctAnswerIds[i]){
+        for(let i = 0; i < question.rightAnswers.length; i++){
+            if(this.chosenAnswers[i] !== question.rightAnswers[i]){
                 this.earnedPoints = 0;
                 return this.earnedPoints;
             }
@@ -108,6 +115,6 @@ export class Question{
     }
 
     getCorrectAnswersIDs(){
-        return this.questionData.correctAnswerIds;
+        return this.questionData.rightAnswers;
     }
 }

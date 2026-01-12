@@ -19,7 +19,9 @@ export const ThemesToLearnBlock = ({themesList = [{title: 'test', grade: 0, id: 
         }
         setChoosedTheme(id);
         setTheme(id);
-        serverController.chooseTheme(themes[id-1].id);
+        
+        const theme = themes.filter((val) => val.id === id)[0];
+        serverController.chooseTheme(theme.id, theme.title);
         
         return true;
     }
@@ -32,7 +34,7 @@ export const ThemesToLearnBlock = ({themesList = [{title: 'test', grade: 0, id: 
             const subjects = [...themes];
 
             const index = subjects.findIndex((val) => val.id === subject);
-            subjects[index].points = parseInt(points) + parseInt(subjects[index].points);
+            subjects[index].grade = parseInt(points) + parseInt(subjects[index].grade);
             setThemes(subjects);
         }
         function updateSubjectList(){

@@ -29,16 +29,16 @@ export const SignModal = ({closeCallback = () => {}}) => {
     let signMessage = <div className="DefaultFont" style={{...messageStyles, color: clientController.getColorSettingDefault(COLORS.text)}} onClick={() => {
         setSignType(0);
         setTimeout(() => {
-            passwordHandlerRef.current(passInfo.pass);
-            loginHandlerRef.current(logInfo.log);
+            if(passInfo.pass.length !== 0){ passwordHandlerRef.current(passInfo.pass); }
+            if(logInfo.log.length !== 0){ loginHandlerRef.current(logInfo.log); }
         }, 50);
     }}>New user? Sign Up</div>;
     if(signType === 0){
         signMessage = <div className="DefaultFont" style={{...messageStyles, color: clientController.getColorSettingDefault(COLORS.text)}} onClick={() => {
             setSignType(1);
             setTimeout(() => {
-                passwordHandlerRef.current(passInfo.pass);
-                loginHandlerRef.current(logInfo.log);
+                if(passInfo.pass.length !== 0){ passwordHandlerRef.current(passInfo.pass); }
+                if(logInfo.log.length !== 0){ loginHandlerRef.current(logInfo.log); }
             }, 50);
 
         }}>Already have an account? Sign In</div>

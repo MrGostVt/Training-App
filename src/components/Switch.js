@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import clientController, { COLORS } from "../application/ClientController";
 
-export const Switch = ({title, values = [{val, prev, descrip}], current = 0, callback = () => {}}) => {
+export const Switch = ({title, values = [{val, prev, descrip, buttonStyles: {}}], settings = {reverse: false, title: true}, current = 0, callback = () => {}}) => {
     const [pointer, setPoint] = useState(current);
     const text = values[pointer].prev;
 
@@ -12,16 +12,23 @@ export const Switch = ({title, values = [{val, prev, descrip}], current = 0, cal
     }
 
     return(
-        <div className="ThemeSwitch DefaultFont" onClick={() => {
+        <div className="SwitchBlock DefaultFont" onClick={() => {
             // setTheme(!!chosenTheme? 0: 1);
             // clientController.switchTheme();
             let point = switchPointer();
             callback(values[point].val);
-        }} style={{fontSize: '20px', color: clientController.getColorSettingDefault(COLORS.text)}}>
-            {title}
-            <div style={{marginLeft: '2%', width: '60%', overflow: 'hidden'}}>{values[pointer].descrip}</div>
-            <div className="ThemeButton" 
-            style={{backgroundColor: clientController.getColorSettingDefault(COLORS.functionalA)}}>
+        }} style={{
+            fontSize: '20px', color: clientController.getColorSettingDefault(COLORS.text),
+            flexDirection: settings.reverse? 'row-reverse': 'row'
+        }}>
+            {settings.title? title: null}
+            <div style={{marginLeft: settings.reverse? '2%': 'none', width: 'auto', overflow: 'hidden', textAlign: 'left'}}>{values[pointer].descrip}</div>
+            <div className="SwitchButton" 
+            style={{backgroundColor: clientController.getColorSettingDefault(COLORS.functionalA),
+                marginRight: settings.reverse? 'auto': 'none',
+                marginLeft: settings.reverse? 'none': 'auto', 
+                ...values[pointer].buttonStyles
+            }}>
                 {text}
             </div>
         </div>

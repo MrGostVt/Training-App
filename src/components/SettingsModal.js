@@ -4,32 +4,24 @@ import clientController, {COLORS} from "../application/ClientController";
 import { ModalWindow } from "./ModalWindow";
 import { LinkBlock } from "./LinkBlock";
 import serverController from "../application/ServerController";
-
-const ThemeSwitch = ({}) => {
-    const [chosenTheme, setTheme] = useState(clientController.theme);
-    const text = !!chosenTheme? 'Dark': 'Light'
-
-    return(
-        <div className="ThemeSwitch DefaultFont" onClick={() => {
-            setTheme(!!chosenTheme? 0: 1);
-            clientController.switchTheme();
-        }} style={{fontSize: '20px', color: clientController.getColorSetting(chosenTheme, COLORS.text)}}>
-            Theme
-            <div className="ThemeButton" 
-            style={{backgroundColor: clientController.getColorSetting(chosenTheme, COLORS.functionalA)}}>
-                {text}
-            </div>
-        </div>
-    )
-};
+import { Switch } from "./Switch";
 
 export const SettingsModal = ({closeCallback = () => {}}) => {
+    const [chosenTheme, setTheme] = useState(clientController.theme);
+
 
     return(
         <ModalWindow title="Settings" closeCallback={closeCallback} defaultButton={{isActive: true, title: 'SIGN OUT', function: () => {
             serverController.signOut();
         }}}>
-            <ThemeSwitch />
+            <Switch title={"Theme"} callback={(val) => {
+                setTheme(val);
+                clientController.switchTheme();
+            }} current={chosenTheme}
+            values={[
+                {val: 0, prev: 'Light'}, 
+                {val: 1, prev: 'Dark'}]}
+            />
             <LinkBlock />
         </ModalWindow>
     );

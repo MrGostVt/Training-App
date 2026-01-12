@@ -60,6 +60,16 @@ class ClientController{
         'wrong-data': [],
     }
 
+    //возможно стоит настроить сохранение данных.
+    questionData = {
+        type: null,// 0 - default, 1 - order, 2 - input
+        theme: null,
+        title: null,
+        answers: null,
+        rightAnswers: null,
+        level: null,
+    }
+
     constructor(){
         this.init();
     }
@@ -79,6 +89,18 @@ class ClientController{
         this.triggerEvent('theme-switch');
         DataStore.Store(StoreKeys.theme, this.theme);
     }
+    
+    setQuestionBuilderField(field, value){
+        if(!Object(this.questionData).hasOwnProperty(field)){
+            console.log("Property not updated");
+            return false;
+        }
+        
+        console.log("Property updated");
+        this.questionData[field] = value;
+        return true;
+    }
+    
     setSubject(id){
         this.subjectTheme = id;
         DataStore.Store(StoreKeys.subjectTheme, id);

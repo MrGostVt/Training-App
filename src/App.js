@@ -103,10 +103,15 @@ const App = ({}) => {
         serverController.startGame();
         setPage(1);
     }
-    function moveOutFromGame(results){
+    function moveOutFromGame(results, isActive = true){
         setPage(0);
-        const sum = results.reduce((acc, curr) => !!acc.length? acc[0]: acc + curr[0]);
-        openModal(3, () => {serverController.finishGame(sum)}, results);
+        if(isActive){
+            console.log(results);
+            const sum = results.reduce((acc, curr) => {
+                return acc.length === undefined? acc + curr[0]: curr[0] + acc[0];
+            });
+            openModal(3, () => {serverController.finishGame(sum, clientController.subjectTheme)}, results);
+        }
     }
     function showTip([text = '', color = clientController.getColorSettingDefault('mainText')]){
         if(tipState != true){

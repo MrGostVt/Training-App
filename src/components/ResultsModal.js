@@ -6,7 +6,10 @@ import { ModalWindow } from "./ModalWindow";
 export const ResultsModal = ({type, results, closeCallback = () => {}}) => {
     
     return(
-        <ModalWindow title={type} closeCallback={closeCallback} defaultButton={{isActive: true, title: 'Claim', function: () => {return true}}}>
+        <ModalWindow title={type} closeCallback={closeCallback} defaultButton={{isActive: true, title: 'Claim', 
+        function: () => {
+            return true
+        }}}>
             <ResultsDisplay results={results} />
         </ModalWindow>
     );

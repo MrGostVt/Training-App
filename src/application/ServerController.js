@@ -32,10 +32,15 @@ class ServerController{
         },
         currentGrade: 0,
         createdQuestions: 0,
-        moderatedQuestions: 0,
+        publishedQuestions: 0,
+        discardedQuestions: 0,
+        moderatedQuestionsCount: 0,
+        publishedQuestionsCount: 0,
+        skippedQuestionsCount: 0,
     }
 
     subjectThemes = [];
+    currentQuestions = [];
 
     constructor() {
         this.token = DataStore.getStored('user-token');
@@ -66,7 +71,20 @@ class ServerController{
     async startGame(){
         clientController.triggerEvent('game-start', clientController.subjectTheme);
     }
+
+    async answer(id, answers){
+        const currentQuestion = this.currentQuestions.filter((val) => val.id === id)[0];
+
+        const result = await this.#makeRequest(endpoints.answerOnQuestion, 'POST', {
+            questionID: currentQuestion.id,
+            rightAnswers: answers,
+        });
+    }
+
     async finishGame(points){
+        this.userData.currentGrade = points;
+        this.currentQuestions = [];
+        DataStore.Store('user-data', this.userData);
         clientController.triggerEvent('game-finish', {subject: clientController.subjectTheme, points: points});
     }
 
@@ -79,8 +97,17 @@ class ServerController{
         })
     }
     
-    async chooseTheme(themeId){
+    async createQuestion(formedData){
+        const result = await this.#makeRequest(endpoints.createQuestion, 'POST', formedData);
+
+        return !!result;
+    }
+
+    async chooseTheme(themeId, title = ''){
         const result = await this.#makeRequest(endpoints.chooseTheme + `?theme=${themeId === undefined? -1: themeId}`, 'POST');
+        this.userData.chosenTheme.id = themeId;
+        this.userData.chosenTheme.title = title;
+        DataStore.Store('user-data', this.userData)
     }
 
 
@@ -178,6 +205,8 @@ class ServerController{
             } 
         });
 
+        console.log(result)
+
         if(result === null){
             return null;
         }
@@ -188,6 +217,13 @@ class ServerController{
         clientController.triggerEvent('subjectList-updated');
 
         return result;
+    }
+
+    async getQuestions(){
+        const questionList = await this.#makeRequest(endpoints.getQuestions + `?theme=${this.userData.chosenTheme.id}`);
+        if(!questionList){return []};
+        this.currentQuestions = [...questionList.list];
+        return questionList.list;
     }
 
     async #makeRequest(endpoint, type = 'GET', body, onError = (status) => {}){
@@ -226,9 +262,7 @@ class ServerController{
             return data;
         }
         catch(err){
-            // console.log(err);
-            // console.error(err.message);
-            onError(err.status);
+            onError(err.status, err.message, err);
             return null;
         }
     }

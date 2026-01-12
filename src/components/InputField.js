@@ -16,7 +16,7 @@ const patterns = {
     username: /^[a-zA-Z0-9]+$/,
     password: /^[a-zA-Zа-яА-ЯёЁ0-9]+$/, 
     text: /^[a-zA-Zа-яА-ЯёЁ0-9]+$/,
-    question: /^[a-zA-Z0-9\?\,\!\.\#_ \+\*\%\^\:\=\(\)\-]+$/,
+    question: /^[a-zA-Z0-9\?\,\!\.\#_\/\ +\*\%\^\:\=\(\)\-\/\>\<\[\]]+$/,
 };
 
 //Добавить экранирование, или перепроверить
@@ -25,7 +25,8 @@ export const InputField = ({typeID = 0, defaultValue, clearFunctionRef = {}, han
     onValueChange = () => {}, contextValidate = async (value, asyncSetDanger) => {return true}}) => {
     const [type, setType] = useState(typeID);
     const [inputState, setInputState] = useState(0);
-    const [value, setValue] = useState(undefined);
+
+    const inputRef = useRef(null);
     const lastTimeOutRef = useRef();
     clearFunctionRef.current = clearField;
     handleFunctionRef.current = handleChanges;
@@ -60,7 +61,8 @@ export const InputField = ({typeID = 0, defaultValue, clearFunctionRef = {}, han
         onValueChange(value, 2);
     }
     function clearField(){
-        setValue(undefined);
+        setInputState(0);
+        inputRef.current.value = ""
     }
 
     let stateDisplay;
@@ -76,9 +78,8 @@ export const InputField = ({typeID = 0, defaultValue, clearFunctionRef = {}, han
             filter: stateDisplay,
             ...styles
         }}>
-            <input className="InputField" id={'InputField' + pattern} type={inputType} required={true} maxLength={max} placeholder={defaultValue} 
+            <input ref={inputRef} className="InputField" id={'InputField' + pattern} type={inputType} required={true} maxLength={max} placeholder={defaultValue} 
             autoComplete={autoComplete} name={pattern}
-            // value={value}
             style={{
                 fontSize: '18px',
                 color: clientController.getColorSettingDefault(COLORS.text),
@@ -87,17 +88,13 @@ export const InputField = ({typeID = 0, defaultValue, clearFunctionRef = {}, han
                 '--autofill-caret-color': clientController.theme === 0? 'black': 'white',
             }}
             onChange={(ev) => {
-                setValue(ev.target.value);
                 clearTimeout(lastTimeOutRef.current);
                 console.log('alert')
                 lastTimeOutRef.current = setTimeout(() => {
                     handleChanges(ev.target.value);
                 }, 600);
             }}
-            // onInput={(ev) => {
-            //     ev.preventDefault();
-            //     console.log(ev.target.value);
-            // }}
+
             ></input>
         </div>
         
