@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import clientController, { COLORS } from "../application/ClientController";
 
-export const Switch = ({title, values = [{val, prev, descrip, buttonStyles: {}}], settings = {reverse: false, title: true}, current = 0, callback = () => {}}) => {
+export const Switch = ({title, values = [{val, prev, descrip, buttonStyles: {}}], settings = {reverse: false, title: true}, current = 0, callback = (val) => {}}) => {
     const [pointer, setPoint] = useState(current);
     const text = values[pointer].prev;
 

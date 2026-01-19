@@ -4,6 +4,7 @@ import { InputField } from "./InputField";
 import clientController from "../application/ClientController";
 import { COLORS } from "../application/ClientController";
 import serverController from "../application/ServerController";
+import { DataStore } from "../application/Store";
 
 const messageStyles = {
     position: 'absolute',
@@ -14,7 +15,7 @@ const messageStyles = {
 };
 
 export const SignModal = ({closeCallback = () => {}}) => {
-    const [signType, setSignType] = useState(0);
+    const [signType, setSignType] = useState(!!DataStore.getStored('is-logined-before')? 1: 0);
     const [passInfo, setPassInfo] = useState({
         pass: '',
         state: false,

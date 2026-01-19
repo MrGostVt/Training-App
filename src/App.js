@@ -11,6 +11,7 @@ import { SignModal } from "./components/SignModal";
 import clientController, { COLORS } from "./application/ClientController";
 import serverController from "./application/ServerController";
 import { Tip } from "./components/Tip";
+import { PaintModal } from "./components/PaintModal";
 
 
 const SavedInstance = {
@@ -55,6 +56,7 @@ const App = ({}) => {
 
         serverController.getUserData();
         serverController.getSubjectThemes();
+        openModal(5, () => {});
 
         return () => {
             clientController.unSubscribeOn('theme-switch', updateTheme);
@@ -78,6 +80,7 @@ const App = ({}) => {
         case 2: modalWindow = <SignModal closeCallback={SavedInstance[2].callback}/>; break;
         case 3: modalWindow = <ResultsModal type={"Practice"} results={SavedInstance[3].others} closeCallback={SavedInstance[3].callback}/>; break;
         case 4: modalWindow = <ProcessQuestionsModal closeCallback={SavedInstance[4].callback} />; break;
+        case 5: modalWindow = <PaintModal closeCallback={SavedInstance[5].callback} tiptext={SavedInstance[5].others}/>; break;
         default: modalWindow = null; break;
     }
 
@@ -96,7 +99,6 @@ const App = ({}) => {
             }
         };
         SavedInstance[id].others = others;
-
         setModal(id);
     }
     function moveToGame(id){

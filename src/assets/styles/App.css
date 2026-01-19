@@ -1,4 +1,4 @@
-body{
+:root{
     overflow:hidden;
     --main-dark-color: #0F1224;
     --functional-dark-color: #21294A;
@@ -114,6 +114,7 @@ body{
     background-position: center;
     background-repeat: no-repeat;
     background-size: 100% 100%;
+    overflow: hidden;
 }
 
 .SettingsOpen{

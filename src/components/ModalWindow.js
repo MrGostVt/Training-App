@@ -35,12 +35,16 @@ export const ModalWindow = ({children, title = 'undefined', size = 0,
     let modalStyles = {
         top: '120vh',
         backgroundColor: clientController.getColorSetting(chosenTheme, COLORS.functional),
-        height: sizeState === 0? '45vh': '65vh'
     };
     if(isLoading){
         backdropFilter = 'blur(3px)'
-        modalStyles.top = sizeState === 0? '27.5vh': '17.5vh';
     }
+    switch(sizeState){
+        case 2: modalStyles.height = '85vh'; if(isLoading) modalStyles.top = '7.5vh'; break;
+        case 1: modalStyles.height = '65vh'; if(isLoading) modalStyles.top = '17.5vh';break;
+        default: modalStyles.height = '45vh'; if(isLoading) modalStyles.top = '27.5vh';break;
+    }
+    
     let button;
     if(defaultButton.isActive){
         button = <DefaultButton styles={{width: '90%', height: '8vh', left: '5%', bottom: '5%', fontWeight: '700',

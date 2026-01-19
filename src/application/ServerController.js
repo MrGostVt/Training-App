@@ -107,7 +107,9 @@ class ServerController{
         const result = await this.#makeRequest(endpoints.chooseTheme + `?theme=${themeId === undefined? -1: themeId}`, 'POST');
         this.userData.chosenTheme.id = themeId;
         this.userData.chosenTheme.title = title;
-        DataStore.Store('user-data', this.userData)
+        this.userData.accessLevel = result.accessLevel;
+        DataStore.Store('user-data', this.userData);        
+        clientController.triggerEvent('userdata-loaded');
     }
 
 
@@ -146,6 +148,7 @@ class ServerController{
 
         DataStore.Store('user-token', result.token);
         this.token = result.token;
+        DataStore.Store('is-logined-before', true);
 
         await this.getUserData();
         await this.getSubjectThemes();
@@ -172,6 +175,7 @@ class ServerController{
 
         DataStore.Store('user-token', result.token);
         this.token = result.token;
+        DataStore.Store('is-logined-before', true);
 
         await this.getUserData();
         await this.getSubjectThemes();

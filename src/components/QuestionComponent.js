@@ -12,25 +12,28 @@ export const QuestionComponent = ({question, number, qty, answers, theme}) => {
         questionText = quest.type === 0? 
         quest.question: 
         quest.question.split("__").map((val, id, array) => {
-            // console.log(chosenAnswers[id]);
             const answer = question.answers.filter((val) => val.id === chosenAnswers[id])[0];
             let selected = id + 1 !== array.length? `${chosenAnswers[id] !== undefined? answer.title: '-'}`: ''
-            // return `${val} ${selected}`
+            let element = null;
+            if(selected.length > 0){
+                element = <div style={{
+                    backgroundColor: clientController.getColorSettingDefault(COLORS.functional),
+                    marginLeft: '0.5%',
+                    marginRight: '0.5%',
+                    width: 'auto',
+                    minWidth: '50px',
+                    borderRadius: '8px',
+                    height: '100%',
+                    flexShrink: '0',
+                }}>{selected}</div>;
+            }
             return(
                 <Fragment key={val+id}>
                     <div style={{
                         marginRight: '0.5%',
                         flexShrink: '0',
                     }}>{val}</div>
-                    <div style={{
-                        backgroundColor: clientController.getColorSettingDefault(COLORS.functional),
-                        marginLeft: '0.5%',
-                        marginRight: '0.5%',
-                        width: '50px',
-                        borderRadius: '8px',
-                        height: '100%',
-                        flexShrink: '0',
-                    }}>{selected}</div>
+                    {element}
                 </Fragment>
             );
         });
@@ -49,6 +52,11 @@ export const QuestionComponent = ({question, number, qty, answers, theme}) => {
     useEffect(() => {
         setAnswers(answers);
     }, [answers])
+    useEffect(() => {
+        // console.log(questionText, 'QUESTION TEXT')
+        clientController.store['currentQuestion'] = questionText;
+        console.log(clientController.store['currentQuestion'], 'CLIENT HORROR');
+    }, [questionText])
     
     return(
         <div className="DefaultFont Question" style={{color: clientController.getColorSetting(theme, COLORS.text)}}>   

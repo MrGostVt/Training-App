@@ -25,6 +25,7 @@ const ThemeSettings = [
         yellow: 'var(--yellow-exception-color)',
         red: 'var(--red-error-color)',
         green: 'var(--green-okay-color)',
+        black: 'black'
     }
 ];
 
@@ -59,6 +60,9 @@ class ClientController{
         'subjectList-updated': [],
         'wrong-data': [],
     }
+    store = {
+        
+    }
 
     //возможно стоит настроить сохранение данных.
     questionData = {
@@ -73,9 +77,19 @@ class ClientController{
     constructor(){
         this.init();
     }
+    
     init(){
         this.theme = !DataStore.checkStored(StoreKeys.theme)? 0: parseInt(DataStore.getStored(StoreKeys.theme));
         this.subjectTheme = !DataStore.checkStored(StoreKeys.subjectTheme)? 0: parseInt(DataStore.getStored(StoreKeys.subjectTheme));
+    }
+    getColorData(color){
+        const stage1 = color.split('var(');
+        if(stage1.length > 1) {
+            const stage2 = stage1[1].split(')')[0];
+            color = window.getComputedStyle(document.documentElement).getPropertyValue(stage2);
+        }
+
+        return color;
     }
     getColorSettingDefault(type){
         return ThemeSettings[this.theme][type];

@@ -20,6 +20,7 @@
 
     /* background-color: var(--functional-dark-color); */
     z-index: 21;
+    overflow: hidden;
 }
 
 .ModalTitle{
@@ -113,4 +114,11 @@
     width: 100%;
     text-align: center;
     top: 10%;
+}
+
+.PaintDesk{
+    width: 100%;
+    /* background-color: rgba(0, 255, 255, 0.514); */
+    position: relative;
+    height: 100%;
 }

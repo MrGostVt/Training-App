@@ -4,6 +4,7 @@ import { UserIcon, UserInfo } from "./User";
 import { LoadedImages } from "../application/ImageLoad";
 import clientController, { COLORS } from "../application/ClientController";
 import SettingsIcon from "../assets/icons/Settings.svg";
+import DeskIcon from "../assets/icons/Desk.svg"
 import FileIcon from "../assets/icons/File.svg";
 import serverController from "../application/ServerController";
 import { AccessLevels } from "../application/ServerController";
@@ -53,6 +54,9 @@ export const ProfileBlock = ({openModal = () => {}}) => {
 
     const smallButtons = [];
     switch(cardState){
+        case 1: 
+            smallButtons.push(<PaintButton onClick={openModal} theme={chosenTheme} key={'PainDesk'} />);
+            break;
         case 0: 
             smallButtons.push(<SettingsButton onClick={openModal} theme={chosenTheme} key={'Settings'}/>);
             smallButtons.push(<FileButton onClick={openModal} theme={chosenTheme} key={'QuestionConstructor'}/>);
@@ -101,6 +105,8 @@ const FileButton = ({onClick = () => {}, theme}) => {
     return(
         <div className={`SquareButton ${anim}`} style={{
             marginBottom: '3%',
+            height: '6vh',
+
         }}
         onClick={() => {
             if(clientController.subjectTheme !== 0){
@@ -108,6 +114,9 @@ const FileButton = ({onClick = () => {}, theme}) => {
                     // setAnimState(1);
                     // setTimeout(() => {setAnimState(0)}, 400);
                 });
+            }
+            else{
+                clientController.triggerEvent('show-tip', ['Choose theme first!', clientController.getColorSetting(2, 'yellow')]);
             }
             setAnimState(1);
 
@@ -117,6 +126,7 @@ const FileButton = ({onClick = () => {}, theme}) => {
         </div>
     );
 }
+
 const SettingsButton = ({onClick = () => {}, theme}) => {
     const [animState, setAnimState] = useState(0);
 
@@ -140,4 +150,30 @@ const SettingsButton = ({onClick = () => {}, theme}) => {
             <SettingsIcon style={{fill: clientController.getColorSetting(theme, COLORS.text)}}/>
         </div>
     );
+}
+
+const PaintButton = ({onClick = () => {}, theme}) => {
+    const [animState, setAnimState] = useState(0);
+
+    let anim;
+    switch(animState){
+        case 1: anim = 'FileAnim'; break;
+        default: anim = ''; break;
+    }
+
+    return(
+        <div className={`SquareButton ${anim}`} style={{
+            marginBottom: '3%',
+            height: '5vh',
+        }}
+        onClick={() => {
+            const tipText = clientController.store['currentQuestion'];
+            onClick(5, () => {
+                setAnimState(2);
+            }, tipText == undefined? '': tipText);
+            setAnimState(1);
+        }}>
+            <DeskIcon style={{fill: clientController.getColorSetting(theme, COLORS.text)}} width={30} height={50}/>
+        </div>
+    )
 }

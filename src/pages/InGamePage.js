@@ -64,6 +64,10 @@ export const InGamePage = ({moveOut = () => {}}) => {
         }
     }, []);
 
+    // useEffect(() => {
+    //     clientController.store['currentQuestion'] = question;
+    // }, [question]);
+
     return(
         <>
             <QuestionComponent question={question} theme = {chosenTheme}
@@ -140,9 +144,12 @@ const Answers = ({answers = [{title, id}], correctCount, theme, setCurrentAnswer
                     }
                     else{
                         let old = list.pop();
+                        console.log(old, 'SET ANSWER old');
+
                         setCurrentAnswer(old);
                         list.push(val.id);
                     }
+                    console.log(val, 'SET ANSWER');
                     setCurrentAnswer(val.id); 
                     setChosen(list); 
                 }}/>
