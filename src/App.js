@@ -56,7 +56,7 @@ const App = ({}) => {
 
         serverController.getUserData();
         serverController.getSubjectThemes();
-        openModal(5, () => {});
+        // openModal(5, () => {});
 
         return () => {
             clientController.unSubscribeOn('theme-switch', updateTheme);

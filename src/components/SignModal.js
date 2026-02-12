@@ -26,6 +26,7 @@ export const SignModal = ({closeCallback = () => {}}) => {
     });
     const passwordHandlerRef = useRef(() => {});
     const loginHandlerRef = useRef(() => {});
+    const formRef = useRef(undefined);
 
     let signMessage = <div className="DefaultFont" style={{...messageStyles, color: clientController.getColorSettingDefault(COLORS.text)}} onClick={() => {
         setSignType(0);
@@ -61,6 +62,14 @@ export const SignModal = ({closeCallback = () => {}}) => {
     return(
         <ModalWindow title={signType === 1? 'Sign In': 'Sign Up'} closeCallback={closeCallback} isBackgroundClose={false}
         defaultButton={{isActive: true, title:signType === 1? 'SIGN IN': 'SIGN UP', type:'submit', function: async () => {
+                const formData = new FormData(formRef.current);
+                const formLogin = formData.get('username');
+                const formPassword = formData.get('password'); 
+
+                if(formLogin !== logInfo.log || formPassword !== passInfo.pass){
+                    clientController.triggerEvent('show-tip', ['Wait a second before submitting', clientController.getColorSetting(2, 'red')])
+                    return false;
+                }
                 // await serverController.loading(1500)
                 // return passInfo.state && logInfo.state;
                 if(passInfo.state && logInfo.state){
@@ -74,7 +83,7 @@ export const SignModal = ({closeCallback = () => {}}) => {
                 }
                 return false;
             }}}>
-            <form className="SignWrap" autoComplete="on" method="post">
+            <form ref={formRef} className="SignWrap" autoComplete="on" method="post" onInput={(ev) => {console.log('INPUT GA')}}> 
                 <InputField typeID = {0} defaultValue={'Username'} pattern="username" max={50} min={3} autoComplete={"username"}
                 handleFunctionRef={loginHandlerRef}
                 onValueChange={onLogChange} contextValidate={async (value, asyncSetDanger) => {

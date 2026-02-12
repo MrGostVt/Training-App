@@ -4,20 +4,20 @@ import '../assets/styles/ThemesToLearn.css';
 import clientController, { COLORS } from "../application/ClientController";
 import serverController from "../application/ServerController";
 
-export const ThemesToLearnBlock = ({themesList = [{title: 'test', grade: 0, id: 0}], choosedThemeID = 0, setTheme = () => {}}) => {
+export const ThemesToLearnBlock = ({themesList = [{title: 'test', grade: 0, id: 0}], chosenSubject = -1, setTheme = () => {}}) => {
     const [themes, setThemes] = useState(themesList);
-    const [chosenTheme, setChoosedTheme] = useState(choosedThemeID);
+    const [chosen, choose] = useState(chosenSubject);
     const [colorTheme, setColorTheme] = useState(clientController.theme);
     
-    function updateChosenTheme(id){
+    function updateChosenSubject(id){
 
-        if(chosenTheme === id){
-            setChoosedTheme(0);
-            setTheme(0);
+        if(chosen === id){
+            choose(-1);
+            setTheme(-1);
             serverController.chooseTheme(undefined);
             return false;
         }
-        setChoosedTheme(id);
+        choose(id);
         setTheme(id);
         
         const theme = themes.filter((val) => val.id === id)[0];
@@ -25,6 +25,9 @@ export const ThemesToLearnBlock = ({themesList = [{title: 'test', grade: 0, id: 
         
         return true;
     }
+    useEffect(() => {
+        choose(chosenSubject);
+    }, [chosenSubject]);
 
     useEffect(() => {
         function updateTheme(){
@@ -40,23 +43,24 @@ export const ThemesToLearnBlock = ({themesList = [{title: 'test', grade: 0, id: 
         function updateSubjectList(){
             setThemes(serverController.subjectThemes);
         }
-
+        
         clientController.subscribeOn('game-finish', updatePoints);
         clientController.subscribeOn('theme-switch', updateTheme);
-        clientController.subscribeOn('subjectList-updated', updateSubjectList)
+        clientController.subscribeOn('subjectList-updated', updateSubjectList);
 
         return () => {
             clientController.unSubscribeOn('theme-switch', updateTheme);
             clientController.unSubscribeOn('game-finish', updatePoints);
             clientController.unSubscribeOn('subjectList-updated', updatePoints);
         }
-    }, [])
+    }, []);
+
     return(
         <div className="StatsCards">
             {themes.map(val => (
                 <ThemeCard name={val.title} points={val.grade} key={val.id} theme={colorTheme}
-                isChosen={val.id === chosenTheme} setChoosedCallback={(callback) => {
-                    const res = updateChosenTheme(val.id);
+                isChosen={val.id === chosen} setChoosedCallback={(callback) => {
+                    const res = updateChosenSubject(val.id);
                 }}/>
             ))}
         </div>

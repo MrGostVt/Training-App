@@ -44,7 +44,6 @@ export const InGamePage = ({moveOut = () => {}}) => {
                 const questions = new QuestionEngine(list);
                 controllerRef.current = questions;
                 const nextQuestion = questions.getQuestion();
-                console.log(nextQuestion);
                 setCurrent(1);
                 setQuestion(nextQuestion);
                 setAnswers(nextQuestion.answers);
@@ -63,10 +62,6 @@ export const InGamePage = ({moveOut = () => {}}) => {
 
         }
     }, []);
-
-    // useEffect(() => {
-    //     clientController.store['currentQuestion'] = question;
-    // }, [question]);
 
     return(
         <>
@@ -144,12 +139,10 @@ const Answers = ({answers = [{title, id}], correctCount, theme, setCurrentAnswer
                     }
                     else{
                         let old = list.pop();
-                        console.log(old, 'SET ANSWER old');
 
                         setCurrentAnswer(old);
                         list.push(val.id);
                     }
-                    console.log(val, 'SET ANSWER');
                     setCurrentAnswer(val.id); 
                     setChosen(list); 
                 }}/>

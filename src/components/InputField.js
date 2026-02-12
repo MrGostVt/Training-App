@@ -89,7 +89,7 @@ export const InputField = ({typeID = 0, defaultValue, clearFunctionRef = {}, han
             }}
             onChange={(ev) => {
                 clearTimeout(lastTimeOutRef.current);
-                console.log('alert')
+                console.log('alert', ev.target.value);
                 lastTimeOutRef.current = setTimeout(() => {
                     handleChanges(ev.target.value);
                 }, 600);

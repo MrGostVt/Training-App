@@ -23,7 +23,7 @@ export const DataStore = {
         return true;
     },
     Store(key, value){
-        if(!value && value !== 0){
+        if(!value && value !== 0 && value !== false){
             localStorage.removeItem(key);
         }
         const serializedValue = JSON.stringify(value);

@@ -42,6 +42,8 @@ class ServerController{
     subjectThemes = [];
     currentQuestions = [];
 
+    earnedPoints = 0;
+
     constructor() {
         this.token = DataStore.getStored('user-token');
 
@@ -79,10 +81,17 @@ class ServerController{
             questionID: currentQuestion.id,
             rightAnswers: answers,
         });
+
+        this.earnedPoints += result.points || 0;
     }
 
     async finishGame(points){
-        this.userData.currentGrade = points;
+        this.userData.currentGrade += points;
+        if(points != this.earnedPoints){
+            clientController.triggerEvent('show-tip', [`Your points must be recalculated later [${points}:${this.earnedPoints}]`, clientController.getColorSetting(2, 'yellow')]);
+            DataStore.Store('last-points-data', {grade: this.userData.currentGrade, theme: this.userData.chosenTheme.id});
+            this.earnedPoints = 0;
+        }
         this.currentQuestions = [];
         DataStore.Store('user-data', this.userData);
         clientController.triggerEvent('game-finish', {subject: clientController.subjectTheme, points: points});
@@ -105,7 +114,8 @@ class ServerController{
 
     async chooseTheme(themeId, title = ''){
         const result = await this.#makeRequest(endpoints.chooseTheme + `?theme=${themeId === undefined? -1: themeId}`, 'POST');
-        this.userData.chosenTheme.id = themeId;
+        if(!result) return;
+        this.userData.chosenTheme.id = themeId || -1;
         this.userData.chosenTheme.title = title;
         this.userData.accessLevel = result.accessLevel;
         DataStore.Store('user-data', this.userData);        
@@ -127,6 +137,8 @@ class ServerController{
         DataStore.Store('user-token', null);
         DataStore.Store('user-data', null);
         DataStore.Store('subject-theme', null);
+        DataStore.Store('last-points-data', null);
+        // clientController.setSubject(null);
         clientController.triggerEvent('unauthorized');
     }
 
@@ -195,8 +207,14 @@ class ServerController{
         }
 
         this.userData = userData;
-
+        
+        const lastPointsData = DataStore.getStored('last-points-data');
+        if(!!lastPointsData && lastPointsData.theme == this.userData.chosenTheme.id && lastPointsData.grade !== this.userData.currentGrade){
+            DataStore.Store('last-points-data', null);
+            clientController.triggerEvent('show-tip', ['Points updated!', clientController.getColorSetting(2, 'green')]);
+        }
         DataStore.Store('user-data', userData);
+        // clientController.
 
         clientController.triggerEvent('userdata-loaded');
         return userData;
@@ -228,6 +246,14 @@ class ServerController{
         if(!questionList){return []};
         this.currentQuestions = [...questionList.list];
         return questionList.list;
+    }
+
+    async getModeration(){
+        const question = await this.#makeRequest(endpoints.getModerating + `?theme=${this.userData.chosenTheme.id}`, 'GET', null, (status) => {
+            clientController.triggerEvent("show-tip", ["Question not found", clientController.getColorSetting(2, "yellow")]);
+        });
+
+        
     }
 
     async #makeRequest(endpoint, type = 'GET', body, onError = (status) => {}){

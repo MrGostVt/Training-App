@@ -29,13 +29,27 @@ export const MainPage = ({moveToGame = () => {}}) =>{
 
     useEffect(() => {
         clientController.setSubject(chosenSubject);
-    }, [chosenSubject])
+    }, [chosenSubject]);
+
+    useEffect(() => {
+        function handleChosenSubject(){
+            const current = serverController.userData.chosenTheme;
+            console.log('HANDLE HANDLEVOCH');
+            console.log(current);
+
+            if(current.id != chosenSubject) setSubject(current.id);
+        }
+        clientController.subscribeOn('userdata-loaded', handleChosenSubject);
+        
+        return () => clientController.unSubscribeOn('userdata-loaded', handleChosenSubject);
+    }, [])
+
 
 
     return(
         <>
             <ThemesToLearnBlock themesList={serverController.subjectThemes}
-                setTheme={setSubject} choosedThemeID={chosenSubject}
+                setTheme={setSubject} chosenSubject={chosenSubject}
             />
             {barrier}
             <GameBlock GameInfo={{

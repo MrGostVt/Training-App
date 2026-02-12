@@ -24,7 +24,6 @@ export class Question{
     }
 
     getData(){
-        console.log(this.questionData)
 
         const data = {
             question: this.questionData.title,
@@ -43,9 +42,6 @@ export class Question{
         for(let id in answers){
             ids.push(id);
         }
-        // console.log(answers);
-        console.log('yeah yeah')
-        // console.log(ids);
 
         let count = 0;
         while(ids.length != 0){
@@ -79,13 +75,15 @@ export class Question{
         const question = this.questionData;
         
         for(const correctId of this.questionData.rightAnswers){
-            if(this.chosenAnswers.includes(correctId)){
+            console.log(`CorrectId: ${correctId} in chosenAnswers`)
+            if(this.chosenAnswers.includes(correctId) || this.chosenAnswers == correctId){
+                console.log("+")
                 correctAnswers++;
             }
         }
         const points = parseInt(correctAnswers/question.rightAnswers.length * question.maxPoints);
         this.earnedPoints = points;
-        
+        // console.log(`${this.questionData.title} \n chosen answers: ${this.chosenAnswers} \n right answers: ${this.questionData.rightAnswers} \n correct answers: ${correctAnswers} \n earned points: ${points} \n max points: ${question.maxPoints}`);
         return points;
     }
 
@@ -97,13 +95,15 @@ export class Question{
             return this.earnedPoints;
         }
         for(let i = 0; i < question.rightAnswers.length; i++){
-            if(this.chosenAnswers[i] !== question.rightAnswers[i]){
+            console.log(`Chosen answer[i]: ${this.chosenAnswers[i]}; rightAnsers[i]: ${question.rightAnswers[i]}`)
+            if(this.chosenAnswers[i] != question.rightAnswers[i]){
                 this.earnedPoints = 0;
                 return this.earnedPoints;
             }
         }
 
         this.earnedPoints = question.maxPoints;
+        // console.log(`${this.questionData.title} \n chosen answers: ${this.chosenAnswers} \n right answers: ${this.questionData.rightAnswers} \n earned points: ${this.earnedPoints} \n max points: ${question.maxPoints}`);
         return this.earnedPoints;
     }
 

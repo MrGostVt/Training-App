@@ -12,8 +12,9 @@ export const QuestionComponent = ({question, number, qty, answers, theme}) => {
         questionText = quest.type === 0? 
         quest.question: 
         quest.question.split("__").map((val, id, array) => {
-            const answer = question.answers.filter((val) => val.id === chosenAnswers[id])[0];
-            let selected = id + 1 !== array.length? `${chosenAnswers[id] !== undefined? answer.title: '-'}`: ''
+            const answer = quest.answers.filter((val) => val.id === chosenAnswers[id])[0];
+            let selected = id + 1 !== array.length? `${chosenAnswers[id] !== undefined? answer.title: '-'}`: '';
+
             let element = null;
             if(selected.length > 0){
                 element = <div style={{
@@ -53,9 +54,7 @@ export const QuestionComponent = ({question, number, qty, answers, theme}) => {
         setAnswers(answers);
     }, [answers])
     useEffect(() => {
-        // console.log(questionText, 'QUESTION TEXT')
         clientController.store['currentQuestion'] = questionText;
-        console.log(clientController.store['currentQuestion'], 'CLIENT HORROR');
     }, [questionText])
     
     return(

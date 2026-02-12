@@ -47,7 +47,7 @@ const StoreKeys = {
 
 class ClientController{
     theme = 0;
-    subjectTheme = 0;
+    subjectTheme = undefined;
     events = {
         'theme-switch': [],
         'game-start': [],
@@ -80,7 +80,7 @@ class ClientController{
     
     init(){
         this.theme = !DataStore.checkStored(StoreKeys.theme)? 0: parseInt(DataStore.getStored(StoreKeys.theme));
-        this.subjectTheme = !DataStore.checkStored(StoreKeys.subjectTheme)? 0: parseInt(DataStore.getStored(StoreKeys.subjectTheme));
+        this.subjectTheme = !DataStore.checkStored(StoreKeys.subjectTheme)? undefined: DataStore.getStored(StoreKeys.subjectTheme);
     }
     getColorData(color){
         const stage1 = color.split('var(');
@@ -115,9 +115,10 @@ class ClientController{
         return true;
     }
     
-    setSubject(id){
-        this.subjectTheme = id;
-        DataStore.Store(StoreKeys.subjectTheme, id);
+    setSubject(subject){
+        console.log(subject);
+        this.subjectTheme = subject;
+        DataStore.Store(StoreKeys.subjectTheme, subject);
     }
 
     subscribeOn(event, callback){
