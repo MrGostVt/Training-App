@@ -63,6 +63,7 @@ class ClientController{
     store = {
         
     }
+    inModerating = [];
 
     //возможно стоит настроить сохранение данных.
     questionData = {
@@ -136,9 +137,31 @@ class ClientController{
     unSubscribeOn(event, callback){
         if(!!this.events[event]){
             this.events[event] = this.events[event].filter(val => callback !== val);
-        }
-        // console.log(this.events["theme-switch"])
-        
+        }        
+    }
+
+    saveModerating(questions){
+        DataStore.Store("questions-to-moderate", questions);
+        this.inModerating = questions;
+        console.log("Save moderating", this.inModerating);
+    }
+    getModerating(){
+        const questions = DataStore.getStored("questions-to-moderate", (data) => {
+            if(!!data || data.length !== 0) return true;
+            return false;
+        });
+        this.inModerating = questions || []
+        console.log("Get moderating", this.inModerating);
+        return this.inModerating;
+    }
+    getNextModerating(){
+        if(!this.inModerating || this.inModerating.length == 0) return null;
+        return this.inModerating[0];
+    }
+    processModerating(){
+        this.inModerating.shift();
+        this.saveModerating(this.inModerating);
+        return true;
     }
 }
 
