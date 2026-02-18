@@ -17,6 +17,7 @@ const endpoints = {
     getModerating: '/question/moderating',
     moderate: '/question/moderate',
     createGenerationPattern: '/question/create-generation-pattern',
+    checkOnModeration: '/question/check-moderator-on-question',
 }
 
 export const AccessLevels = ['Default', 'Creator', 'Moderator', 'Admin'];
@@ -248,12 +249,33 @@ class ServerController{
         return questionList.list;
     }
 
-    async getModeration(){
-        const question = await this.#makeRequest(endpoints.getModerating + `?theme=${this.userData.chosenTheme.id}`, 'GET', null, (status) => {
+    async getQuestionsOnModeration(limit = 3){
+        const responce = await this.#makeRequest(endpoints.getModerating + `?theme=${this.userData.chosenTheme.id}&limit=${limit}`, 'GET', null, (status) => {
             clientController.triggerEvent("show-tip", ["Question not found", clientController.getColorSetting(2, "yellow")]);
         });
-
+        if(!responce || responce.questions.length == 0){
+            return [];
+        }
         
+        return responce.questions;
+    }
+    async checkQuestionsOnModeration(ids = []){
+        console.log(endpoints.checkOnModeration + `?idlist=${ids.join(',')}`);
+        const responce = await this.#makeRequest(endpoints.checkOnModeration + `?idlist=${ids.join(',')}`);
+        if(!responce) return [].fill(false, 0, ids.length-1);
+
+        return responce.questions;
+    }
+    async moderate(questionID, approved){
+        const responce = await this.#makeRequest(endpoints.moderate, 'POST', {
+            themeID: this.userData.chosenTheme.id,
+            approved, 
+            questionID,
+            timestamp: new Date(),
+        });
+
+        this.userData.moderatedQuestionsCount++;
+        this.userData[approved? 'publishedQuestionsCount': 'skippedQuestionsCount']++;
     }
 
     async #makeRequest(endpoint, type = 'GET', body, onError = (status) => {}){

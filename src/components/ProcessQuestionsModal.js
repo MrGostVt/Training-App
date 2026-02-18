@@ -28,7 +28,6 @@ export const ProcessQuestionsModal = ({closeCallback = () => {}}) => {
     };
     switch(processType){
         case 2: field = <ModerateQuestionField />; defaultButton.isActive = false; defaultButton.function = () => {
-            // console.log(clientController.questionData);
             return false;
         }; 
         modalTitle = 'Moderate questions';
@@ -37,7 +36,6 @@ export const ProcessQuestionsModal = ({closeCallback = () => {}}) => {
             const data = {...clientController.questionData};     
             const wrongProps = [];
             for (const property in data) {
-                console.log(property);
                 if(data[property] === null || data[property].length === 0){
                     wrongProps.push(property);
                 }
@@ -59,7 +57,6 @@ export const ProcessQuestionsModal = ({closeCallback = () => {}}) => {
                 theme: 1
             }
 
-            console.log(formedQuestion);
             const result = await serverController.createQuestion(formedQuestion);
             if(result) clientController.triggerEvent('show-tip', ['Success!', clientController.getColorSetting(2, 'green')]);
             
@@ -110,7 +107,7 @@ const InfoWrap = ({onClick1 = () => {}, onClick2 = () => {}}) => (
             text={'Moderate other peoples questions!'} statistics={[
                 {title: 'Moderated', score: serverController.userData.moderatedQuestionsCount}, 
                 {title: 'Published', score: serverController.userData.publishedQuestionsCount}, 
-                {title: 'Skipped', score: serverController.userData.skippedQuestionsCount}]}/>
+                {title: 'Discarded', score: serverController.userData.skippedQuestionsCount}]}/>
     </div>
 );
 
@@ -289,27 +286,51 @@ const CreateQuestionField = ({}) => {
     );
 }
 
-let test = {type: 0, themeId: 0, id: 0, 
-    questionData:{question: 'What is the capital of France?', correctAnswerIds:[0], maxPoints: 5,
-        answers:[{title: "Paris", id: 0}, {title: "Ierusalim", id: 1}, {title: "Zhytomyr", id: 2}, {title: "Kyiv", id: 3}]}};
-test = {type: 1, themeId: 0, id: 5, 
-    questionData:{question: 'Set a number order: 2 __ 4 __ 6 __ 8', correctAnswerIds:[2,3,1], maxPoints: 10,
-        answers:[{title: "1", id: 0}, {title: "7", id: 1}, {title: "3", id: 2}, {title: "5", id: 3}, {title: "9", id: 4}]}};
-
 const ModerateQuestionField = ({}) => {
     const [question, setQuestion] = useState(null);
     const [answers, setAnswers] = useState([]);
     const [correct, setCorrect] = useState([]);
 
     useEffect(() => {
-        const testQuest = new Question(test.type, test.themeId, test.id, test.questionData);
-        const questionData = testQuest.getData();
-        const correct = testQuest.getCorrectAnswersIDs();
+        const fetch = async () => {
+            let questionsList = [];
+            let saved = clientController.getModerating();
 
-        setQuestion(questionData);
-        setAnswers(questionData.answers);
-        setCorrect(correct);
+            if(saved.length != 0){
+                const savedStates = await serverController.checkQuestionsOnModeration(saved.map(val => val.id));
+                saved = saved.filter((val, index) => {
+                    if(index >= savedStates.length) return false;
+                    return savedStates[index];
+                });
+            }
+
+            if(saved.length < 3) {
+                const newest = await serverController.getQuestionsOnModeration(3 - saved.length);
+                questionsList = [...saved, ...newest];
+            }
+            else questionsList = [...saved];
+            clientController.saveModerating(questionsList);
+            
+            TakeQuestion();
+        } 
+        
+        fetch();
     }, []);
+
+    function TakeQuestion(){
+        const question = clientController.getNextModerating();
+        if(!question) return false;
+
+        const processed = new Question(question);
+        setQuestion(processed);
+        setAnswers(processed.getData().answers);
+        setCorrect(processed.getCorrectAnswersIDs());
+    }
+    function Process(result){
+        serverController.moderate(question.getData().id, result);
+        clientController.processModerating();
+        TakeQuestion();
+    }
 
 
     if(!question){
@@ -318,7 +339,7 @@ const ModerateQuestionField = ({}) => {
     return(
         <div style={{position: 'relative',left: '5%',width: '90%'}}>
             <h3 className="DefaultFont" style={{color: clientController.getColorSettingDefault(COLORS.text)}}>Question</h3>
-            <TextPreview text={question.question} textStyles={{textAlign: 'center'}}/>
+            <TextPreview text={question.getData().question} textStyles={{textAlign: 'center'}}/>
             <h3 className="DefaultFont" style={{color: clientController.getColorSettingDefault(COLORS.text)}}>Answers</h3>
             <div className="ScrollBar" style={{
                 maxHeight: '25vh',
@@ -327,13 +348,13 @@ const ModerateQuestionField = ({}) => {
             }}>
                 {answers.map((val) => (
                     <AnswerBlock val={val} key={val.id} number={correct.indexOf(val.id) + 1}
-                    isOrderDisplayed={question.type === 1 && correct.includes(val.id)}
+                    isOrderDisplayed={question.type == 1 && (correct.includes(val.id))}
                     isCorrect={correct.includes(val.id)}/>
                 ))}
             </div>
             <div>
-                <DefaultButton text="Skip" styles={{position: 'absolute', left: '0'}}/>
-                <DefaultButton text="Publish" styles={{position: 'absolute', right: '0'}}/>
+                <DefaultButton text="Discard" styles={{position: 'absolute', left: '0'}} onClick={() => { Process(false);}}/>
+                <DefaultButton text="Publish" styles={{position: 'absolute', right: '0'}} onClick={() => { Process(true);}}/>
             </div>
         </div>
     );

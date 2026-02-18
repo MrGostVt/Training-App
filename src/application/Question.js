@@ -14,11 +14,12 @@ export class Question{
         this.questionData = questionData;
         this.questionData.answers = this.formAnswers(questionData.answers);
         this.questionData.answers = this.shuffleAnswers(this.questionData.answers);
+        this.questionData.rightAnswers = this.questionData.rightAnswers.map(val => +val);
     }
 
     formAnswers(answers = []){
         const formedAnswers = answers.map((val, id) => {
-            return {title: val, id}
+            return {title: val, id: +id}
         })
         return formedAnswers;
     }
@@ -75,9 +76,7 @@ export class Question{
         const question = this.questionData;
         
         for(const correctId of this.questionData.rightAnswers){
-            console.log(`CorrectId: ${correctId} in chosenAnswers`)
             if(this.chosenAnswers.includes(correctId) || this.chosenAnswers == correctId){
-                console.log("+")
                 correctAnswers++;
             }
         }
@@ -95,7 +94,6 @@ export class Question{
             return this.earnedPoints;
         }
         for(let i = 0; i < question.rightAnswers.length; i++){
-            console.log(`Chosen answer[i]: ${this.chosenAnswers[i]}; rightAnsers[i]: ${question.rightAnswers[i]}`)
             if(this.chosenAnswers[i] != question.rightAnswers[i]){
                 this.earnedPoints = 0;
                 return this.earnedPoints;
