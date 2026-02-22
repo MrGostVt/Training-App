@@ -73,7 +73,7 @@ export const ProfileBlock = ({openModal = () => {}}) => {
                 display: '-webkit-inline-box',
                 marginBottom: '5%',
             }}>
-            <UserIcon />
+            <UserIcon userIconUrl={(serverController.getStaticLink(serverController.userData.icon))}/>
             <UserInfo info={
                 {
                     name: username,

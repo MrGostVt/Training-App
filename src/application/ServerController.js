@@ -6,6 +6,7 @@ const API = process.env.REACT_APP_API_URL;
 const endpoints = {
     getUserData: '/user/get-data',
     chooseTheme: '/user/choose-theme',
+    uploadIcon: '/user/upload-icon',
     getThemes: '/theme/get',
     createTheme: '/theme/create',
     logIn: '/authorize/logIn',
@@ -18,6 +19,7 @@ const endpoints = {
     moderate: '/question/moderate',
     createGenerationPattern: '/question/create-generation-pattern',
     checkOnModeration: '/question/check-moderator-on-question',
+    static: '/static'
 }
 
 export const AccessLevels = ['Default', 'Creator', 'Moderator', 'Admin'];
@@ -38,6 +40,7 @@ class ServerController{
         moderatedQuestionsCount: 0,
         publishedQuestionsCount: 0,
         skippedQuestionsCount: 0,
+        icon: null,
     }
 
     subjectThemes = [];
@@ -69,6 +72,13 @@ class ServerController{
                 this.getSubjectThemes();
             }
         }
+    }
+
+    getStaticLink(file){
+        return API + endpoints.static + '/' + file;
+    }
+    getApi(){
+        return API;
     }
 
     async startGame(){
@@ -278,9 +288,25 @@ class ServerController{
         this.userData[approved? 'publishedQuestionsCount': 'skippedQuestionsCount']++;
     }
 
-    async #makeRequest(endpoint, type = 'GET', body, onError = (status) => {}){
+    async uploadIcon(file, onError = () => {}){
+        console.log("FILE");
+        console.log(file);
+        console.log("BODY");
+        const body = new FormData();
+        body.append("file", file, file.name);
+        console.log([...body.entries()]);
+        const responce = await this.#makeRequest(endpoints.uploadIcon, 'POST', body, onError, {});
+        if(responce){
+            this.userData.icon = responce.icon;
+            DataStore.Store('user-data', this.userData);
+            return true;
+        }
+        return false;
+    }
+
+    async #makeRequest(endpoint, type = 'GET', body, onError = (status) => {}, headers= {'Content-Type': 'application/json'}){
         const Headers = {
-            'Content-Type': 'application/json',
+            ...headers,
             'Authorization': `Bearer ${this.token}`
         }
 
@@ -289,8 +315,13 @@ class ServerController{
             headers: Headers,
         };
         
-        if(type === 'POST'){
+        if(type === 'POST' && !(body instanceof FormData)){
+            console.log("STRINGIFIED")
             request.body = JSON.stringify(body);
+            // request.body = body
+        }
+        else if(body instanceof FormData){
+            request.body = body;
         }
 
         console.log(request);
@@ -315,6 +346,7 @@ class ServerController{
         }
         catch(err){
             onError(err.status, err.message, err);
+            console.error(err);
             return null;
         }
     }
