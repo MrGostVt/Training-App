@@ -5,14 +5,18 @@
     width: 100%;
     height: 100%;
     transition: .3s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
     z-index: 20;
 }
 
 .ModalWindow{
-    position: absolute;
+    position: relative;
     width: 90%;
     /* height: 45vh; */
+    max-width: 70vh;
     left: 5%;
     /* top: 27.5vh; */
     border-radius: 8px;

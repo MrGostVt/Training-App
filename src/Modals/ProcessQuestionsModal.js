@@ -2,15 +2,15 @@ import React, { useEffect } from "react";
 import { useState, useRef } from "react";
 import clientController, { COLORS } from "../application/ClientController";
 import { ModalWindow } from "./ModalWindow";
-import { InfoBlock } from "./InfoBlock";
-import { InputField } from "./InputField";
-import { DefaultButton } from "./DefaultButton";
+import { InfoBlock } from '../components/InfoBlock';
+import { InputField } from "../components/InputField";
+import { DefaultButton } from "../components/DefaultButton";
 import { LoadedImages } from "../application/ImageLoad";
-import { Switch } from "./Switch";
+import { Switch } from "../components/Switch";
 import PlusIcon from "../assets/icons/Plus.svg"
-import { QuestionComponent } from "./QuestionComponent";
+import { QuestionComponent } from "../components/QuestionComponent";
 import { Question } from "../application/Question";
-import { TextPreview } from "./TextPreview";
+import { TextPreview } from "../components/TextPreview";
 import serverController, { AccessLevels } from "../application/ServerController";
 
 export const ProcessQuestionsModal = ({closeCallback = () => {}}) => {

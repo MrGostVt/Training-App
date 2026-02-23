@@ -10,6 +10,7 @@ const ThemeSettings = [
         secondaryText: 'var(--secondary-text-light-color)',
         border: 'var(--border-light)',
         borderActive: 'var(--border-light-active)',
+        defaultBorder: 'var(--default-border-light)',
     },
     {
         main: 'var(--main-dark-color)',
@@ -20,6 +21,7 @@ const ThemeSettings = [
         secondaryText: 'var(--secondary-text-dark-color)',
         border: 'var(--border-dark)',
         borderActive: 'var(--border-dark-active)',
+        defaultBorder: 'var(--default-border-dark)'
     },
     {
         yellow: 'var(--yellow-exception-color)',
@@ -38,6 +40,7 @@ export const COLORS = {
     text2: 'secondaryText',
     border: 'border',
     borderA: 'borderActive',
+    borderD: 'defaultBorder',
 }
 
 const StoreKeys = {
@@ -49,6 +52,7 @@ class ClientController{
     theme = 0;
     subjectTheme = undefined;
     events = {
+        'resize': [],
         'theme-switch': [],
         'game-start': [],
         'game-finish': [],
@@ -74,14 +78,26 @@ class ClientController{
         rightAnswers: null,
         level: null,
     }
+    screenType;
 
     constructor(){
         this.init();
+        window.addEventListener("resize", () => {
+            const currentType = this.identifyScreenType();
+            if(currentType != this.screenType) {
+                this.screenType = currentType;
+                this.triggerEvent('resize', currentType);
+            }
+        }); 
     }
     
     init(){
         this.theme = !DataStore.checkStored(StoreKeys.theme)? 0: parseInt(DataStore.getStored(StoreKeys.theme));
         this.subjectTheme = !DataStore.checkStored(StoreKeys.subjectTheme)? undefined: DataStore.getStored(StoreKeys.subjectTheme);
+        this.screenType = this.identifyScreenType();
+    }
+    identifyScreenType(){
+        return window.innerWidth >= 520? 'Desktop': 'Mobile';
     }
     getColorData(color){
         const stage1 = color.split('var(');

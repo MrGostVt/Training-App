@@ -1,7 +1,7 @@
 .UserInfoDefault{
     position: relative;
     margin-left: 2%;
-    height: 100%;
+    height: auto;
     width: auto;
     display: flex;
     flex-direction: column;
@@ -9,8 +9,8 @@
 }
 .UserIconDefault{
     position: relative;
-    width: 17vh;
-    height: 17vh;
+    width: 15vh;
+    height: 15vh;
     border-radius: 50%;
     overflow: hidden;
 }
@@ -34,4 +34,56 @@
     background-position: center;
     background-repeat: no-repeat;
     background-size: 110% 110%;
+}
+
+.ProfileBlock{
+    position: relative;
+    margin-bottom: 5%;
+}   
+
+@media (min-width: 520px) {
+    .ProfileBlock{
+        width: 300px;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        /* background-color: var(--functional-active-light-color); */
+        z-index: 1;
+    }
+    .UserInfoDefault{
+        text-align: center;
+    }
+    .SmallButtonsBlock{
+        position: relative;
+        display: block;
+        width: 100%;
+    }
+    .SmallButtonsBlock::before{
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        
+        width: 60%;
+        height: 2px;
+        background-color: black;
+    }
+    .UserIconDefault{
+        margin-top: 2.5vh;        
+    }
+}
+@media (max-width: 520px) {
+    .ProfileBlock{
+        left: 5%;
+        width: 90%;
+        height: 17vh;
+        display: -webkit-inline-box;
+    }
+    .SmallButtonsBlock{
+        position: absolute;
+        right: 0%;
+        width: 4.5vh;
+    }
 }

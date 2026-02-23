@@ -2,9 +2,9 @@ import React from "react";
 import { useState } from "react";
 import clientController, {COLORS} from "../application/ClientController";
 import { ModalWindow } from "./ModalWindow";
-import { LinkBlock } from "./LinkBlock";
+import { LinkBlock } from "../components/LinkBlock";
 import serverController from "../application/ServerController";
-import { Switch } from "./Switch";
+import { Switch } from "../components/Switch";
 
 export const SettingsModal = ({closeCallback = () => {}}) => {
     const [chosenTheme, setTheme] = useState(clientController.theme);

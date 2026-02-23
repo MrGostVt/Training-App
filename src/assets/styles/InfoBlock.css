@@ -58,3 +58,11 @@
     width: 90%;
     max-height: 10vh;
 }
+
+.NewsBlock{
+    width: 90%;
+    height: 30vh;
+    margin-left: 5%;
+    margin-bottom: 3vh;
+    background-color: aliceblue;
+}

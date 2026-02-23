@@ -1,6 +1,6 @@
 import React, {  useRef, useState } from "react";
 import { ModalWindow } from "./ModalWindow";
-import { InputField } from "./InputField";
+import { InputField } from "../components/InputField"
 import clientController from "../application/ClientController";
 import { COLORS } from "../application/ClientController";
 import serverController from "../application/ServerController";

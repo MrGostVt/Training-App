@@ -4,15 +4,14 @@ import { MainPage } from "./pages/MainPage";
 import { PagePreview } from "./components/PagePreview";
 import { ProfileBlock } from "./components/ProfileBlock";
 import { InGamePage } from "./pages/InGamePage";
-import { ProcessQuestionsModal } from "./components/ProcessQuestionsModal";
-import { ResultsModal } from "./components/ResultsModal";
-import { SettingsModal } from "./components/SettingsModal";
-import { SignModal } from "./components/SignModal";
+import { ProcessQuestionsModal } from "./Modals/ProcessQuestionsModal";
+import { ResultsModal } from "./Modals/ResultsModal";
+import { SettingsModal } from "./Modals/SettingsModal";
+import { SignModal } from "./Modals/SignModal";
 import clientController, { COLORS } from "./application/ClientController";
 import serverController from "./application/ServerController";
 import { Tip } from "./components/Tip";
-import { PaintModal } from "./components/PaintModal";
-
+import { PaintModal } from "./Modals/PaintModal";
 
 const SavedInstance = {
     'tip': {callback: () => {}, others: {
@@ -129,7 +128,12 @@ const App = ({}) => {
         <div className="App" style={{backgroundColor: clientController.getColorSetting(chosenTheme, COLORS.main)}}>
             <PagePreview text="Trainee-App"/>
             <ProfileBlock openModal = {openModal}/>
-            {page}
+            <div className="WideBlock" style={{
+                backgroundColor: clientController.getColorSetting(chosenTheme, COLORS.f)
+
+            }}>
+                {page}
+            </div>
             {modalWindow}
             {tip}
         </div>

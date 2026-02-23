@@ -1,7 +1,8 @@
 import React, { useEffect, useReducer, useRef, useState } from "react";
 import '../assets/styles/ModalWindow.css';
-import { DefaultButton } from "./DefaultButton";
-import clientController, { COLORS } from "../application/ClientController";
+import { DefaultButton } from "../components/DefaultButton";
+// import clientController, { COLORS } from "../application/ClientController";
+import clientController, {COLORS} from "../application/ClientController";
 
 
 export const ModalWindow = ({children, title = 'undefined', size = 0,
@@ -40,9 +41,9 @@ export const ModalWindow = ({children, title = 'undefined', size = 0,
         backdropFilter = 'blur(3px)'
     }
     switch(sizeState){
-        case 2: modalStyles.height = '85vh'; if(isLoading) modalStyles.top = '7.5vh'; break;
-        case 1: modalStyles.height = '65vh'; if(isLoading) modalStyles.top = '17.5vh';break;
-        default: modalStyles.height = '45vh'; if(isLoading) modalStyles.top = '27.5vh';break;
+        case 2: modalStyles.height = '85vh'; if(isLoading) modalStyles.top = '0vh'; break;
+        case 1: modalStyles.height = '65vh'; if(isLoading) modalStyles.top = '0vh';break;
+        default: modalStyles.height = '45vh'; if(isLoading) modalStyles.top = '0vh';break;
     }
     
     let button;

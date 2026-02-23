@@ -6,6 +6,7 @@ import { GameBlock } from "../components/GameBlock";
 import { LoadedImages } from "../application/ImageLoad";
 import serverController from "../application/ServerController";
 import clientController from "../application/ClientController";
+import { NewsBlock } from "../components/NewsBlock";
 
 export const MainPage = ({moveToGame = () => {}}) =>{
     const [chosenSubject, setSubject] = useState(clientController.subjectTheme);
@@ -47,25 +48,32 @@ export const MainPage = ({moveToGame = () => {}}) =>{
 
 
     return(
-        <>
+        <>  
+            <NewsBlock></NewsBlock>
             <ThemesToLearnBlock themesList={serverController.subjectThemes}
                 setTheme={setSubject} chosenSubject={chosenSubject}
             />
+            {/* <ThemesToLearnBlock themesList={serverController.subjectThemes}
+                setTheme={setSubject} chosenSubject={chosenSubject}
+            /> */}
             {barrier}
-            <GameBlock GameInfo={{
-                type: 'Practice',
-                typeDescripe: 'Quick game',
-                description: 'Play a quick practice to improve your skills',
-                iconUrl: LoadedImages['Practice.png'],
-                typeId: 1,
-            }} moveToGame={moveToGame}/>
-            <GameBlock GameInfo={{
-                type: 'Tournament',
-                typeDescripe: 'Tournament match',
-                description: 'Join to tournament and show your skills',
-                iconUrl: LoadedImages['Tournament.png'],
-                typeId: 2,
-            }} moveToGame={() => {clientController.triggerEvent('show-tip', ['Coming soon!', clientController.getColorSetting(2, 'yellow')])}}/>
+            <div className="GameBlockField">
+                <GameBlock GameInfo={{
+                    type: 'Practice',
+                    typeDescripe: 'Quick game',
+                    description: 'Play a quick practice to improve your skills',
+                    iconUrl: LoadedImages['Practice.png'],
+                    typeId: 1,
+                }} moveToGame={moveToGame}/>
+                <GameBlock GameInfo={{
+                    type: 'Tournament',
+                    typeDescripe: 'Tournament match',
+                    description: 'Join to tournament and show your skills',
+                    iconUrl: LoadedImages['Tournament.png'],
+                    typeId: 2,
+                }} moveToGame={() => {clientController.triggerEvent('show-tip', ['Coming soon!', clientController.getColorSetting(2, 'yellow')])}}/>
+            </div>
+            
         </>
     );
 }

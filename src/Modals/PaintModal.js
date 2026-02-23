@@ -1,9 +1,10 @@
 import React, {  useEffect, useRef, useState } from "react";
 import { ModalWindow } from "./ModalWindow";
-import { PaintDesk } from "./PaintDesk";
-import { Switch } from "./Switch";
-import clientController, { COLORS } from "../application/ClientController";
-import { TextPreview } from "./TextPreview";
+import { PaintDesk } from "../components/PaintDesk";
+import { Switch } from "../components/Switch";
+import clientController, {COLORS} from "../application/ClientController";
+import { TextPreview } from "../components/TextPreview"
+
 //Select numbers in the range 16 * 10 / 5 - 56 / 8 * 6
 export const PaintModal = ({closeCallback = () => {}, tiptext = ''}) => {
     const [brushSize, setBrushSize] = useState(5);

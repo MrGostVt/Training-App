@@ -2,9 +2,11 @@
     position: relative;
     left: 5%;
     width: 90%;
+    max-width: 50vh;
     height: 24vh;
     margin-bottom: 5%;
 }
+
 
 .InfoInGameBlock{
     position: relative;
@@ -24,4 +26,13 @@
     background-repeat: no-repeat;
     background-position: center;
     background-size: calc(15vh - 2vw) 15vh;
+}
+
+@media (min-width: 520px) {
+    .GameBlockField{
+        position: relative;
+        display: flex;
+        flex-direction: row;
+        gap: 3%;
+    }
 }

@@ -8,6 +8,7 @@
     --secondary-text-dark-color: #8F99CC;
     --border-dark: #2E386B;
     --border-dark-active: #8F99CC;
+    --default-border-dark: #b3b3b3;
 
     --main-light-color: #FFFFFF;
     --functional-light-color: #E5E8F5;
@@ -17,6 +18,7 @@
     --secondary-text-light-color: #47579E;
     --border-light: #2E386B;
     --border-light-active: #8F99CC;
+    --default-border-light: #b3b3b3;
 
     --yellow-exception-color:orange;
     --red-error-color: #cb0000;
@@ -36,11 +38,25 @@
     height: 100%;
 }
 
+
+
 @media (min-width: 520px) {
     .App{
-        width: 520px;
+        width: 100vw;
         height: 100vh;
         border-radius: 8px;
+    }
+    .WideBlock{
+        position: absolute;
+        top: 8vh;
+        width: calc(100% - 300px);
+        height: auto;
+        right: 0;
+        margin-left: 5%;
+        /* background-color: orangered; */
+    }
+    .PagePreview{
+        border-bottom: black solid 2px;
     }
 }
 @media (max-width: 520px) {
@@ -52,6 +68,7 @@
 
 .App{
     position: relative;
+    overflow-y: scroll;
     /* background-color: var(--main-dark-color); */
 }
 
@@ -75,6 +92,7 @@
     font-weight: 500;
     line-height: 24px;
     font-size: 18px;
+    z-index: 1;
 }
 
 .DefaultButton{
@@ -108,13 +126,21 @@
 
 .SquareButton{
     position: relative;
-    width: 4vh;
-    height: 4vh;
+    width: 5vh;
+    height: 5vh;
 
     background-position: center;
     background-repeat: no-repeat;
     background-size: 100% 100%;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    /* margin-bottom: 3%; */
+    margin-right: 3%;
+    margin-left: 3%;
 }
 
 .SettingsOpen{
