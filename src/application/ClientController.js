@@ -7,10 +7,13 @@ const ThemeSettings = [
         functionalActive: 'var(--functional-active-light-color)',
         mainButton: 'var(--main-button-light-color)',
         mainText: 'var(--main-text-light-color)',
+        text: 'var(--text-light-color)',
+        textActive: 'var(--text-dark-active)',
         secondaryText: 'var(--secondary-text-light-color)',
         border: 'var(--border-light)',
         borderActive: 'var(--border-light-active)',
         defaultBorder: 'var(--default-border-light)',
+        background: 'var(--background-light)',
     },
     {
         main: 'var(--main-dark-color)',
@@ -18,16 +21,19 @@ const ThemeSettings = [
         functionalActive: 'var(--functional-active-dark-color)',
         mainButton: 'var(--main-button-dark-color)',
         mainText: 'var(--main-text-dark-color)',
+        text: 'var(--text-dark-color)',
+        textActive: 'var(--text-light-active)',
         secondaryText: 'var(--secondary-text-dark-color)',
         border: 'var(--border-dark)',
         borderActive: 'var(--border-dark-active)',
-        defaultBorder: 'var(--default-border-dark)'
+        defaultBorder: 'var(--default-border-dark)',
+        backgroud: 'var(--background-dark)',
     },
     {
         yellow: 'var(--yellow-exception-color)',
         red: 'var(--red-error-color)',
         green: 'var(--green-okay-color)',
-        black: 'black'
+        black: 'black',
     }
 ];
 
@@ -38,9 +44,12 @@ export const COLORS = {
     button: 'mainButton',
     text: 'mainText',
     text2: 'secondaryText',
+    text3: 'text',
     border: 'border',
     borderA: 'borderActive',
     borderD: 'defaultBorder',
+    back: 'background',
+    textA: 'textActive',
 }
 
 const StoreKeys = {
@@ -113,6 +122,18 @@ class ClientController{
     }
     getColorSetting(theme, type){
         return ThemeSettings[theme][type];
+    }
+    
+    pastelColors = [
+        '#EFF6FF', '#ECFDF5', '#FEFCE8',
+        '#FDF2F8', '#EEF2FF', '#FFF7ED',
+        '#ffc09f', '#ffee93', '#fcf5c7',
+        '#a0ced9', '#adf7b6'
+    ];
+    
+    getRandomPastelColor(){
+        const index = Math.round(Math.random() * this.pastelColors.length-1);  
+        return this.pastelColors[index];  
     }
     switchTheme(){
         this.theme = !!this.theme? 0: 1;

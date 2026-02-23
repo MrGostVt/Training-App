@@ -15,14 +15,10 @@
 .ModalWindow{
     position: relative;
     width: 90%;
-    /* height: 45vh; */
     max-width: 70vh;
-    left: 5%;
-    /* top: 27.5vh; */
     border-radius: 8px;
     transition: .2s;
 
-    /* background-color: var(--functional-dark-color); */
     z-index: 21;
     overflow: hidden;
 }

@@ -26,20 +26,31 @@ export const ProfileBlock = ({openModal = () => {}}) => {
             const subject = serverController.userData.chosenTheme.title;
             const level = serverController.userData.accessLevel;
             const points = serverController.userData.currentGrade;
-            console.log(subject);
-            setInfo([`Level ${AccessLevels[level]}`, `Theme: ${subject}`, `${points} Points`]);
+
+            setInfo([
+                {text: `Level: ${AccessLevels[level]}`, styles: {
+                    color: clientController.getColorSettingDefault(COLORS.button),
+                }}, 
+                {text: `Theme: ${subject}`, styles: {
+                    color: clientController.getColorSettingDefault(COLORS.text3),
+                }}, 
+                {text: `${points} Points`, styles: {
+                    color: clientController.getColorSettingDefault(COLORS.text3),
+                    fontSize: '22px', fontWeight: 600
+                }}
+            ]);
             setCardState(1);
         }
         function onGameFinish(){
             const level = serverController.userData.accessLevel;
-            setInfo([`Level ${AccessLevels[level]}`]);
+            setInfo([{text: `Level: ${AccessLevels[level]}`, styles: {}}]);
             setCardState(0);
         }
 
         function handleUserDataUpdate(){
             const data = serverController.userData;
             setUsername(data.username);
-            setInfo([`Level ${AccessLevels[data.accessLevel]}`]);
+            setInfo([{text: `Level: ${AccessLevels[data.accessLevel]}`, styles: {}}]);
         }
 
         function handleScreenUpdate(type){
@@ -109,9 +120,7 @@ export const ProfileBlock = ({openModal = () => {}}) => {
     }
 
     return(
-        <div className="ProfileBlock" style={{
-            borderRight: screen == 'Desktop'?  `2px solid ${clientController.getColorSetting(chosenTheme, COLORS.borderD)}`: ''
-        }}>
+        <div className="ProfileBlock">
             <UserIcon userIconUrl={(serverController.getStaticLink(serverController.userData.icon))}/>
             <UserInfo info={
                 {
@@ -154,23 +163,24 @@ const Button = ({onClick = (onExit) => {}, getAnimation = (state) => (''), theme
                 });
                 setAnimState(1);
             }} styles={{
-                width: '50%',
+                width: '80%',
                 position: 'relative',
                 display: 'flex',
                 flexDirection: 'row',
                 justifyContent: 'center',
                 alignItems: 'center',
                 margin: '0 auto',
-                marginTop: '5%',
+                marginBottom: '5%',
+                gap: '2px', fontSize: '16px',
                 color: clientController.getColorSetting(theme, COLORS.text),
                 backgroundColor: clientController.getColorSetting(theme, COLORS.functional)
             }}>
                 <SquareButton animation={anim}>{children}</SquareButton>
-                <text style={{
-                    flex: 1,
+                <span style={{
+                    // flex: 1,
                     textAlign: 'left',
                     fontSize: '14px'
-                }}>{text}</text>
+                }}>{text}</span>
             </DefaultButton>
         )
     }

@@ -5,20 +5,26 @@
     --functional-active-dark-color: #303c6b;
     --main-button-dark-color: #617AFA;
     --main-text-dark-color: #FFFFFF;
+    --text-dark-color: #4B5563;
+    --text-dark-active: #1D4ED8;
     --secondary-text-dark-color: #8F99CC;
     --border-dark: #2E386B;
     --border-dark-active: #8F99CC;
     --default-border-dark: #b3b3b3;
+    --background-dark: #F8F9FC;
 
     --main-light-color: #FFFFFF;
     --functional-light-color: #E5E8F5;
     --functional-active-light-color: #c6cef3;
-    --main-button-light-color: #617AFA;
+    --main-button-light-color: #2563EB;
     --main-text-light-color: #0D0F1C;
     --secondary-text-light-color: #47579E;
+    --text-light-color: #4B5563;
+    --text-light-active: #1D4ED8;
     --border-light: #2E386B;
     --border-light-active: #8F99CC;
     --default-border-light: #b3b3b3;
+    --background-light: #F8F9FC;
 
     --yellow-exception-color:orange;
     --red-error-color: #cb0000;
@@ -38,7 +44,9 @@
     height: 100%;
 }
 
-
+.WideBlock{
+    min-height: calc(100% - 8vh);
+}
 
 @media (min-width: 520px) {
     .App{
@@ -50,13 +58,16 @@
         position: absolute;
         top: 8vh;
         width: calc(100% - 300px);
-        height: auto;
         right: 0;
         margin-left: 5%;
         /* background-color: orangered; */
     }
     .PagePreview{
         border-bottom: black solid 2px;
+    }
+    .SquareButton{
+        /* margin-left: 25px; */
+        scale: 0.75;
     }
 }
 @media (max-width: 520px) {
@@ -137,10 +148,6 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin: 0 auto;
-    /* margin-bottom: 3%; */
-    margin-right: 3%;
-    margin-left: 3%;
 }
 
 .SettingsOpen{
@@ -289,3 +296,14 @@ textarea:focus, input:focus{
     }
 }
 
+/* ::before{
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: 100%;
+    background-color: black;
+    height: 2px;
+} */

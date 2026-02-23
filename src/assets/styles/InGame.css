@@ -1,11 +1,15 @@
 .Question{
-    position: relative;
-    left: 5%;
+    position: sticky;
+    /* left: 5%; */
     width: 90%;
+    top: 2.5vh;
     
     /* color: var(--main-text-dark-color); */
     font-size: 22px;
     line-height: 28px;
+    margin: 0 auto;
+    margin-bottom: 3vh;
+    z-index: 3;
 
     /* display: flex; */
 }
@@ -17,5 +21,44 @@
     
     scrollbar-color: #4d4d4d #e1ebe100;
     scrollbar-width: none;
+    overflow-y: hidden;
     /* color: var(--main-text-dark-color); */
+}
+@media (min-width: 1000px) {
+    .Question{
+        margin-top: 2.5vh;
+    }
+    .AnswersList{
+        display: grid;
+        grid-template-columns: repeat(3, 180px);
+        gap: 32px;
+        justify-content: center;
+    }
+}
+@media (max-width: 1000px) {
+    .AnswersList{
+        display: grid;
+        grid-template-columns: repeat(2, 180px);
+        gap: 32px;
+        justify-content: center;
+    }
+}
+@media (max-width: 520px){
+    .AnswersList{
+        display: block;
+    }
+}
+.QuestionInfoPreview{
+    position: relative;
+}
+.QuestionInfoPreview::after{
+    content: "";
+    position: absolute;
+    bottom: -1.25vh;
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: 100%;
+    background-color: black;
+    height: 2px;
 }

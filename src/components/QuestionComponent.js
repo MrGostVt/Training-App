@@ -1,6 +1,7 @@
 import React from "react";
 import { Fragment, useRef, useState, useEffect } from "react";
 import clientController, { COLORS } from "../application/ClientController";
+import { TextPreview } from "./TextPreview";
 
 export const QuestionComponent = ({question, number, qty, answers, theme}) => {
     const [quest, setQuest] = useState(question);
@@ -59,16 +60,15 @@ export const QuestionComponent = ({question, number, qty, answers, theme}) => {
     
     return(
         <div className="DefaultFont Question" style={{color: clientController.getColorSetting(theme, COLORS.text)}}>   
-            {`Question ${number}/${qty}. Choose ${answerCount} ${answerCount === 1? 'answer':'answers'}`}
-            <div style={{
-                fontSize: '16px', 
-                textAlign: 'center',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginBottom: '3%',
-                marginTop: '3%',
-            }}>{questionText}</div>
+            <p className="QuestionInfoPreview">{`Question ${number}/${qty}. Choose ${answerCount} ${answerCount === 1? 'answer':'answers'}`}</p>
+            <TextPreview text={questionText} wrapStyles={{
+                width: 'auto', height: 'auto', margin: 0,
+                backgroundColor: clientController.getColorSettingDefault(COLORS.functional),
+                }} 
+                highlightMath={true} hightlightColor={clientController.getColorSettingDefault(COLORS.textA)}
+                textStyles={{display: 'flex', flexDirection: 'row', justifyContent: 'center', textAlign: 'center', 
+                color: clientController.getColorSettingDefault(COLORS.text3),
+            }}/>
         </div>
     );
 }

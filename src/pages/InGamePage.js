@@ -6,33 +6,13 @@ import clientController, { COLORS } from "../application/ClientController";
 import { QuestionComponent } from "../components/QuestionComponent";
 import serverController from "../application/ServerController";
 
-const LIST = [
-    {type: 0, themeId: 0, id: 0, 
-        questionData:{question: 'What is the capital of France?', correctAnswerIds:[0], maxPoints: 5,
-            answers:[{title: "Paris", id: 0}, {title: "Ierusalim", id: 1}, {title: "Zhytomyr", id: 2}, {title: "Kyiv", id: 3}]}},
-    {type: 0, themeId: 0, id: 1, 
-        questionData:{question: 'What is the capital of world', correctAnswerIds:[2], maxPoints: 5,
-            answers:[{title: "Paris", id: 0}, {title: "Ierusalim", id: 1}, {title: "Zhytomyr", id: 2}, {title: "Kyiv", id: 3}]}},
-    {type: 0, themeId: 0, id: 2, 
-        questionData:{question: 'What is the capital of jewish', correctAnswerIds:[0], maxPoints: 5,
-            answers:[ {title: "Ierusalim", id: 0}, {title: "Zhytomyr", id: 1}, {title: "Kyiv", id: 2}]}},
-    {type: 0, themeId: 0, id: 3, 
-        questionData:{question: 'Why i do this shit? Lorem ipsum adkhjkflg hklfjg khfjgklhjfg hjlfkgj hlfjgkl hjfklj', correctAnswerIds:[3], maxPoints: 5,
-            answers:[{title: "maks loh", id: 0}, {title: "Skibidi tualet", id: 1}, {title: "mayakovskii", id: 2}, {title: "cause i'm trockyy", id: 3}]}},
-    {type: 0, themeId: 0, id: 4, 
-        questionData:{question: 'Where are my pants?', correctAnswerIds:[0,1], maxPoints: 5,
-            answers:[{title: "Paris", id: 0}, {title: "Ierusalim", id: 1}, {title: "Zhytomyr", id: 2}, {title: "Kyiv", id: 3}]}},
-    {type: 1, themeId: 0, id: 5, 
-        questionData:{question: 'Set a number order: 2 __ 4 __ 6 __ 8', correctAnswerIds:[2,3,1], maxPoints: 10,
-            answers:[{title: "1", id: 0}, {title: "7", id: 1}, {title: "3", id: 2}, {title: "5", id: 3}, {title: "9", id: 4}]}},
-];
-
 export const InGamePage = ({moveOut = () => {}}) => {
     const [chosenTheme, setTheme] = useState(clientController.theme);
     const [question, setQuestion] = useState(null);
     const [currentQuest, setCurrent] = useState(0);
     const [chosenAnswer, setChosen] = useState([]);
     const [answers, setAnswers] = useState([]);
+    const [screen, setScreen] = useState(clientController.identifyScreenType());
     const controllerRef = useRef(null);
 
     useEffect(() => {
@@ -56,10 +36,14 @@ export const InGamePage = ({moveOut = () => {}}) => {
                 }, 2000);
             }
         } 
+        function handleResize(type){
+            setScreen(type);
+        }
 
         getQuestionList();
+        clientController.subscribeOn('resize', handleResize);
         return () => {
-
+            clientController.unSubscribeOn('resize', handleResize);
         }
     }, []);
 
@@ -68,7 +52,7 @@ export const InGamePage = ({moveOut = () => {}}) => {
             <QuestionComponent question={question} theme = {chosenTheme}
             number={currentQuest} qty={controllerRef.current? controllerRef.current.getQty(): 0} 
             answers={chosenAnswer}/>
-            <Answers answers={answers} theme = {chosenTheme}
+            <Answers answers={answers} theme = {chosenTheme} screen={screen}
             correctCount={question? question.correctCount: 0}
             setCurrentAnswer={(id) => {
                 let answers;
@@ -81,7 +65,13 @@ export const InGamePage = ({moveOut = () => {}}) => {
                 setChosen([...answers])
             }}/>
             
-            <DefaultButton styles={{bottom: '5%', width: '90%', left: '5%', backgroundColor: clientController.getColorSetting(chosenTheme, COLORS.button)}} 
+            <DefaultButton styles={{ 
+                position:'sticky', bottom: '5vh', 
+                width: '90%', left: 0, right: 0, margin: '0 auto',
+                backgroundColor: clientController.getColorSetting(chosenTheme, COLORS.button),
+                color: clientController.getColorSetting(chosenTheme, COLORS.functional),
+                fontWeight: 500, fontSize: '16px'
+            }} 
             onClick={() => {
                 if(controllerRef.current !== null && chosenAnswer.length == question.correctCount){
                     const id = controllerRef.current.getQuestion().id;
@@ -104,6 +94,8 @@ export const InGamePage = ({moveOut = () => {}}) => {
                         setAnswers(nextQuestion.answers);
                     }
                 }
+                else clientController.triggerEvent('show-tip', [`Choose ${question.correctCount} answers!`, clientController.getColorSetting(2, 'yellow')]);
+                
             }} text="Done"/>
         </>
     )
@@ -111,22 +103,31 @@ export const InGamePage = ({moveOut = () => {}}) => {
 
 
 
-const Answers = ({answers = [{title, id}], correctCount, theme, setCurrentAnswer = () => {}}) => {
+const Answers = ({answers = [{title, id}], correctCount, theme, screen, setCurrentAnswer = () => {}}) => {
     const [chosen, setChosen] = useState([]);
+    const [colors, setColors] = useState([])
     const border = 'solid 2px var(--main-button-dark-color)';
 
     useEffect(() => {
         setChosen([]);
+        setColors(answers.map(() => ( clientController.getRandomPastelColor())));
+
     }, [answers])
+
+    const desktopStyles = screen !== 'Desktop'? {}: {
+        aspectRatio: '1', height: 'auto', justifySelf: 'center',
+        fontSize: '32px', marginTop: '4px', fontWeight: 600,
+    } 
 
     return(
         <div className="AnswersList" style={{color: clientController.getColorSetting(theme, COLORS.text)}}>
-            {answers.map((val) => (
+            {answers.map((val, id) => (
                 <DefaultButton text={val.title} key={val.id} styles={{
-                    position: 'relative', 
-                    marginBottom: '5%', width: '100%', 
-                    border: chosen.includes(val.id)? border: '',
-                    backgroundColor: clientController.getColorSetting(theme, COLORS.functional),
+                    position: 'relative', margin: '0 auto', 
+                    marginBottom: '25px', width: '100%', maxWidth: '500px',
+                    border: chosen.includes(val.id)? border: '', 
+                    backgroundColor: colors[id],
+                    ...desktopStyles
                 }}
                 onClick={() => {
                     const isIncludes = chosen.includes(val.id);
@@ -147,6 +148,7 @@ const Answers = ({answers = [{title, id}], correctCount, theme, setCurrentAnswer
                     setChosen(list); 
                 }}/>
             ))}
+            <div style={{position: 'relative', height: '10vh'}}></div>
         </div>
     );
 }

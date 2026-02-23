@@ -24,7 +24,7 @@ const App = ({}) => {
     const [pageId, setPage] = useState(0);
     const [modal, setModal] = useState(0);
     const [tipState, setTipState] = useState(false);
-
+    const [screen, setScreen] = useState(clientController.identifyScreenType());
     const [chosenTheme, setTheme] = useState(clientController.theme);
 
     useEffect(() => {
@@ -39,30 +39,25 @@ const App = ({}) => {
         function onForbidden(){
 
         }
+        function handleResize(type){
+            setScreen(type);
+        }
 
         clientController.subscribeOn('theme-switch', updateTheme);
         clientController.subscribeOn('unauthorized', onUnauthorized );
         clientController.subscribeOn('forbidden', onForbidden);
         clientController.subscribeOn('show-tip', showTip); // добавить возможность выбирать цвет для подсказки.
-
-        // async function name(params) {
-        //     await serverController.getUserData();
-        // }
-
-
-        // openModal(2, () => {});
-        // openModal(4, () => {}); 
+        clientController.subscribeOn('resize', handleResize);
 
         serverController.getUserData();
         serverController.getSubjectThemes();
-        // openModal(5, () => {});
 
         return () => {
             clientController.unSubscribeOn('theme-switch', updateTheme);
             clientController.unSubscribeOn('unauthorized', onUnauthorized);
             clientController.unSubscribeOn('forbidden', onForbidden);
             clientController.unSubscribeOn('show-tip', showTip);
-
+            clientController.unSubscribeOn('resize', handleResize);
         }
     }, []);
 
@@ -129,8 +124,8 @@ const App = ({}) => {
             <PagePreview text="Trainee-App"/>
             <ProfileBlock openModal = {openModal}/>
             <div className="WideBlock" style={{
-                backgroundColor: clientController.getColorSetting(chosenTheme, COLORS.f)
-
+                backgroundColor: clientController.getColorSetting(chosenTheme, COLORS.back),
+                borderLeft: screen == 'Desktop'?  `2px solid ${clientController.getColorSetting(chosenTheme, COLORS.borderD)}`: ''
             }}>
                 {page}
             </div>
