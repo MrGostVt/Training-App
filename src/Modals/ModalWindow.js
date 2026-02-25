@@ -1,7 +1,8 @@
 import React, { useEffect, useReducer, useRef, useState } from "react";
 import '../assets/styles/ModalWindow.css';
-import { DefaultButton } from "./DefaultButton";
-import clientController, { COLORS } from "../application/ClientController";
+import { DefaultButton } from "../components/DefaultButton";
+// import clientController, { COLORS } from "../application/ClientController";
+import clientController, {COLORS} from "../application/ClientController";
 
 
 export const ModalWindow = ({children, title = 'undefined', size = 0,
@@ -40,15 +41,15 @@ export const ModalWindow = ({children, title = 'undefined', size = 0,
         backdropFilter = 'blur(3px)'
     }
     switch(sizeState){
-        case 2: modalStyles.height = '85vh'; if(isLoading) modalStyles.top = '7.5vh'; break;
-        case 1: modalStyles.height = '65vh'; if(isLoading) modalStyles.top = '17.5vh';break;
-        default: modalStyles.height = '45vh'; if(isLoading) modalStyles.top = '27.5vh';break;
+        case 2: modalStyles.height = '85vh'; if(isLoading) modalStyles.top = '0vh'; break;
+        case 1: modalStyles.height = '65vh'; if(isLoading) modalStyles.top = '0vh';break;
+        default: modalStyles.height = '45vh'; if(isLoading) modalStyles.top = '0vh';break;
     }
     
     let button;
     if(defaultButton.isActive){
         button = <DefaultButton styles={{width: '90%', height: '8vh', left: '5%', bottom: '5%', fontWeight: '700',
-            backgroundColor: `var(--main-button-dark-color)`, color: 'var(--main-text-dark-color)'}} text={defaultButton.title}
+            backgroundColor: clientController.getColorSetting(chosenTheme, COLORS.button), color: 'var(--main-text-dark-color)'}} text={defaultButton.title}
             onClick={async () => {
                 let isCanExit = true;
                 
@@ -59,7 +60,7 @@ export const ModalWindow = ({children, title = 'undefined', size = 0,
                 if(isCanExit) exitFunction(false);
             }}
             type = {defaultButton.type}
-            />
+        />
     }
     
     return(

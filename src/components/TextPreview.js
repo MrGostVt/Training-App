@@ -1,7 +1,42 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import clientController, { COLORS } from "../application/ClientController";
 
-export const TextPreview = ({text, textStyles = {}, wrapStyles = {}}) => {
+export const TextPreview = ({text, textStyles = {}, wrapStyles = {}, highlightMath = false, hightlightColor = ''}) => {
+    const [editedText, updateText] = useState([text]);
+    
+    useEffect(() => {
+        if (!highlightMath) return;
+      
+        const result = [];
+        let buffer = "";
+        let isMath = /[0-9\-+/*^]/.test(text[0]);
+        for (let char of text) {
+            const charIsMath = /[0-9\-+/*^]/.test(char);
+            if(charIsMath === isMath || char === ' '){
+                buffer += char;
+            }
+            else{
+                result.push({text:buffer, math: isMath});
+                buffer = char;
+                isMath = charIsMath;
+            }
+        }
+      
+        if (buffer) {
+          result.push({ text: buffer, math: isMath });
+        }
+      
+        updateText(
+          result.map((part, i) =>
+            <span key={i} style={{ 
+                color: part.math ? hightlightColor: "inherit", marginRight: '6px',
+                fontWeight: part.math ? 600: 'inherit'
+                }}>
+              {part.text}
+            </span>
+          )
+        );
+      }, [text]);
 
     return(
         <div className="DefaultFont InputFieldWrap" style={{
@@ -11,9 +46,13 @@ export const TextPreview = ({text, textStyles = {}, wrapStyles = {}}) => {
             ...wrapStyles,
         }}>
             <div style={{
-                ...textStyles
+                ...textStyles,
+                display: 'inline'
             }}>
-                {text}
+                {editedText.map(val => (
+                    val
+                ))}
+                {/* {text} */}
             </div>
         </div>
     );

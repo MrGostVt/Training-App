@@ -34,10 +34,10 @@
 
 .InfoIcon{
     position: relative;
-    width: 90%;
-    left: 5%;
     height: 8vh;
-    background-size: 40% 110%;
+    background-size: 100% 100%;
+    aspect-ratio: 1;
+    margin: 0 auto;
     background-repeat: no-repeat;
     background-position: center;
 }
@@ -57,4 +57,12 @@
     left: 5%;
     width: 90%;
     max-height: 10vh;
+}
+
+.NewsBlock{
+    width: 90%;
+    height: 30vh;
+    margin-left: 5%;
+    margin-bottom: 3vh;
+    background-color: aliceblue;
 }

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import clientController, { COLORS } from "../application/ClientController";
 
-export const DefaultButton = ({text = 'default', styles = {}, onClick = () => {}, type}) => {
+export const DefaultButton = ({children, text = 'default', styles = {}, onClick = () => {}, type}) => {
     const [shadowState, setShadow] = useState(true);
 
     let shadow;
@@ -19,6 +19,7 @@ export const DefaultButton = ({text = 'default', styles = {}, onClick = () => {}
             onPointerLeave={() => setShadow(true)}
             onClick={onClick}
         >
+            {children}
             {text}
         </button>
     );

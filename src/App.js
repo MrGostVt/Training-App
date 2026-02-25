@@ -1,23 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import './assets/styles/App.css';
 import { MainPage } from "./pages/MainPage";
 import { PagePreview } from "./components/PagePreview";
 import { ProfileBlock } from "./components/ProfileBlock";
 import { InGamePage } from "./pages/InGamePage";
-import { ProcessQuestionsModal } from "./components/ProcessQuestionsModal";
-import { ResultsModal } from "./components/ResultsModal";
-import { SettingsModal } from "./components/SettingsModal";
-import { SignModal } from "./components/SignModal";
+import { ProcessQuestionsModal } from "./Modals/ProcessQuestionsModal";
+import { ResultsModal } from "./Modals/ResultsModal";
+import { SettingsModal } from "./Modals/SettingsModal";
+import { SignModal } from "./Modals/SignModal";
 import clientController, { COLORS } from "./application/ClientController";
 import serverController from "./application/ServerController";
 import { Tip } from "./components/Tip";
-import { PaintModal } from "./components/PaintModal";
-
+import { PaintModal } from "./Modals/PaintModal";
+import { DefaultButton } from "./components/DefaultButton";
+import { ModalButton } from "./Modals/ModalButton";
 
 const SavedInstance = {
     'tip': {callback: () => {}, others: {
-        text: '', color: undefined
+        text: '', styles: undefined
     }, queue: []},
+    'modalButton': {callback: () => {}, others: {
+        text: '', color: undefined
+    }},
     1: () => {},
 };
 
@@ -25,8 +29,10 @@ const App = ({}) => {
     const [pageId, setPage] = useState(0);
     const [modal, setModal] = useState(0);
     const [tipState, setTipState] = useState(false);
-
+    const [screen, setScreen] = useState(clientController.identifyScreenType());
     const [chosenTheme, setTheme] = useState(clientController.theme);
+    const [modalButton, setModalButton] = useState(false);
+    const [,forceUpdate] = useState(0);
 
     useEffect(() => {
         function updateTheme(){
@@ -40,37 +46,35 @@ const App = ({}) => {
         function onForbidden(){
 
         }
+        function handleResize(type){
+            setScreen(type);
+        }
 
         clientController.subscribeOn('theme-switch', updateTheme);
         clientController.subscribeOn('unauthorized', onUnauthorized );
         clientController.subscribeOn('forbidden', onForbidden);
         clientController.subscribeOn('show-tip', showTip); // добавить возможность выбирать цвет для подсказки.
-
-        // async function name(params) {
-        //     await serverController.getUserData();
-        // }
-
-
-        // openModal(2, () => {});
-        // openModal(4, () => {}); 
+        clientController.subscribeOn('resize', handleResize);
 
         serverController.getUserData();
         serverController.getSubjectThemes();
-        // openModal(5, () => {});
+
+        // setTimeout(() => {showModalButton(() => {})}, 100)
 
         return () => {
             clientController.unSubscribeOn('theme-switch', updateTheme);
             clientController.unSubscribeOn('unauthorized', onUnauthorized);
             clientController.unSubscribeOn('forbidden', onForbidden);
             clientController.unSubscribeOn('show-tip', showTip);
-
+            clientController.unSubscribeOn('resize', handleResize);
         }
     }, []);
 
     let page;
+    const buttonRef = useRef();
     switch(pageId){
         case 1: page = <InGamePage moveOut = {moveOutFromGame}/>; break;
-        case 0: page = <MainPage moveToGame={moveToGame}/>; break;
+        case 0: page = <MainPage moveToGame={moveToGame} callButton={showModalButton} moveButtonAway={() => buttonRef.current.close()}/>; break;
         default: page = null;
     }
 
@@ -90,7 +94,24 @@ const App = ({}) => {
             color={SavedInstance['tip'].others.color}    
         onClose={() => {setTipState(false); }}/>;
     }
+    let button;
+    if(modalButton){
+        button = 
+        <ModalButton ref={buttonRef} exit={() => {console.log("EXIT");setModalButton(false)}} onClick={SavedInstance['modalButton'].callback}
+            text={SavedInstance['modalButton'].others.text} styles={SavedInstance['modalButton'].others.styles}
+        />
+    }
 
+    function showModalButton(callback, text, styles){
+        let flag = false;
+        if(modalButton) {
+            flag = true;
+        }
+        setModalButton(true);
+        SavedInstance['modalButton'].others = {styles, text};
+        SavedInstance['modalButton'].callback = callback;
+        if(flag) forceUpdate(v => v + 1);
+    }
     function openModal(id, callback, others){
         SavedInstance[id] = {
             callback: () =>{
@@ -126,10 +147,19 @@ const App = ({}) => {
     }
 
     return(
-        <div className="App" style={{backgroundColor: clientController.getColorSetting(chosenTheme, COLORS.main)}}>
+        <div className="App" style={{
+            backgroundColor: clientController.getColorSetting(chosenTheme, COLORS.main),
+            scrollbarColor: `${clientController.getColorSetting(chosenTheme, COLORS.functional)} ${clientController.getColorSetting(chosenTheme, COLORS.back)}`
+        }}>
             <PagePreview text="Trainee-App"/>
             <ProfileBlock openModal = {openModal}/>
-            {page}
+            <div className="WideBlock" style={{
+                backgroundColor: clientController.getColorSetting(chosenTheme, COLORS.back),
+                borderLeft: screen == 'Desktop'?  `2px solid ${clientController.getColorSetting(chosenTheme, COLORS.borderD)}`: ''
+            }}>
+                {page}
+                {button}
+            </div>
             {modalWindow}
             {tip}
         </div>

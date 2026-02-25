@@ -2,15 +2,15 @@ import React, { useEffect } from "react";
 import { useState, useRef } from "react";
 import clientController, { COLORS } from "../application/ClientController";
 import { ModalWindow } from "./ModalWindow";
-import { InfoBlock } from "./InfoBlock";
-import { InputField } from "./InputField";
-import { DefaultButton } from "./DefaultButton";
+import { InfoBlock } from '../components/InfoBlock';
+import { InputField } from "../components/InputField";
+import { DefaultButton } from "../components/DefaultButton";
 import { LoadedImages } from "../application/ImageLoad";
-import { Switch } from "./Switch";
+import { Switch } from "../components/Switch";
 import PlusIcon from "../assets/icons/Plus.svg"
-import { QuestionComponent } from "./QuestionComponent";
+import { QuestionComponent } from "../components/QuestionComponent";
 import { Question } from "../application/Question";
-import { TextPreview } from "./TextPreview";
+import { TextPreview } from "../components/TextPreview";
 import serverController, { AccessLevels } from "../application/ServerController";
 
 export const ProcessQuestionsModal = ({closeCallback = () => {}}) => {
@@ -252,6 +252,7 @@ const CreateQuestionField = ({}) => {
             <div className="AnswersList" style={{
                 height: '20vh',
                 overflowY: 'auto',
+                display:'block',
             }}>
                 {answers.map((val, id) => (
                     <AnswerBlock val={val}
@@ -272,11 +273,12 @@ const CreateQuestionField = ({}) => {
                 }}>
                     <InputField defaultValue={'Add an answer.'} max={25} min={1} onValueChange={updateLastAnswer}
                     clearFunctionRef={answerTitleClearRef}
-                    pattern="question" styles={{width: '80%', marginBottom: '1%%', marginRight: '9%'}} />
+                    pattern="question" styles={{width: '80%', marginBottom: '1%'}} />
                     <DefaultButton text={<PlusIcon />} onClick={addAnswer}
                     styles={{
                         height: '5.5vh',
                         width: '5.5vh',
+                        marginLeft: 'auto',
                         ...getSquareStyles()
                     }}>
                     </DefaultButton>
@@ -376,13 +378,12 @@ const AnswerBlock = ({val, isOrderDisplayed = false, number = 0, isCorrect = fal
                 height: '4vh',
                 width: '80%',
                 filter: isCorrect? 'drop-shadow(rgb(9, 255, 0) 0px 4px 0px)': '',
-                marginRight: isOrderDisplayed? '3%': '12%'
             }} onClick={onAnswerClick}/>
             {isOrderDisplayed? 
                 <DefaultButton text={number} styles={{
                     height: '3.5vh',
                     width: '3.5vh',
-                    marginRight: '2%',
+                    marginLeft: 'auto',
                     color: clientController.getColorSettingDefault(COLORS.text),
                     ...getSquareStyles()
                 }} onClick={onOrderDisplayClick}/>
@@ -393,6 +394,7 @@ const AnswerBlock = ({val, isOrderDisplayed = false, number = 0, isCorrect = fal
                 styles={{
                     height: '3.5vh',
                     width: '3.5vh',
+                    marginLeft: 'auto',
                     ...getSquareStyles()
                 }}/>
             :null

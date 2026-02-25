@@ -1,22 +1,34 @@
 :root{
     overflow:hidden;
-    --main-dark-color: #0F1224;
-    --functional-dark-color: #21294A;
-    --functional-active-dark-color: #303c6b;
-    --main-button-dark-color: #617AFA;
+    --main-dark-color: #2D2826;
+    --functional-dark-color: #3D3532;
+    --functional-active-dark-color: #4d4036;
+    --main-button-dark-color: #C2410C;
     --main-text-dark-color: #FFFFFF;
-    --secondary-text-dark-color: #8F99CC;
+    --text-dark-color: #9CA3AF;
+    --text-dark-active: #FB923C;
+    --secondary-text-dark-color: #9CA3AF;
+    --third-text-dark-color: #F5F0E6;
     --border-dark: #2E386B;
     --border-dark-active: #8F99CC;
+    --border-dark-active-2: #fffb00;
+    --default-border-dark: #2D2826;
+    --background-dark: #1A1817;
 
     --main-light-color: #FFFFFF;
-    --functional-light-color: #E5E8F5;
+    --functional-light-color: #F1F5F9;
     --functional-active-light-color: #c6cef3;
-    --main-button-light-color: #617AFA;
+    --main-button-light-color: #2563EB;
     --main-text-light-color: #0D0F1C;
     --secondary-text-light-color: #47579E;
+    --third-text-light-color: #F5F0E6;
+    --text-light-color: #4B5563;
+    --text-light-active: #1D4ED8;
     --border-light: #2E386B;
     --border-light-active: #8F99CC;
+    --border-light-active-2:#2563EB;
+    --default-border-light: #b3b3b3;
+    --background-light: #F8F9FC;
 
     --yellow-exception-color:orange;
     --red-error-color: #cb0000;
@@ -36,11 +48,30 @@
     height: 100%;
 }
 
+.WideBlock{
+    min-height: calc(100% - 8vh);
+}
+
 @media (min-width: 520px) {
     .App{
-        width: 520px;
+        width: 100vw;
         height: 100vh;
         border-radius: 8px;
+    }
+    .WideBlock{
+        position: absolute;
+        top: 8vh;
+        width: calc(100% - 300px);
+        right: 0;
+        margin-left: 5%;
+        /* background-color: orangered; */
+    }
+    .PagePreview{
+        border-bottom: black solid 2px;
+    }
+    .SquareButton{
+        /* margin-left: 25px; */
+        scale: 0.75;
     }
 }
 @media (max-width: 520px) {
@@ -48,10 +79,14 @@
         width: 100%;
         height: 100%;
     }
+    .WideBlock{
+        box-shadow: 0px 0px 14px 20px rgba(0,0,0,0.4);
+    }
 }
 
 .App{
     position: relative;
+    overflow-y: auto;
     /* background-color: var(--main-dark-color); */
 }
 
@@ -75,6 +110,7 @@
     font-weight: 500;
     line-height: 24px;
     font-size: 18px;
+    z-index: 1;
 }
 
 .DefaultButton{
@@ -108,13 +144,17 @@
 
 .SquareButton{
     position: relative;
-    width: 4vh;
-    height: 4vh;
+    width: 5vh;
+    height: 5vh;
 
     background-position: center;
     background-repeat: no-repeat;
     background-size: 100% 100%;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .SettingsOpen{
@@ -195,7 +235,7 @@ textarea:focus, input:focus{
 }
 
 .Tip{
-    position: absolute;
+    position: fixed;
     background-color: var(--functional-active-dark-color);
     color: var(--main-text-dark-color);
     z-index: 100;
@@ -263,3 +303,14 @@ textarea:focus, input:focus{
     }
 }
 
+/* ::before{
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: 100%;
+    background-color: black;
+    height: 2px;
+} */

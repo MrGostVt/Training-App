@@ -1,9 +1,7 @@
-import React, { useEffect } from "react";
-import { useState } from "react";
-import clientController, { COLORS } from "../application/ClientController";
+import React, { useEffect, useState } from "react";
+import clientController from "../application/ClientController";
 
-export const PagePreview = ({text = "text"}) => {
-    const [isBackButton, setBackButton] = useState(false);
+export const NewsBlock = ({}) =>{
     const [chosenTheme, setTheme] = useState(clientController.theme);
     const [screen, setScreen] = useState(clientController.identifyScreenType());
 
@@ -23,11 +21,12 @@ export const PagePreview = ({text = "text"}) => {
             clientController.unSubscribeOn('resize', handleScreenUpdate);
         }
     }, []);
-
+    
     return(
-        <div className="PagePreview DefaultFont" style={{
-            color: clientController.getColorSetting(chosenTheme, COLORS.text),
-            borderBottom: screen == 'Desktop'?  `2px solid ${clientController.getColorSetting(chosenTheme, COLORS.borderD)}`: ''
-        }}>{text}</div>
-    );
+        <div className="NewsBlock" style={{
+            marginTop: screen == 'Desktop'? '2.5vh': 0,
+        }}>
+
+        </div>
+    )
 }
