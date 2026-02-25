@@ -5,38 +5,33 @@ import { ThemesToLearnBlock } from "../components/ThemesToLearnBlock";
 import { GameBlock } from "../components/GameBlock";
 import { LoadedImages } from "../application/ImageLoad";
 import serverController from "../application/ServerController";
-import clientController from "../application/ClientController";
+import clientController, { COLORS } from "../application/ClientController";
 import { NewsBlock } from "../components/NewsBlock";
 
-export const MainPage = ({moveToGame = () => {}}) =>{
+export const MainPage = ({moveToGame = () => {}, callButton = () => {}, moveButtonAway = () => {}}) =>{
     const [chosenSubject, setSubject] = useState(clientController.subjectTheme);
+    const [chosenGame, setGame] = useState(undefined);
+
     let barrier;
     if(chosenSubject <= 0){
-        barrier = <div className="DefaultFont" style={{
+        barrier = <div style={{
             position: 'absolute', 
-            left: '4%', 
-            width: '92%', 
-            height: 'calc(48vh + 5%)',
+            width: '100%', 
+            height: '100%',
             zIndex: '10',
             backdropFilter: 'blur(3px)',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            fontSize: '24px',
-            color: 'var(--main-text-dark-color)',
-        }}>Choose theme first</div>
+            transform: 'translateY(-5%)'
+        }}></div>
     }
 
     useEffect(() => {
         clientController.setSubject(chosenSubject);
+        if(chosenSubject <= 0 && chosenGame !== undefined){moveButtonAway(); chosenGame.onNew(); setGame(undefined);}
     }, [chosenSubject]);
 
     useEffect(() => {
         function handleChosenSubject(){
             const current = serverController.userData.chosenTheme;
-            console.log('HANDLE HANDLEVOCH');
-            console.log(current);
 
             if(current.id != chosenSubject) setSubject(current.id);
         }
@@ -45,7 +40,23 @@ export const MainPage = ({moveToGame = () => {}}) =>{
         return () => clientController.unSubscribeOn('userdata-loaded', handleChosenSubject);
     }, [])
 
-
+    function HandleChoose({type, onNew}){
+        if(chosenGame !== undefined && type === chosenGame.type) {
+            setGame(undefined);
+            moveButtonAway()
+            return false;
+        }
+        
+        if(chosenGame !== undefined) {chosenGame.onNew();}
+        setGame({type, onNew});
+        callButton(() => {
+            setGame(undefined);
+            onNew();
+            if(type == 2) clientController.triggerEvent('show-tip', ['Coming soon!', clientController.getColorSetting(2, 'yellow')])
+            else moveToGame(type);
+        }, 'Start', {color: clientController.getColorSettingDefault(COLORS.text4)});
+        return true;
+    }
 
     return(
         <>  
@@ -53,10 +64,6 @@ export const MainPage = ({moveToGame = () => {}}) =>{
             <ThemesToLearnBlock themesList={serverController.subjectThemes}
                 setTheme={setSubject} chosenSubject={chosenSubject}
             />
-            {/* <ThemesToLearnBlock themesList={serverController.subjectThemes}
-                setTheme={setSubject} chosenSubject={chosenSubject}
-            /> */}
-            {barrier}
             <div className="GameBlockField">
                 <GameBlock GameInfo={{
                     type: 'Practice',
@@ -64,14 +71,15 @@ export const MainPage = ({moveToGame = () => {}}) =>{
                     description: 'Play a quick practice to improve your skills',
                     iconUrl: LoadedImages['Practice.png'],
                     typeId: 1,
-                }} moveToGame={moveToGame}/>
+                }} moveToGame={moveToGame} setActive={HandleChoose}/>
                 <GameBlock GameInfo={{
                     type: 'Tournament',
                     typeDescripe: 'Tournament match',
                     description: 'Join to tournament and show your skills',
                     iconUrl: LoadedImages['Tournament.png'],
                     typeId: 2,
-                }} moveToGame={() => {clientController.triggerEvent('show-tip', ['Coming soon!', clientController.getColorSetting(2, 'yellow')])}}/>
+                }} setActive={HandleChoose}/>
+                {barrier}
             </div>
             
         </>

@@ -69,7 +69,7 @@ export const InGamePage = ({moveOut = () => {}}) => {
                 position:'sticky', bottom: '5vh', 
                 width: '90%', left: 0, right: 0, margin: '0 auto',
                 backgroundColor: clientController.getColorSetting(chosenTheme, COLORS.button),
-                color: clientController.getColorSetting(chosenTheme, COLORS.functional),
+                color: clientController.getColorSetting(chosenTheme, COLORS.text4),
                 fontWeight: 500, fontSize: '16px'
             }} 
             onClick={() => {
@@ -106,13 +106,12 @@ export const InGamePage = ({moveOut = () => {}}) => {
 const Answers = ({answers = [{title, id}], correctCount, theme, screen, setCurrentAnswer = () => {}}) => {
     const [chosen, setChosen] = useState([]);
     const [colors, setColors] = useState([])
-    const border = 'solid 2px var(--main-button-dark-color)';
+    const border = 'solid 2px ' + clientController.getColorSetting(theme, COLORS.borderA2);
 
     useEffect(() => {
         setChosen([]);
         setColors(answers.map(() => ( clientController.getRandomPastelColor())));
-
-    }, [answers])
+    }, [answers]);
 
     const desktopStyles = screen !== 'Desktop'? {}: {
         aspectRatio: '1', height: 'auto', justifySelf: 'center',

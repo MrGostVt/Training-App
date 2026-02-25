@@ -29,7 +29,8 @@ export const TextPreview = ({text, textStyles = {}, wrapStyles = {}, highlightMa
         updateText(
           result.map((part, i) =>
             <span key={i} style={{ 
-                color: part.math ? hightlightColor: "inherit", marginRight: '6px' 
+                color: part.math ? hightlightColor: "inherit", marginRight: '6px',
+                fontWeight: part.math ? 600: 'inherit'
                 }}>
               {part.text}
             </span>

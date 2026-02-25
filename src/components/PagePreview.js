@@ -13,7 +13,6 @@ export const PagePreview = ({text = "text"}) => {
         }
         function handleScreenUpdate(type){
             setScreen(type);
-            console.log(type);
         }
 
         clientController.subscribeOn('theme-switch', updateTheme);

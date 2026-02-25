@@ -1,10 +1,11 @@
 .GameBlock{
     position: relative;
-    left: 5%;
-    width: 90%;
-    max-width: 50vh;
-    height: 24vh;
     margin-bottom: 5%;
+    box-shadow: 0px 0px 13px -3px rgba(0,0,0,0.45);
+    min-width: 300px;
+    aspect-ratio: 1.5;
+    border-radius: 8px;
+    width: 100%;
 }
 
 
@@ -12,27 +13,44 @@
     position: relative;
     width: 100%;
     height: calc(100% - 22px - 14%);
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
 }
 
 .InGameIcon{
-    height: 100%;
-    width: 38%;
-    position: absolute;
+    height: 70%;
+    position: relative;
 
-    right: 0%;
-    bottom: 0%;
+    right: 3%;
     border-radius: 8px;
+    aspect-ratio: 1;
+    margin-left: auto;
 
+    align-self: self-start;
     background-repeat: no-repeat;
     background-position: center;
     background-size: calc(15vh - 2vw) 15vh;
 }
 
-@media (min-width: 520px) {
+.GameBlockField{
+    position: relative;
+    left: 5%;
+    width: 90%;
+}
+
+@media (min-width: 1000px) {
     .GameBlockField{
-        position: relative;
         display: flex;
         flex-direction: row;
         gap: 3%;
+    }       
+}
+@media (min-width: 520px) {
+    .GameBlock{
+        width: 45%;
+        margin-left: auto;
+        margin-right: auto;
+        max-height: 240px;
     }
 }

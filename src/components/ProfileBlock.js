@@ -21,6 +21,7 @@ export const ProfileBlock = ({openModal = () => {}}) => {
     useEffect(() => {
         function updateTheme(){
             setTheme(clientController.theme);
+            handleUserDataUpdate();
         }
         function onGameStart(){
             const subject = serverController.userData.chosenTheme.title;
@@ -30,12 +31,14 @@ export const ProfileBlock = ({openModal = () => {}}) => {
             setInfo([
                 {text: `Level: ${AccessLevels[level]}`, styles: {
                     color: clientController.getColorSettingDefault(COLORS.button),
+                    fontWeight: 600,
                 }}, 
                 {text: `Theme: ${subject}`, styles: {
                     color: clientController.getColorSettingDefault(COLORS.text3),
+                    fontWeight: 600,
                 }}, 
                 {text: `${points} Points`, styles: {
-                    color: clientController.getColorSettingDefault(COLORS.text3),
+                    color: clientController.getColorSettingDefault(COLORS.text),
                     fontSize: '22px', fontWeight: 600
                 }}
             ]);
@@ -43,14 +46,20 @@ export const ProfileBlock = ({openModal = () => {}}) => {
         }
         function onGameFinish(){
             const level = serverController.userData.accessLevel;
-            setInfo([{text: `Level: ${AccessLevels[level]}`, styles: {}}]);
+            setInfo([{text: `Level: ${AccessLevels[level]}`, styles: {
+                color: clientController.getColorSettingDefault(COLORS.button),
+                fontWeight: 600,
+            }}]);
             setCardState(0);
         }
 
         function handleUserDataUpdate(){
             const data = serverController.userData;
             setUsername(data.username);
-            setInfo([{text: `Level: ${AccessLevels[data.accessLevel]}`, styles: {}}]);
+            setInfo([{text: `Level: ${AccessLevels[data.accessLevel]}`, styles: {
+                color: clientController.getColorSettingDefault(COLORS.button),
+                fontWeight: 600,
+            }}]);
         }
 
         function handleScreenUpdate(type){
@@ -171,15 +180,16 @@ const Button = ({onClick = (onExit) => {}, getAnimation = (state) => (''), theme
                 alignItems: 'center',
                 margin: '0 auto',
                 marginBottom: '5%',
-                gap: '2px', fontSize: '16px',
+                gap: '2px',
                 color: clientController.getColorSetting(theme, COLORS.text),
-                backgroundColor: clientController.getColorSetting(theme, COLORS.functional)
+                backgroundColor: clientController.getColorSetting(theme, COLORS.functional),
+                filter: 'none'
             }}>
                 <SquareButton animation={anim}>{children}</SquareButton>
                 <span style={{
                     // flex: 1,
                     textAlign: 'left',
-                    fontSize: '14px'
+                    fontSize: '16px'
                 }}>{text}</span>
             </DefaultButton>
         )

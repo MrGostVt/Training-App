@@ -49,7 +49,7 @@ export const ModalWindow = ({children, title = 'undefined', size = 0,
     let button;
     if(defaultButton.isActive){
         button = <DefaultButton styles={{width: '90%', height: '8vh', left: '5%', bottom: '5%', fontWeight: '700',
-            backgroundColor: `var(--main-button-dark-color)`, color: 'var(--main-text-dark-color)'}} text={defaultButton.title}
+            backgroundColor: clientController.getColorSetting(chosenTheme, COLORS.button), color: 'var(--main-text-dark-color)'}} text={defaultButton.title}
             onClick={async () => {
                 let isCanExit = true;
                 
@@ -60,7 +60,7 @@ export const ModalWindow = ({children, title = 'undefined', size = 0,
                 if(isCanExit) exitFunction(false);
             }}
             type = {defaultButton.type}
-            />
+        />
     }
     
     return(

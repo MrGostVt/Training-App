@@ -69,7 +69,7 @@ export const UserInfo = ({info, theme}) => {
 
     return(
         <div className="UserInfoDefault">
-            <div className="DefaultFont" style={{fontSize: '22px', color: clientController.getColorSetting(chosenTheme, COLORS.text)}}>{name}</div>
+            <div className="DefaultFont" style={{fontSize: '22px', fontWeight: 600, color: clientController.getColorSetting(chosenTheme, COLORS.text)}}>{name}</div>
             {other.map(val => (
                 <div className="DefaultFont" style={{fontSize: '16px', color: clientController.getColorSetting(chosenTheme, COLORS.text2), ...val.styles}} key={val.text}>{val.text}</div>
             ))}

@@ -80,13 +80,15 @@ const ThemeCard = ({name, points, isChosen, setChoosedCallback = () => {}, theme
 
     return(
         <div className="ThemeCard" onClick={setActive} 
-        style={{borderColor: isActive? 
-            clientController.getColorSetting(theme, COLORS.borderA): 
-            clientController.getColorSetting(theme, COLORS.border),
+        style={{
+            backgroundColor: clientController.getColorSetting(theme, COLORS.main),
+            border: isActive? 
+                'solid 2px ' + clientController.getColorSetting(theme, COLORS.button)
+                : 'solid 2px ' + clientController.getColorSetting(theme, COLORS.main),
         }}>
             <div className="ThemeInfoWrapper">
-                <div className="DefaultFont" style={{color: clientController.getColorSetting(theme, COLORS.text), fontSize: '24px'}}>{points}</div>
-                <div className="DefaultFont" style={{color:  clientController.getColorSetting(theme, COLORS.text2), fontSize: '14px'}}>{name}</div>
+                <div className="DefaultFont" style={{color: clientController.getColorSetting(theme, COLORS.text), fontSize: '24px', fontWeight: '600'}}>{points}</div>
+                <div className="DefaultFont" style={{color:  clientController.getColorSetting(theme, COLORS.text3), fontSize: '14px'}}>{name}</div>
             </div>
         </div>
     )
