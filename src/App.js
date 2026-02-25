@@ -12,7 +12,6 @@ import clientController, { COLORS } from "./application/ClientController";
 import serverController from "./application/ServerController";
 import { Tip } from "./components/Tip";
 import { PaintModal } from "./Modals/PaintModal";
-import { DefaultButton } from "./components/DefaultButton";
 import { ModalButton } from "./Modals/ModalButton";
 
 const SavedInstance = {
@@ -58,8 +57,6 @@ const App = ({}) => {
 
         serverController.getUserData();
         serverController.getSubjectThemes();
-
-        // setTimeout(() => {showModalButton(() => {})}, 100)
 
         return () => {
             clientController.unSubscribeOn('theme-switch', updateTheme);
@@ -141,7 +138,6 @@ const App = ({}) => {
             SavedInstance['tip'].others = {
                 text, color,
             };
-            // SavedInstance['tip'].queue.push(1); ДОБАВИТЬ ОЧЕРЕДЬ УВЕДОМЛЕНИЙ
             setTipState(true);
         }
     }
@@ -155,7 +151,8 @@ const App = ({}) => {
             <ProfileBlock openModal = {openModal}/>
             <div className="WideBlock" style={{
                 backgroundColor: clientController.getColorSetting(chosenTheme, COLORS.back),
-                borderLeft: screen == 'Desktop'?  `2px solid ${clientController.getColorSetting(chosenTheme, COLORS.borderD)}`: ''
+                borderLeft: screen == 'Desktop'?  `2px solid ${clientController.getColorSetting(chosenTheme, COLORS.borderD)}`: '',
+                boxShadow: screen == 'Mobile'? clientController.getBoxShadow(chosenTheme): ''
             }}>
                 {page}
                 {button}
