@@ -13,6 +13,7 @@ import serverController from "./application/ServerController";
 import { Tip } from "./components/Tip";
 import { PaintModal } from "./Modals/PaintModal";
 import { ModalButton } from "./Modals/ModalButton";
+import { ProcessNewsModal } from "./Modals/ProcessNewsModal";
 
 const SavedInstance = {
     'tip': {callback: () => {}, others: {
@@ -55,8 +56,7 @@ const App = ({}) => {
         clientController.subscribeOn('show-tip', showTip); // добавить возможность выбирать цвет для подсказки.
         clientController.subscribeOn('resize', handleResize);
 
-        serverController.getUserData();
-        serverController.getSubjectThemes();
+        serverController.init();
 
         return () => {
             clientController.unSubscribeOn('theme-switch', updateTheme);
@@ -71,7 +71,7 @@ const App = ({}) => {
     const buttonRef = useRef();
     switch(pageId){
         case 1: page = <InGamePage moveOut = {moveOutFromGame}/>; break;
-        case 0: page = <MainPage moveToGame={moveToGame} callButton={showModalButton} moveButtonAway={() => buttonRef.current.close()}/>; break;
+        case 0: page = <MainPage callPopUp={openModal} moveToGame={moveToGame} callButton={showModalButton} moveButtonAway={() => buttonRef.current.close()}/>; break;
         default: page = null;
     }
 
@@ -82,6 +82,7 @@ const App = ({}) => {
         case 3: modalWindow = <ResultsModal type={"Practice"} results={SavedInstance[3].others} closeCallback={SavedInstance[3].callback}/>; break;
         case 4: modalWindow = <ProcessQuestionsModal closeCallback={SavedInstance[4].callback} />; break;
         case 5: modalWindow = <PaintModal closeCallback={SavedInstance[5].callback} tiptext={SavedInstance[5].others}/>; break;
+        case 6: modalWindow = <ProcessNewsModal closeCallback={SavedInstance[6].callback} />; break;
         default: modalWindow = null; break;
     }
 

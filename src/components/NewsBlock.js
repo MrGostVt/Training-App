@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import clientController from "../application/ClientController";
+import serverController from "../application/ServerController";
 
 const plug = {
     title: 'Nothing happened yet',
@@ -32,7 +33,7 @@ const plug = {
         //     },
         // ]);
 
-export const NewsBlock = ({}) =>{
+export const NewsBlock = ({callPopUp = () => {}, news = undefined}) =>{
     const [chosenTheme, setTheme] = useState(clientController.theme);
     const [screen, setScreen] = useState(clientController.identifyScreenType());
     const [newsList, setNewsList] = useState([plug]);
@@ -45,11 +46,9 @@ export const NewsBlock = ({}) =>{
         function handleScreenUpdate(type){
             setScreen(type);
         }
-
         
         setPointer(0);
-
-        
+        if(news !== undefined) setNewsList(news); 
 
         clientController.subscribeOn('theme-switch', updateTheme);
         clientController.subscribeOn('resize', handleScreenUpdate);
@@ -61,6 +60,9 @@ export const NewsBlock = ({}) =>{
     }, []);
 
     useEffect(() => {
+        if(news !== undefined && news.length) setNewsList(news);
+    }, [news]);
+    useEffect(() => {
         if(newsList.length > 1){
             var interval = setInterval(() => {
                 MoveRight();
@@ -69,14 +71,17 @@ export const NewsBlock = ({}) =>{
         return () => {clearInterval(interval);}
     }, [newsList]);
     
-    function MoveRight(){
+    // function MoveRight(){
+    //     setPointer(p => p + 1 == newsList.length? 0: p + 1);
+    // }
+    const MoveRight = useCallback(() => {
         setPointer(p => p + 1 == newsList.length? 0: p + 1);
-    }
-    
+    });
     return(
         <div className="NewsBlock DefaultFont" style={{
             marginTop: screen == 'Desktop'? '2.5vh': 0,
-        }}>
+        }} onClick={() => {
+            +serverController.userData.accessLevel === 3? callPopUp(6, () => {}, undefined): null}}>
             <News  {...newsList[pointer]}/>
         </div>
     )
@@ -85,6 +90,7 @@ export const NewsBlock = ({}) =>{
 const News = ({title, description, header, image, background}) => (
     <div className={"News"} style={{
         backgroundColor: background,
+        backgroundImage: image && `url(${image})`,
         top: 0
         }} key={title}>
             <div className={"NewsInfoWrap " + "ProgressBar"}>

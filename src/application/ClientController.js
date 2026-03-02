@@ -78,6 +78,7 @@ class ClientController{
         'userdata-loaded': [],
         'subjectList-updated': [],
         'wrong-data': [],
+        'news-loaded': []
     }
     store = {
         

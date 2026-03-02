@@ -122,3 +122,11 @@
     position: relative;
     height: 100%;
 }
+
+.NewsForm{
+    margin-left: 5%;   
+    margin-right: 5%; 
+    height: calc(6vh * 4);
+    overflow-y: scroll;
+    scrollbar-width: none;
+}

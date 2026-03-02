@@ -19,7 +19,9 @@ const endpoints = {
     moderate: '/question/moderate',
     createGenerationPattern: '/question/create-generation-pattern',
     checkOnModeration: '/question/check-moderator-on-question',
-    static: '/static'
+    uploadArticle: '/article/create',
+    getArticles: '/article/get',
+    static: '/static',
 }
 
 export const AccessLevels = ['Default', 'Creator', 'Moderator', 'Admin'];
@@ -72,6 +74,15 @@ class ServerController{
                 this.getSubjectThemes();
             }
         }
+        if(DataStore.checkStored('news')){
+            this.news = DataStore.getStored('news');
+        }
+    }
+
+    init(){
+        this.getUserData();
+        this.getSubjectThemes();
+        this.getNews();
     }
 
     getStaticLink(file){
@@ -173,8 +184,7 @@ class ServerController{
         this.token = result.token;
         DataStore.Store('is-logined-before', true);
 
-        await this.getUserData();
-        await this.getSubjectThemes();
+        this.init();
 
         return true;
     }
@@ -200,8 +210,7 @@ class ServerController{
         this.token = result.token;
         DataStore.Store('is-logined-before', true);
 
-        await this.getUserData();
-        await this.getSubjectThemes();
+        this.init();
 
         return true;
     }
@@ -252,6 +261,22 @@ class ServerController{
         return result;
     }
 
+    news = [];
+
+    async getNews(){
+        const responce = await this.#makeRequest(endpoints.getArticles, 'GET');
+        if(responce !== null && responce.news.length){
+            const formed = responce.news.map(val => {
+                return {...val, image: val.image && this.getStaticLink(val.image)};
+            });
+
+            this.news = formed;
+            DataStore.Store(this.news);
+        }
+        clientController.triggerEvent('news-loaded', this.news);
+        return this.news;
+    }
+
     async getQuestions(){
         const questionList = await this.#makeRequest(endpoints.getQuestions + `?theme=${this.userData.chosenTheme.id}`);
         if(!questionList){return []};
@@ -289,9 +314,6 @@ class ServerController{
     }
 
     async uploadIcon(file, onError = () => {}){
-        console.log("FILE");
-        console.log(file);
-        console.log("BODY");
         const body = new FormData();
         body.append("file", file, file.name);
         console.log([...body.entries()]);
@@ -302,6 +324,23 @@ class ServerController{
             return true;
         }
         return false;
+    }
+    async uploadNews({title, image, description, header, background}, onError = () => {}){
+        const body = new FormData();
+        body.append('title', title);
+        if(image !== null) body.append('file', image);
+        body.append('description', description);
+        body.append('header', header);
+        body.append('background', background);
+
+        const responce = await this.#makeRequest(endpoints.uploadArticle, 'POST', body, onError, {});
+        if(responce) {
+            this.news.unshift({
+                title, header, description, background, image
+            });
+            clientController.triggerEvent('news-loaded', this.news);
+        }
+        return responce;
     }
 
     async #makeRequest(endpoint, type = 'GET', body, onError = (status) => {}, headers= {'Content-Type': 'application/json'}){
@@ -318,7 +357,6 @@ class ServerController{
         if(type === 'POST' && !(body instanceof FormData)){
             console.log("STRINGIFIED")
             request.body = JSON.stringify(body);
-            // request.body = body
         }
         else if(body instanceof FormData){
             request.body = body;
