@@ -78,6 +78,7 @@ class ClientController{
         'userdata-loaded': [],
         'subjectList-updated': [],
         'wrong-data': [],
+        'news-loaded': []
     }
     store = {
         
@@ -130,12 +131,11 @@ class ClientController{
         return ThemeSettings[theme][type];
     }
 
-    pastelColors = [
-        '#EFF6FF', '#ECFDF5', '#FEFCE8',
-        '#FDF2F8', '#EEF2FF', '#FFF7ED',
-        '#ffc09f', '#ffee93', '#fcf5c7',
-        '#a0ced9', '#adf7b6'
-    ];
+    boxShadows = ['0px 0px 14px 20px rgb(248, 249, 252)', '0px 0px 14px 20px rgba(0,0,0,0.4)'];
+    getBoxShadow(theme){
+        return this.boxShadows[theme]
+    }
+
     pastelColors = [
         [
             '#EFF6FF', '#ECFDF5', '#FEFCE8',

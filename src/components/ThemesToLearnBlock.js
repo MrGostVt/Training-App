@@ -4,7 +4,7 @@ import '../assets/styles/ThemesToLearn.css';
 import clientController, { COLORS } from "../application/ClientController";
 import serverController from "../application/ServerController";
 
-export const ThemesToLearnBlock = ({themesList = [{title: 'test', grade: 0, id: 0}], chosenSubject = -1, setTheme = () => {}}) => {
+export const ThemesToLearnBlock = ({themesList = [{title: 'test', grade: 0, id: 0}], chosenSubject = -1, setTheme = () => {}, showPopUp = () => {}}) => {
     const [themes, setThemes] = useState(themesList);
     const [chosen, choose] = useState(chosenSubject);
     const [colorTheme, setColorTheme] = useState(clientController.theme);
@@ -55,6 +55,13 @@ export const ThemesToLearnBlock = ({themesList = [{title: 'test', grade: 0, id: 
         }
     }, []);
 
+    let createButton = null;
+    if(serverController.userData.accessLevel === 3){
+        createButton = <ThemeCard name={'Theme'} points={'Create'} theme={colorTheme} setChoosedCallback={() => {
+            showPopUp(1, () => {});
+        }} />
+    }
+
     return(
         <div className="StatsCards">
             {themes.map(val => (
@@ -63,6 +70,7 @@ export const ThemesToLearnBlock = ({themesList = [{title: 'test', grade: 0, id: 
                     const res = updateChosenSubject(val.id);
                 }}/>
             ))}
+            {createButton}
         </div>
     )
 }

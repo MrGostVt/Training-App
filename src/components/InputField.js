@@ -2,10 +2,12 @@ import React, { useEffect, useRef, useState } from "react"
 import clientController, { COLORS } from "../application/ClientController";
 
 function validateInput(value, pattern, max, min){
-    const dangerousChars = /[<>"'`;{}\[\]\\]/g;
+    const dangerousChars = /[`;{}\[\]\\]/g;
     let isDanger = value.length > max || value.length < min;
     isDanger = isDanger || dangerousChars.test(value);
     isDanger = isDanger || !patterns[pattern].test(value);
+    isDanger = isDanger || value.toLowerCase().split("<script").length > 1; //|| value.toLowerCase().split("drop").length > 1 
+    
     if(isDanger){
         clientController.triggerEvent('show-tip', [`Property must contain only allowed ${min}-${max} symbols`, clientController.getColorSetting(2,'red')]);
     }
@@ -15,7 +17,7 @@ function validateInput(value, pattern, max, min){
 const patterns = {
     username: /^[a-zA-Z0-9]+$/,
     password: /^[a-zA-Zа-яА-ЯёЁ0-9]+$/, 
-    text: /^[a-zA-Zа-яА-ЯёЁ0-9]+$/,
+    text: /^[a-zA-Z0-9\?\,\!\.\#_\/\ +\*\%\^\:\=\(\)\-\/\>\<\[\]\'\"]+$/,
     question: /^[a-zA-Z0-9\?\,\!\.\#_\/\ +\*\%\^\:\=\(\)\-\/\>\<\[\]]+$/,
 };
 
@@ -89,7 +91,6 @@ export const InputField = ({typeID = 0, defaultValue, clearFunctionRef = {}, han
             }}
             onChange={(ev) => {
                 clearTimeout(lastTimeOutRef.current);
-                console.log('alert', ev.target.value);
                 lastTimeOutRef.current = setTimeout(() => {
                     handleChanges(ev.target.value);
                 }, 600);

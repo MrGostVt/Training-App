@@ -8,9 +8,10 @@ import serverController from "../application/ServerController";
 import clientController, { COLORS } from "../application/ClientController";
 import { NewsBlock } from "../components/NewsBlock";
 
-export const MainPage = ({moveToGame = () => {}, callButton = () => {}, moveButtonAway = () => {}}) =>{
+export const MainPage = ({moveToGame = () => {}, callPopUp = () => {}, callButton = () => {}, moveButtonAway = () => {}}) =>{
     const [chosenSubject, setSubject] = useState(clientController.subjectTheme);
     const [chosenGame, setGame] = useState(undefined);
+    const [news, setNews] = useState(serverController.news);
 
     let barrier;
     if(chosenSubject <= 0){
@@ -30,15 +31,24 @@ export const MainPage = ({moveToGame = () => {}, callButton = () => {}, moveButt
     }, [chosenSubject]);
 
     useEffect(() => {
+        serverController.getNews();
         function handleChosenSubject(){
             const current = serverController.userData.chosenTheme;
 
             if(current.id != chosenSubject) setSubject(current.id);
         }
+        async function handleNewsUpdate(news){
+            setNews(news);
+        }
+
         clientController.subscribeOn('userdata-loaded', handleChosenSubject);
+        clientController.subscribeOn('news-loaded', handleNewsUpdate);
         
-        return () => clientController.unSubscribeOn('userdata-loaded', handleChosenSubject);
-    }, [])
+        return () => {
+            clientController.unSubscribeOn('userdata-loaded', handleChosenSubject);
+            clientController.unSubscribeOn('news-loaded', handleNewsUpdate);
+        }
+    }, []);
 
     function HandleChoose({type, onNew}){
         if(chosenGame !== undefined && type === chosenGame.type) {
@@ -60,9 +70,9 @@ export const MainPage = ({moveToGame = () => {}, callButton = () => {}, moveButt
 
     return(
         <>  
-            <NewsBlock></NewsBlock>
+            <NewsBlock callPopUp={callPopUp} news={news}></NewsBlock>
             <ThemesToLearnBlock themesList={serverController.subjectThemes}
-                setTheme={setSubject} chosenSubject={chosenSubject}
+                setTheme={setSubject} chosenSubject={chosenSubject} showPopUp={callPopUp}
             />
             <div className="GameBlockField">
                 <GameBlock GameInfo={{
@@ -81,7 +91,6 @@ export const MainPage = ({moveToGame = () => {}, callButton = () => {}, moveButt
                 }} setActive={HandleChoose}/>
                 {barrier}
             </div>
-            
         </>
     );
 }
