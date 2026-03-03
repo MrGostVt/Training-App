@@ -130,3 +130,13 @@
     overflow-y: scroll;
     scrollbar-width: none;
 }
+
+.IntegrationForm{
+    height: calc(6vh * 6);
+    overflow-y: scroll;
+    scrollbar-width: none;
+}
+
+#InputFieldlongText{
+    resize:none;
+}

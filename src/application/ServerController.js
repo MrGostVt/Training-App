@@ -47,6 +47,7 @@ class ServerController{
 
     subjectThemes = [];
     currentQuestions = [];
+    news = [];
 
     earnedPoints = 0;
 
@@ -261,7 +262,6 @@ class ServerController{
         return result;
     }
 
-    news = [];
 
     async getNews(){
         const responce = await this.#makeRequest(endpoints.getArticles, 'GET');
@@ -271,7 +271,7 @@ class ServerController{
             });
 
             this.news = formed;
-            DataStore.Store(this.news);
+            DataStore.Store('news', [...this.news]);
         }
         clientController.triggerEvent('news-loaded', this.news);
         return this.news;

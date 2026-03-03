@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useState, useRef } from "react";
 import clientController, { COLORS } from "../application/ClientController";
 import { ModalWindow } from "./ModalWindow";
@@ -15,6 +15,7 @@ import serverController, { AccessLevels } from "../application/ServerController"
 
 export const ProcessQuestionsModal = ({closeCallback = () => {}}) => {
     const [processType, setProcessType] = useState(0);
+    const [data, setData] = useState(null);
 
     let field;
     let modalTitle;
@@ -27,64 +28,87 @@ export const ProcessQuestionsModal = ({closeCallback = () => {}}) => {
         function: () => true
     };
     switch(processType){
-        case 2: field = <ModerateQuestionField />; defaultButton.isActive = false; defaultButton.function = () => {
-            return false;
-        }; 
-        modalTitle = 'Moderate questions';
-        break;
-        case 1: field = <CreateQuestionField/>; defaultButton.title = 'Create'; defaultButton.function = async () => {
-            const data = {...clientController.questionData};     
-            const wrongProps = [];
-            for (const property in data) {
-                if(data[property] === null || data[property].length === 0){
-                    wrongProps.push(property);
-                }
-            }       
-            if(wrongProps.length !== 0){
-                clientController.triggerEvent('show-tip', [`${wrongProps.join(', ')} must be valid.`, clientController.getColorSetting(2, 'red')]);
+        case 3: 
+            field = <CreatePatternField setData={setData}/>; 
+            modalTitle = 'Create a pattern';
+            defaultButton.title = 'Create';
+            defaultButton.isActive = true;
+            defaultButton.function = async () => {
                 return false;
             }
-
-            const answersList = data.answers.map(val => val.title);
-            const rightAnswersList = data.rightAnswers.map(value => data.answers.findIndex(val => value === val.id));
-
-            const formedQuestion = {
-                title: data.title, 
-                level: data.level, 
-                type: data.type <= 1? 0: 1, 
-                answers: answersList, 
-                rightAnswers: rightAnswersList, 
-                theme: 1
-            }
-
-            const result = await serverController.createQuestion(formedQuestion);
-            if(result) clientController.triggerEvent('show-tip', ['Success!', clientController.getColorSetting(2, 'green')]);
-            
-            return result;
-        }; 
-        modalTitle = 'Create a question';
+        
         break;
-        default: field = <InfoWrap onClick1={() => {
-            if(serverController.userData.accessLevel > 0){
-                setProcessType(1);
-                return;
-            }
-            clientController.triggerEvent('show-tip', 
-                [`Improve your topic level to get a ${AccessLevels[1]} access!`, 
-                clientController.getColorSetting(2, 'yellow')]
-            );
-        }} onClick2={() => {
-            if(serverController.userData.accessLevel > 1){
-                setProcessType(2)
-                return;
-            }
-            clientController.triggerEvent('show-tip', 
-                [`Improve your topic level to get a ${AccessLevels[2]} access!`, 
-                clientController.getColorSetting(2, 'yellow')]
-            );
-        }} />; 
-        modalTitle = 'Chose an activity'
-        break;
+        case 2: 
+            field = <ModerateQuestionField />; defaultButton.isActive = false; defaultButton.function = () => {
+                return false;
+            }; 
+            modalTitle = 'Moderate questions';
+            break;
+        case 1: 
+            field = <CreateQuestionField/>; 
+            defaultButton.title = 'Create'; 
+            defaultButton.function = async () => {
+                const data = {...clientController.questionData};     
+                const wrongProps = [];
+                for (const property in data) {
+                    if(data[property] === null || data[property].length === 0){
+                        wrongProps.push(property);
+                    }
+                }       
+                if(wrongProps.length !== 0){
+                    clientController.triggerEvent('show-tip', [`${wrongProps.join(', ')} must be valid.`, clientController.getColorSetting(2, 'red')]);
+                    return false;
+                }
+
+                const answersList = data.answers.map(val => val.title);
+                const rightAnswersList = data.rightAnswers.map(value => data.answers.findIndex(val => value === val.id));
+
+                const formedQuestion = {
+                    title: data.title, 
+                    level: data.level, 
+                    type: data.type <= 1? 0: 1, 
+                    answers: answersList, 
+                    rightAnswers: rightAnswersList, 
+                    theme: 1
+                }
+
+                const result = await serverController.createQuestion(formedQuestion);
+                if(result) clientController.triggerEvent('show-tip', ['Success!', clientController.getColorSetting(2, 'green')]);
+                
+                return result;
+            }; 
+            modalTitle = 'Create a question';
+            break;
+        default: 
+            field = <InfoWrap onClick={[() => {
+                if(serverController.userData.accessLevel > 0){
+                    setProcessType(1);
+                    return;
+                }
+                clientController.triggerEvent('show-tip', 
+                    [`Improve your topic level to get a ${AccessLevels[1]} access!`, 
+                    clientController.getColorSetting(2, 'yellow')]
+                );
+            },
+            () => {
+                if(serverController.userData.accessLevel > 1){
+                    setProcessType(2)
+                    return;
+                }
+                clientController.triggerEvent('show-tip', 
+                    [`Improve your topic level to get a ${AccessLevels[2]} access!`, 
+                    clientController.getColorSetting(2, 'yellow')]
+                );
+            },
+            () => {
+                if(serverController.userData.accessLevel === 3){
+                    setProcessType(3);
+                    return;
+                }
+            },
+            ]}/>; 
+            modalTitle = 'Chose an activity'
+            break;
     }
 
 
@@ -96,18 +120,27 @@ export const ProcessQuestionsModal = ({closeCallback = () => {}}) => {
     );
 }
 
-const InfoWrap = ({onClick1 = () => {}, onClick2 = () => {}}) => (
-    <div className="InfoWrap">
-            <InfoBlock title="Create a Question" button={{title: 'Create', function: onClick1}} icounUrl={LoadedImages['Idea.png']}
+const InfoWrap = ({onClick = []}) => (
+    <div className="InfoWrap" style={{
+        justifyContent: serverController.userData.accessLevel === 3? 'left': 'center'
+    }}>
+            <InfoBlock title="Create a Question" button={{title: 'Create', function: onClick[0]}} icounUrl={LoadedImages['Idea.png']}
             text={'Create questions on the topic!'} statistics={[
                 {title: 'Created', score: serverController.userData.createdQuestions}, 
                 {title: 'Published', score: serverController.userData.publishedQuestions},
                 {title: 'Discarded', score: serverController.userData.discardedQuestions}]}/>
-            <InfoBlock title="Moderate a Questions" button={{title: 'Moderate', function: onClick2}} icounUrl={LoadedImages['Practice.png']}
+            <InfoBlock title="Moderate a Questions" button={{title: 'Moderate', function: onClick[1]}} icounUrl={LoadedImages['Practice.png']}
             text={'Moderate other peoples questions!'} statistics={[
                 {title: 'Moderated', score: serverController.userData.moderatedQuestionsCount}, 
                 {title: 'Published', score: serverController.userData.publishedQuestionsCount}, 
                 {title: 'Discarded', score: serverController.userData.skippedQuestionsCount}]}/>
+            {
+                serverController.userData.accessLevel === 3?
+                <InfoBlock title="Create a pattern" button={{title: 'Create', function: onClick[2]}} icounUrl={LoadedImages['Practice.png']}
+                text={'Create a generation pattern!'} statistics={[
+                    {title: 'Created', score: 'null'}, ]} />
+                : null
+            }
     </div>
 );
 
@@ -118,6 +151,25 @@ function getSquareStyles() {
         backgroundColor: clientController.getColorSettingDefault(COLORS.functionalA),
         position: 'relative',
     };
+}
+
+const CreatePatternField = ({setData = () => {}}) => {
+
+    const UpdateValue = useCallback((val, state) => {
+        setData(state === 2? val: null);
+    }, [setData]);
+
+    return(
+        <div className="IntegrationForm">
+            <InputField defaultValue={"Pattern"} isBigText={true} pattern="longText"
+            styles={{
+                left: '5%',
+                width: '90%',
+                height: 'auto',
+            }} max={10000} onValueChange={UpdateValue}
+            />
+        </div>
+    );
 }
 
 const CreateQuestionField = ({}) => {
