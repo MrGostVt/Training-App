@@ -58,7 +58,7 @@ export const ThemesToLearnBlock = ({themesList = [{title: 'test', grade: 0, id: 
     let createButton = null;
     if(serverController.userData.accessLevel === 3){
         createButton = <ThemeCard name={'Theme'} points={'Create'} theme={colorTheme} setChoosedCallback={() => {
-            showPopUp(1, () => {});
+            showPopUp(7, () => {}, undefined);
         }} />
     }
 

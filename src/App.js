@@ -14,6 +14,7 @@ import { Tip } from "./components/Tip";
 import { PaintModal } from "./Modals/PaintModal";
 import { ModalButton } from "./Modals/ModalButton";
 import { ProcessNewsModal } from "./Modals/ProcessNewsModal";
+import { ProcessThemeModal } from "./Modals/ProcessThemeModal";
 
 const SavedInstance = {
     'tip': {callback: () => {}, others: {
@@ -83,6 +84,7 @@ const App = ({}) => {
         case 4: modalWindow = <ProcessQuestionsModal closeCallback={SavedInstance[4].callback} />; break;
         case 5: modalWindow = <PaintModal closeCallback={SavedInstance[5].callback} tiptext={SavedInstance[5].others}/>; break;
         case 6: modalWindow = <ProcessNewsModal closeCallback={SavedInstance[6].callback} />; break;
+        case 7: modalWindow = <ProcessThemeModal closeCallback={SavedInstance[7].callback} />; break;
         default: modalWindow = null; break;
     }
 

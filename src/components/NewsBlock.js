@@ -71,9 +71,6 @@ export const NewsBlock = ({callPopUp = () => {}, news = undefined}) =>{
         return () => {clearInterval(interval);}
     }, [newsList]);
     
-    // function MoveRight(){
-    //     setPointer(p => p + 1 == newsList.length? 0: p + 1);
-    // }
     const MoveRight = useCallback(() => {
         setPointer(p => p + 1 == newsList.length? 0: p + 1);
     });

@@ -17,7 +17,7 @@ export const DefaultButton = ({children, text = 'default', styles = {}, onClick 
             onPointerDown={() => setShadow(false)}
             onPointerUp={() => setShadow(true)}
             onPointerLeave={() => setShadow(true)}
-            onClick={onClick}
+            onClick={(ev) => onClick(ev)}
         >
             {children}
             {text}

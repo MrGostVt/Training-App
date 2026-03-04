@@ -21,7 +21,8 @@ export const MainPage = ({moveToGame = () => {}, callPopUp = () => {}, callButto
             height: '100%',
             zIndex: '10',
             backdropFilter: 'blur(3px)',
-            transform: 'translateY(-5%)'
+            transform: 'translateY(-5%)',
+            top: 0,
         }}></div>
     }
 

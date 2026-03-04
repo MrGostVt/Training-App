@@ -26,7 +26,6 @@ export const ProcessNewsModal = ({closeCallback = () => {}}) => {
         });
     }, [data]);
 
-
     return(
         <ModalWindow closeCallback={closeCallback} title="Create" size={2} defaultButton={{isActive: true, type: 'submit', title: 'Create', function: async () => {
             const {header, title, description} = data;
@@ -91,13 +90,22 @@ export const ProcessNewsModal = ({closeCallback = () => {}}) => {
                 </div>
                 
                 <InputField styles={{width: '100%'}} defaultValue={'Header'}
-                onValueChange={(val, state) => {if(state === 2) UpdateData('header', val)}}/>
+                onValueChange={(val, state) => {
+                    if(state === 2) UpdateData('header', val);
+                    else UpdateData('header', null);
+                }}/>
                 <InputField styles={{width: '100%'}} defaultValue={'Title'}
                 min={3} max={60}
-                onValueChange={(val, state) => {if(state === 2) UpdateData('title', val)}}/>
+                onValueChange={(val, state) => {
+                    if(state === 2) UpdateData('title', val);
+                    else UpdateData('title', null);
+                }}/>
                 <InputField styles={{width: '100%'}} defaultValue={'Description'}
                 min={3} max={120}
-                onValueChange={(val, state) => {if(state === 2) UpdateData('description', val)}}/>
+                onValueChange={(val, state) => {
+                    if(state === 2) UpdateData('description', val);
+                    else UpdateData('description', null);
+                }}/>
             </form>
         </ModalWindow>
     )

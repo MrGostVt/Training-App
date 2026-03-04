@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useState, useRef } from "react";
 import clientController, { COLORS } from "../application/ClientController";
 import { ModalWindow } from "./ModalWindow";
@@ -15,6 +15,7 @@ import serverController, { AccessLevels } from "../application/ServerController"
 
 export const ProcessQuestionsModal = ({closeCallback = () => {}}) => {
     const [processType, setProcessType] = useState(0);
+    const [data, setData] = useState(null);
 
     let field;
     let modalTitle;
@@ -27,64 +28,95 @@ export const ProcessQuestionsModal = ({closeCallback = () => {}}) => {
         function: () => true
     };
     switch(processType){
-        case 2: field = <ModerateQuestionField />; defaultButton.isActive = false; defaultButton.function = () => {
-            return false;
-        }; 
-        modalTitle = 'Moderate questions';
+        case 3: 
+            field = <CreatePatternField setData={setData}/>; 
+            modalTitle = 'Create a pattern';
+            defaultButton.title = 'Create';
+            defaultButton.isActive = true;
+            defaultButton.function = async () => {
+                const {pattern, maxPoints, type, level} = data;
+                if(!pattern || pattern.length < 4) return false;
+                if(!maxPoints || type === null || level === null) return false;
+                const result = await serverController.createGenerationPattern({...data}, (status, message) => {
+                    clientController.triggerEvent('show-tip', [message, clientController.getColorSetting(2, 'red')]);
+                });
+                
+                if(result) clientController.triggerEvent('show-tip', ['Success', clientController.getColorSetting(2, 'green')]);
+                return result;
+            }
+        
         break;
-        case 1: field = <CreateQuestionField/>; defaultButton.title = 'Create'; defaultButton.function = async () => {
-            const data = {...clientController.questionData};     
-            const wrongProps = [];
-            for (const property in data) {
-                if(data[property] === null || data[property].length === 0){
-                    wrongProps.push(property);
-                }
-            }       
-            if(wrongProps.length !== 0){
-                clientController.triggerEvent('show-tip', [`${wrongProps.join(', ')} must be valid.`, clientController.getColorSetting(2, 'red')]);
+        case 2: 
+            field = <ModerateQuestionField />; defaultButton.isActive = false; defaultButton.function = () => {
                 return false;
-            }
+            }; 
+            modalTitle = 'Moderate questions';
+            break;
+        case 1: 
+            field = <CreateQuestionField/>; 
+            defaultButton.title = 'Create'; 
+            defaultButton.function = async () => {
+                const data = {...clientController.questionData};     
+                const wrongProps = [];
+                for (const property in data) {
+                    if(data[property] === null || data[property].length === 0){
+                        wrongProps.push(property);
+                    }
+                }       
+                if(wrongProps.length !== 0){
+                    clientController.triggerEvent('show-tip', [`${wrongProps.join(', ')} must be valid.`, clientController.getColorSetting(2, 'red')]);
+                    return false;
+                }
 
-            const answersList = data.answers.map(val => val.title);
-            const rightAnswersList = data.rightAnswers.map(value => data.answers.findIndex(val => value === val.id));
+                const answersList = data.answers.map(val => val.title);
+                const rightAnswersList = data.rightAnswers.map(value => data.answers.findIndex(val => value === val.id));
 
-            const formedQuestion = {
-                title: data.title, 
-                level: data.level, 
-                type: data.type <= 1? 0: 1, 
-                answers: answersList, 
-                rightAnswers: rightAnswersList, 
-                theme: 1
-            }
+                const formedQuestion = {
+                    title: data.title, 
+                    level: data.level, 
+                    type: data.type <= 1? 0: 1, 
+                    answers: answersList, 
+                    rightAnswers: rightAnswersList, 
+                    theme: 1
+                }
 
-            const result = await serverController.createQuestion(formedQuestion);
-            if(result) clientController.triggerEvent('show-tip', ['Success!', clientController.getColorSetting(2, 'green')]);
-            
-            return result;
-        }; 
-        modalTitle = 'Create a question';
-        break;
-        default: field = <InfoWrap onClick1={() => {
-            if(serverController.userData.accessLevel > 0){
-                setProcessType(1);
-                return;
-            }
-            clientController.triggerEvent('show-tip', 
-                [`Improve your topic level to get a ${AccessLevels[1]} access!`, 
-                clientController.getColorSetting(2, 'yellow')]
-            );
-        }} onClick2={() => {
-            if(serverController.userData.accessLevel > 1){
-                setProcessType(2)
-                return;
-            }
-            clientController.triggerEvent('show-tip', 
-                [`Improve your topic level to get a ${AccessLevels[2]} access!`, 
-                clientController.getColorSetting(2, 'yellow')]
-            );
-        }} />; 
-        modalTitle = 'Chose an activity'
-        break;
+                const result = await serverController.createQuestion(formedQuestion);
+                if(result) clientController.triggerEvent('show-tip', ['Success!', clientController.getColorSetting(2, 'green')]);
+                
+                return result;
+            }; 
+            modalTitle = 'Create a question';
+            break;
+        default: 
+            field = <InfoWrap onClick={[() => {
+                if(serverController.userData.accessLevel > 0){
+                    setProcessType(1);
+                    return;
+                }
+                clientController.triggerEvent('show-tip', 
+                    [`Improve your topic level to get a ${AccessLevels[1]} access!`, 
+                    clientController.getColorSetting(2, 'yellow')]
+                );
+            },
+            () => {
+                if(serverController.userData.accessLevel > 1){
+                    setProcessType(2)
+                    return;
+                }
+                clientController.triggerEvent('show-tip', 
+                    [`Improve your topic level to get a ${AccessLevels[2]} access!`, 
+                    clientController.getColorSetting(2, 'yellow')]
+                );
+            },
+            () => {
+                if(serverController.userData.accessLevel === 3){
+                    setProcessType(3);
+                    return;
+                }
+            },
+            ]}/>; 
+            modalTitle = 'Chose an activity'
+            break;
     }
 
 
@@ -96,18 +128,27 @@ export const ProcessQuestionsModal = ({closeCallback = () => {}}) => {
     );
 }
 
-const InfoWrap = ({onClick1 = () => {}, onClick2 = () => {}}) => (
-    <div className="InfoWrap">
-            <InfoBlock title="Create a Question" button={{title: 'Create', function: onClick1}} icounUrl={LoadedImages['Idea.png']}
+const InfoWrap = ({onClick = []}) => (
+    <div className="InfoWrap" style={{
+        justifyContent: serverController.userData.accessLevel === 3? 'left': 'center'
+    }}>
+            <InfoBlock title="Create a Question" button={{title: 'Create', function: onClick[0]}} icounUrl={LoadedImages['Idea.png']}
             text={'Create questions on the topic!'} statistics={[
                 {title: 'Created', score: serverController.userData.createdQuestions}, 
                 {title: 'Published', score: serverController.userData.publishedQuestions},
                 {title: 'Discarded', score: serverController.userData.discardedQuestions}]}/>
-            <InfoBlock title="Moderate a Questions" button={{title: 'Moderate', function: onClick2}} icounUrl={LoadedImages['Practice.png']}
+            <InfoBlock title="Moderate a Questions" button={{title: 'Moderate', function: onClick[1]}} icounUrl={LoadedImages['Practice.png']}
             text={'Moderate other peoples questions!'} statistics={[
                 {title: 'Moderated', score: serverController.userData.moderatedQuestionsCount}, 
                 {title: 'Published', score: serverController.userData.publishedQuestionsCount}, 
                 {title: 'Discarded', score: serverController.userData.skippedQuestionsCount}]}/>
+            {
+                serverController.userData.accessLevel === 3?
+                <InfoBlock title="Create a pattern" button={{title: 'Create', function: onClick[2]}} icounUrl={LoadedImages['Practice.png']}
+                text={'Create a generation pattern!'} statistics={[
+                    {title: 'Created', score: 'null'}, ]} />
+                : null
+            }
     </div>
 );
 
@@ -118,6 +159,72 @@ function getSquareStyles() {
         backgroundColor: clientController.getColorSettingDefault(COLORS.functionalA),
         position: 'relative',
     };
+}
+
+const CreatePatternField = ({setData = () => {}}) => {
+    const [question, setQuestion] = useState({
+        type:0, level: 1, maxPoints: null, pattern: null, data: undefined
+    });
+    const scrollRef = useRef(undefined);
+
+    const UpdateValue = useCallback((val, state, property) => {
+        if(Object.hasOwn(question, property)){
+            setQuestion((prev) => {
+                let temp = {...prev, [property]: val};
+                if(state !== 2) temp = {...prev, [property]: null};
+        
+                if(property === 'pattern') scrollRef.current.scrollIntoView({behavior: "smooth"});
+                
+                setData(temp);
+                return temp;
+            });
+        }
+    }, [setData]);
+
+    return(
+        <div className="IntegrationForm" style={{height: 'calc(6vh * 7)'}}>
+            <Switch title={"Type"} callback={(val) => UpdateValue(val, 2, 'type')} current={0}
+            values={[
+                {val: 0, prev: 'Default', descrip: 'One Answer'}, 
+                // {val: 1, prev: 'Several', descrip: 'Several answers'}, 
+            ]}
+            settings={{title: false, reverse: true}}/>
+            <Switch title={"Level"} callback={(val) => UpdateValue(val, 2, 'levle')} current={0}
+            values={[
+                {val: 1, prev: 'Easy', descrip: 'Easy level', buttonStyles: {backgroundColor: clientController.getColorSetting(2, 'green')}}, 
+                {val: 2, prev: 'Middle', descrip: 'Middle level', buttonStyles: {backgroundColor: clientController.getColorSetting(2, 'yellow')}}, 
+                {val: 3, prev: 'Hard', descrip: 'Hard level', buttonStyles: {backgroundColor: clientController.getColorSetting(2, 'red')}}]}
+            settings={{title: false, reverse: true}}/>
+            <InputField defaultValue={"MaxPoints"} typeID={2} min={1} max={4} styles={{left: '5%', width: '90%'}}
+            onValueChange={(val, status) => UpdateValue(+val, status, 'maxPoints')}
+            contextValidate={(val) => {
+                const min_limit = 5;
+                const max_limit = 25;
+
+                if(Number.isNaN(+val)) return false;
+                if(+val > max_limit || +val < min_limit) {
+                    clientController.triggerEvent('show-tip', [`Value must be in range from ${min_limit} to ${max_limit}`, clientController.getColorSetting(2, 'yellow')]);    
+                    return false;
+                };
+
+                return true;
+            }}
+            pattern="number"/>
+            <InputField styles={{
+                left: '5%', width: '90%'
+            }}
+            defaultValue={'Enter data separated by commas: D1, D2, D3'} max={10000} min={0}
+            onValueChange={(val,state) => UpdateValue(val, state,'data')} 
+            />
+            <InputField defaultValue={"Pattern"} ref={scrollRef} isBigText={true} pattern="longText"
+            styles={{
+                left: '5%',
+                width: '90%',
+                height: 'auto',
+            }} max={10000} onValueChange={(val, status) => UpdateValue(val, status, 'pattern')}
+            />
+        </div>
+    );
 }
 
 const CreateQuestionField = ({}) => {
