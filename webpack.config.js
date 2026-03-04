@@ -1,4 +1,5 @@
 const path = require('path');
+const WebpackObfuscator = require('webpack-obfuscator');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const webpack = require('webpack');
@@ -48,7 +49,26 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './public/index.html',
     }),
-    new webpack.DefinePlugin(envKeys) //для работы с ENV.
+    new webpack.DefinePlugin(envKeys),
+    new WebpackObfuscator({
+      compact: true,
+      controlFlowFlattening: true,
+      controlFlowFlatteningThreshold: 0.75,
+      deadCodeInjection: true,
+      deadCodeInjectionThreshold: 0.4,
+      debugProtection: true,
+      debugProtectionInterval: 0,
+      disableConsoleOutput: true,
+      identifierNamesGenerator: "hexadecimal",
+      log: false,
+      renameGlobals: false,
+      rotateStringArray: true,
+      selfDefending: true,
+      stringArray: true,
+      stringArrayEncoding: ["base64"],
+      stringArrayThreshold: 0.75,
+      unicodeEscapeSequence: false
+    })
   ],
   devServer: {
     static: {
