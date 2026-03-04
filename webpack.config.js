@@ -7,10 +7,13 @@ const dotenv = require('dotenv');
 
 const env = dotenv.config().parsed || {};
 
-const envKeys = Object.keys(env).reduce((prev, next) => {
-  prev[`process.env.${next}`] = JSON.stringify(env[next]);
-  return prev;
-}, {});
+// const envKeys = Object.keys(env).reduce((prev, next) => {
+//   prev[`process.env.${next}`] = JSON.stringify(env[next]);
+//   return prev;
+// }, {});
+new webpack.DefinePlugin({
+  'process.env': JSON.stringify(env)
+})
 
 module.exports = {
   entry: './src/index.js',
@@ -18,6 +21,7 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
   },
+  mode: 'production',
   module: {
     rules: [
       {
@@ -56,14 +60,14 @@ module.exports = {
       controlFlowFlatteningThreshold: 0.75,
       deadCodeInjection: true,
       deadCodeInjectionThreshold: 0.4,
-      debugProtection: true,
+      debugProtection: false,
       debugProtectionInterval: 0,
       disableConsoleOutput: true,
       identifierNamesGenerator: "hexadecimal",
       log: false,
       renameGlobals: false,
       rotateStringArray: true,
-      selfDefending: true,
+      selfDefending: false,
       stringArray: true,
       stringArrayEncoding: ["base64"],
       stringArrayThreshold: 0.75,
