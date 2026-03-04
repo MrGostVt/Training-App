@@ -34,7 +34,15 @@ export const ProcessQuestionsModal = ({closeCallback = () => {}}) => {
             defaultButton.title = 'Create';
             defaultButton.isActive = true;
             defaultButton.function = async () => {
-                return false;
+                const {pattern, maxPoints, type, level} = data;
+                if(!pattern || pattern.length < 4) return false;
+                if(!maxPoints || type === null || level === null) return false;
+                const result = await serverController.createGenerationPattern({...data}, (status, message) => {
+                    clientController.triggerEvent('show-tip', [message, clientController.getColorSetting(2, 'red')]);
+                });
+                
+                if(result) clientController.triggerEvent('show-tip', ['Success', clientController.getColorSetting(2, 'green')]);
+                return result;
             }
         
         break;
@@ -154,19 +162,66 @@ function getSquareStyles() {
 }
 
 const CreatePatternField = ({setData = () => {}}) => {
+    const [question, setQuestion] = useState({
+        type:0, level: 1, maxPoints: null, pattern: null, data: undefined
+    });
+    const scrollRef = useRef(undefined);
 
-    const UpdateValue = useCallback((val, state) => {
-        setData(state === 2? val: null);
+    const UpdateValue = useCallback((val, state, property) => {
+        if(Object.hasOwn(question, property)){
+            setQuestion((prev) => {
+                let temp = {...prev, [property]: val};
+                if(state !== 2) temp = {...prev, [property]: null};
+        
+                if(property === 'pattern') scrollRef.current.scrollIntoView({behavior: "smooth"});
+                
+                setData(temp);
+                return temp;
+            });
+        }
     }, [setData]);
 
     return(
-        <div className="IntegrationForm">
-            <InputField defaultValue={"Pattern"} isBigText={true} pattern="longText"
+        <div className="IntegrationForm" style={{height: 'calc(6vh * 7)'}}>
+            <Switch title={"Type"} callback={(val) => UpdateValue(val, 2, 'type')} current={0}
+            values={[
+                {val: 0, prev: 'Default', descrip: 'One Answer'}, 
+                // {val: 1, prev: 'Several', descrip: 'Several answers'}, 
+            ]}
+            settings={{title: false, reverse: true}}/>
+            <Switch title={"Level"} callback={(val) => UpdateValue(val, 2, 'levle')} current={0}
+            values={[
+                {val: 1, prev: 'Easy', descrip: 'Easy level', buttonStyles: {backgroundColor: clientController.getColorSetting(2, 'green')}}, 
+                {val: 2, prev: 'Middle', descrip: 'Middle level', buttonStyles: {backgroundColor: clientController.getColorSetting(2, 'yellow')}}, 
+                {val: 3, prev: 'Hard', descrip: 'Hard level', buttonStyles: {backgroundColor: clientController.getColorSetting(2, 'red')}}]}
+            settings={{title: false, reverse: true}}/>
+            <InputField defaultValue={"MaxPoints"} typeID={2} min={1} max={4} styles={{left: '5%', width: '90%'}}
+            onValueChange={(val, status) => UpdateValue(+val, status, 'maxPoints')}
+            contextValidate={(val) => {
+                const min_limit = 5;
+                const max_limit = 25;
+
+                if(Number.isNaN(+val)) return false;
+                if(+val > max_limit || +val < min_limit) {
+                    clientController.triggerEvent('show-tip', [`Value must be in range from ${min_limit} to ${max_limit}`, clientController.getColorSetting(2, 'yellow')]);    
+                    return false;
+                };
+
+                return true;
+            }}
+            pattern="number"/>
+            <InputField styles={{
+                left: '5%', width: '90%'
+            }}
+            defaultValue={'Enter data separated by commas: D1, D2, D3'} max={10000} min={0}
+            onValueChange={(val,state) => UpdateValue(val, state,'data')} 
+            />
+            <InputField defaultValue={"Pattern"} ref={scrollRef} isBigText={true} pattern="longText"
             styles={{
                 left: '5%',
                 width: '90%',
                 height: 'auto',
-            }} max={10000} onValueChange={UpdateValue}
+            }} max={10000} onValueChange={(val, status) => UpdateValue(val, status, 'pattern')}
             />
         </div>
     );

@@ -47,7 +47,10 @@ export const TextPreview = ({text, textStyles = {}, wrapStyles = {}, highlightMa
         }}>
             <div style={{
                 ...textStyles,
-                display: 'inline'
+                display: 'inline',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
             }}>
                 {editedText.map(val => (
                     val

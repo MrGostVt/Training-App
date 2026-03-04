@@ -27,11 +27,12 @@ const patterns = {
     password: /^[a-zA-Zа-яА-ЯёЁ0-9]+$/, 
     text: /^[a-zA-Z0-9\?\,\!\.\#_\/\ +\*\%\^\:\=\(\)\-\/\>\<\[\]\'\"]+$/,
     question: /^[a-zA-Z0-9\?\,\!\.\#_\/\ +\*\%\^\:\=\(\)\-\/\>\<\[\]]+$/,
-    longText: /^[a-zA-Z0-9\?\,\!\.\#_\/\ +\*\%\^\:\=\(\)\-\/\>\<\[\]\'\|\"]+$/,
+    longText: /^[a-zA-Z0-9\?\,\!\.\#_\/\ +\*\%\^\:\=\(\)\-\/\>\<\[\]\'\|\@\"]+$/,
+    number: /^[0-9]+$/
 };
 
 //Добавить экранирование, или перепроверить
-export const InputField = ({typeID = 0, defaultValue, clearFunctionRef = {}, handleFunctionRef = {},
+export const InputField = ({typeID = 0, ref={}, defaultValue, clearFunctionRef = {}, handleFunctionRef = {},
     max = 30, min = 1, pattern = 'text', styles, autoComplete = 'off', isBigText = false,
     onValueChange = () => {}, contextValidate = async (value, asyncSetDanger) => {return true}}) => {
     const [type, setType] = useState(typeID);
@@ -48,6 +49,11 @@ export const InputField = ({typeID = 0, defaultValue, clearFunctionRef = {}, han
         case 2: inputType = 'number'; break;
         case 1: inputType = 'password'; break;
         default: inputType = 'text'; break;
+    }
+
+    const setRefs = (node) => {
+        inputRef.current = node;
+        ref.current = node;
     }
 
     async function handleChanges(value){
@@ -93,7 +99,7 @@ export const InputField = ({typeID = 0, defaultValue, clearFunctionRef = {}, han
         }}>
             {
                 !isTextArea?
-                <input ref={inputRef} className="InputField" id={'InputField' + pattern} type={inputType} required={true} maxLength={max} placeholder={defaultValue} 
+                <input ref={setRefs} className="InputField" id={'InputField' + pattern} type={inputType} required={true} maxLength={max} placeholder={defaultValue} 
                 autoComplete={autoComplete} name={pattern}
                 style={inputStypes}
                 onChange={(ev) => {
@@ -105,7 +111,7 @@ export const InputField = ({typeID = 0, defaultValue, clearFunctionRef = {}, han
 
                 ></input>
                 :
-                <textarea style={inputStypes} className="InputField" ref={inputRef}
+                <textarea ref={setRefs} style={inputStypes} className="InputField"
                 id={'InputField' + pattern} type={inputType} required={true} maxLength={max} placeholder={defaultValue}
                 autoComplete={autoComplete} name={pattern}
                 onChange={(ev) => {

@@ -9,6 +9,7 @@ const endpoints = {
     uploadIcon: '/user/upload-icon',
     getThemes: '/theme/get',
     createTheme: '/theme/create',
+    createIntegration: '/theme/create-integration',
     logIn: '/authorize/logIn',
     register: '/authorize/register',
     checkUserName: '/authorize/check-username',
@@ -61,19 +62,21 @@ class ServerController{
             }
         }
         if(DataStore.checkStored('subject-list')){
-            const subjects_str = DataStore.getStored('subject-list', (data) => {
+            const subjects = DataStore.getStored('subject-list', (data) => {
                 for (const prop of data) {
-                    if(typeof prop === 'object'){
-                        return true;
+                    if(typeof prop !== 'object'){
+                        return false;
                     }
                 }
-            })
+                return true;
+            });
 
-            if(subjects_str === null){
+            this.subjectThemes = subjects;
+            if(subjects === null){
                 DataStore.Store('subject-list', null);
                 this.subjectThemes = [];
-                this.getSubjectThemes();
             }
+
         }
         if(DataStore.checkStored('news')){
             this.news = DataStore.getStored('news');
@@ -133,6 +136,41 @@ class ServerController{
         const result = await this.#makeRequest(endpoints.createQuestion, 'POST', formedData);
 
         return !!result;
+    }
+
+    async createTheme(theme, onError = () => {}){
+        const result = await this.#makeRequest(endpoints.createTheme, 'POST', theme, (status) => onError(status));
+        if(result) this.getSubjectThemes();
+        
+        return result || false;
+    }
+
+    async createIntegration(integration, onError = () => {}){
+        function Convert(arr){
+            return arr.map(val => {
+                const [key, value] = val.split(':');
+                return {key, value};
+            });
+        }
+
+        let {headers, params} = integration;
+        if(headers) headers = Convert(headers);
+        if(params) params = Convert(params);
+
+        const body = {...integration, headers, params, themeId: this.userData.chosenTheme.id};
+        const responce = await this.#makeRequest(endpoints.createIntegration, 'POST', body, onError);
+        return responce || false;
+    }
+
+    async createGenerationPattern(patternData, onError = () => {}){
+        const {data} = patternData;
+        if(!!data) patternData.data = data.replace(" ", '').split(",");
+
+        const body = {...patternData, theme: this.userData.chosenTheme.id};
+
+        const responce = await this.#makeRequest(endpoints.createGenerationPattern, 'POST', body, onError);
+        
+        return responce || false;
     }
 
     async chooseTheme(themeId, title = ''){
@@ -248,14 +286,20 @@ class ServerController{
             } 
         });
 
-        console.log(result)
-
         if(result === null){
             return null;
         }
+        const chosenId = this.userData.chosenTheme.id;
+        const found = result.findIndex((val) => val.id === chosenId);
+        
+        if(found !== -1){
+            const subject = result[found];
+            result.splice(found, 1);
+            result.unshift(subject);
+        }
 
         this.subjectThemes = result;
-        DataStore.Store('subject-list', JSON.stringify(result));
+        DataStore.Store('subject-list', result);
 
         clientController.triggerEvent('subjectList-updated');
 
@@ -375,7 +419,7 @@ class ServerController{
                 }
 
                 throw {
-                    message: result.status + ' Something wrong',
+                    message: (await result.json()).message,
                     status: result.status,
                 };
             }
