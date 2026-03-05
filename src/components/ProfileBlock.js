@@ -114,7 +114,7 @@ export const ProfileBlock = ({openModal = () => {}}) => {
                 <Button text="Question constructor" theme={chosenTheme} onClick={(onExit) => {
                     if(clientController.subjectTheme !== 0) openModal(4, onExit);
                     else clientController.triggerEvent('show-tip', ['Choose theme first!', clientController.getColorSetting(2, 'yellow')]);
-                }} key={'PaintDesk'} getAnimation={(state) => {
+                }} key={'QuestionConstructorButton'} getAnimation={(state) => {
                     return '';
                 }}>
                     <FileIcon height={30} width={30}
@@ -130,7 +130,7 @@ export const ProfileBlock = ({openModal = () => {}}) => {
 
     return(
         <div className="ProfileBlock">
-            <UserIcon userIconUrl={(serverController.getStaticLink(serverController.userData.icon))}/>
+            <UserIcon userIconUrl={serverController.userData.icon && serverController.getStaticLink(serverController.userData.icon)}/>
             <UserInfo info={
                 {
                     name: username,

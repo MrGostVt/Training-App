@@ -63,7 +63,7 @@ export const ThemesToLearnBlock = ({themesList = [{title: 'test', grade: 0, id: 
     }
 
     return(
-        <div className="StatsCards">
+        <div className="StatsCards" >
             {themes.map(val => (
                 <ThemeCard name={val.title} points={val.grade} key={val.id} theme={colorTheme}
                 isChosen={val.id === chosen} setChoosedCallback={(callback) => {
@@ -71,6 +71,13 @@ export const ThemesToLearnBlock = ({themesList = [{title: 'test', grade: 0, id: 
                 }}/>
             ))}
             {createButton}
+            {
+                themes.length === 0?
+                <h1 className="DefaultFont" style={{
+                    color: clientController.getColorSetting(colorTheme, COLORS.text3)
+                }}>Themes are not available</h1>
+                :null
+            }
         </div>
     )
 }

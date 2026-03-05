@@ -9,29 +9,6 @@ const plug = {
     image: null,
     background: '#7eb0db',
 }
-// setNewsList([
-        //     {
-        //         title: 'First information',
-        //         description: 'Legend of football dancing in the moonlight',
-        //         header: 'Thats too cold.',
-        //         image: null,
-        //         background: '#7eb0db',
-        //     },
-        //     {
-        //         title: 'Second information',
-        //         description: 'Legend of football dancing in the sunlight',
-        //         header: 'Thats too hot.',
-        //         image: null,
-        //         background: '#7edb91',
-        //     },
-        //     {
-        //         title: 'Third information',
-        //         description: 'Legend of football dancing in the rainlight',
-        //         header: 'Thats too good.',
-        //         image: null,
-        //         background: '#db7e7e',
-        //     },
-        // ]);
 
 export const NewsBlock = ({callPopUp = () => {}, news = undefined}) =>{
     const [chosenTheme, setTheme] = useState(clientController.theme);
@@ -48,7 +25,7 @@ export const NewsBlock = ({callPopUp = () => {}, news = undefined}) =>{
         }
         
         setPointer(0);
-        if(news !== undefined) setNewsList(news); 
+        if(news !== undefined && news.length !== 0) setNewsList(news); 
 
         clientController.subscribeOn('theme-switch', updateTheme);
         clientController.subscribeOn('resize', handleScreenUpdate);
@@ -91,9 +68,9 @@ const News = ({title, description, header, image, background}) => (
         top: 0
         }} key={title}>
             <div className={"NewsInfoWrap " + "ProgressBar"}>
-                <h className="SmallNewsHeader" style={{
+                <span className="SmallNewsHeader" style={{
                     borderColor: 'violet', backgroundColor: 'violet'
-                }}> {header}</h>
+                }}> {header}</span>
             <div className="NewsTitle">{title}</div>
             <div className="NewsDescription"> {description}</div>
         </div>
