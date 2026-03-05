@@ -68,6 +68,7 @@ class ClientController{
     subjectTheme = undefined;
     events = {
         'resize': [],
+        'loading-complete': [],
         'theme-switch': [],
         'game-start': [],
         'game-finish': [],
@@ -78,7 +79,8 @@ class ClientController{
         'userdata-loaded': [],
         'subjectList-updated': [],
         'wrong-data': [],
-        'news-loaded': []
+        'news-loaded': [],
+        'doesnt-work': [],
     }
     store = {
         
@@ -108,7 +110,19 @@ class ClientController{
     }
     
     init(){
-        this.theme = !DataStore.checkStored(StoreKeys.theme)? 0: parseInt(DataStore.getStored(StoreKeys.theme));
+        const isThemeChosen = DataStore.checkStored(StoreKeys.theme);
+        if (!isThemeChosen) {
+            if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches){
+                this.setTheme(1);
+            }
+            else{
+                this.setTheme(0);
+            }
+        } 
+        else {
+            this.setTheme(parseInt(DataStore.getStored(StoreKeys.theme)));
+        }
+
         this.subjectTheme = !DataStore.checkStored(StoreKeys.subjectTheme)? undefined: DataStore.getStored(StoreKeys.subjectTheme);
         this.screenType = this.identifyScreenType();
     }
@@ -159,6 +173,11 @@ class ClientController{
     switchTheme(){
         this.theme = !!this.theme? 0: 1;
         console.log(this.theme);
+        this.triggerEvent('theme-switch');
+        DataStore.Store(StoreKeys.theme, this.theme);
+    }
+    setTheme(id){
+        this.theme = id;
         this.triggerEvent('theme-switch');
         DataStore.Store(StoreKeys.theme, this.theme);
     }

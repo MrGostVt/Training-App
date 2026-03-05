@@ -2,8 +2,10 @@ import clientController from "./ClientController";
 import { DataStore } from "./Store";
 
 const API = process.env.REACT_APP_API_URL;
+const SECRET = process.env.REACT_APP_SECRET_KEY;
 
 const endpoints = {
+    status: '/status',
     getUserData: '/user/get-data',
     chooseTheme: '/user/choose-theme',
     uploadIcon: '/user/upload-icon',
@@ -81,12 +83,22 @@ class ServerController{
         if(DataStore.checkStored('news')){
             this.news = DataStore.getStored('news');
         }
+        
+        this.init();
     }
 
-    init(){
-        this.getUserData();
+    async init(){
+        const onError = (status) => {
+            clientController.triggerEvent('doesnt-work');
+        }
+        const responce = await this.#makeRequest(endpoints.status, 'GET', {}, onError);
+        if(!responce) return;
+        
+        const data = await this.getUserData();
         this.getSubjectThemes();
         this.getNews();
+        
+        if(!!data) clientController.triggerEvent('loading-complete');
     }
 
     getStaticLink(file){
@@ -94,6 +106,9 @@ class ServerController{
     }
     getApi(){
         return API;
+    }
+    getSecret(){
+        return SECRET;
     }
 
     async startGame(){
@@ -203,11 +218,14 @@ class ServerController{
         clientController.triggerEvent('unauthorized');
     }
 
-    async register(login, password){
-        const result = await this.#makeRequest(endpoints.register, 'POST', {
+    async register(login, password, adminCode ){
+        const body = {
             userName: login,
             password: password,
-        }, (status) => {
+        };
+        if(adminCode !== null && adminCode.length !== 0) body['adminCode'] = adminCode;
+        
+        const result = await this.#makeRequest(endpoints.register, 'POST', body, (status) => {
             switch(status){
                 // case 401: clientController.triggerEvent('show-tip', ['Wrong password! Try again', clientController.getColorSetting(2,'yellow')]); break;
                 case 404: clientController.triggerEvent('show-tip', ['Wrong request! Check a data.', clientController.getColorSetting(2,'red')]); break;
@@ -254,8 +272,9 @@ class ServerController{
         return true;
     }
 
-    async getUserData(){
+    async getUserData(onError = (status) => {}){
         const userData = await this.#makeRequest(endpoints.getUserData, 'GET', undefined, (status) => {
+            onError(status);
             if(status > 403){
                 clientController.triggerEvent('show-tip', ['Something went wrong!', clientController.getColorSetting(2,'red')]);
             }
@@ -279,8 +298,9 @@ class ServerController{
         return userData;
     }
 
-    async getSubjectThemes(){
+    async getSubjectThemes(onError = () => {}){
         const result = await this.#makeRequest(endpoints.getThemes, 'GET', {}, (status) => {
+            onError(status);
             if(status > 403){
                 clientController.triggerEvent('show-tip', ['Something went wrong!', clientController.getColorSetting(2,'red')]);
             } 
@@ -307,8 +327,8 @@ class ServerController{
     }
 
 
-    async getNews(){
-        const responce = await this.#makeRequest(endpoints.getArticles, 'GET');
+    async getNews(onError = () => {}){
+        const responce = await this.#makeRequest(endpoints.getArticles, 'GET',{}, onError);
         if(responce !== null && responce.news.length){
             const formed = responce.news.map(val => {
                 return {...val, image: val.image && this.getStaticLink(val.image)};
@@ -339,7 +359,6 @@ class ServerController{
         return responce.questions;
     }
     async checkQuestionsOnModeration(ids = []){
-        console.log(endpoints.checkOnModeration + `?idlist=${ids.join(',')}`);
         const responce = await this.#makeRequest(endpoints.checkOnModeration + `?idlist=${ids.join(',')}`);
         if(!responce) return [].fill(false, 0, ids.length-1);
 
@@ -360,7 +379,6 @@ class ServerController{
     async uploadIcon(file, onError = () => {}){
         const body = new FormData();
         body.append("file", file, file.name);
-        console.log([...body.entries()]);
         const responce = await this.#makeRequest(endpoints.uploadIcon, 'POST', body, onError, {});
         if(responce){
             this.userData.icon = responce.icon;
@@ -390,7 +408,8 @@ class ServerController{
     async #makeRequest(endpoint, type = 'GET', body, onError = (status) => {}, headers= {'Content-Type': 'application/json'}){
         const Headers = {
             ...headers,
-            'Authorization': `Bearer ${this.token}`
+            'Authorization': `Bearer ${this.token}`,
+            'X-target-language': `ua`
         }
 
         let request = {
@@ -399,14 +418,11 @@ class ServerController{
         };
         
         if(type === 'POST' && !(body instanceof FormData)){
-            console.log("STRINGIFIED")
             request.body = JSON.stringify(body);
         }
         else if(body instanceof FormData){
             request.body = body;
         }
-
-        console.log(request);
 
         try{
             const result = await fetch((API + endpoint), request);

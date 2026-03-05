@@ -140,3 +140,19 @@
 #InputFieldlongText{
     resize:none;
 }
+
+.LinkBlock{
+    position: relative;
+    display: flex;
+    width: 90%;
+    left: 5%;
+    height: auto;
+    height: 6vh;
+}
+
+.LinkIcon{
+    height: 100%;
+    aspect-ratio: 1;
+    background-size: contain;
+
+}

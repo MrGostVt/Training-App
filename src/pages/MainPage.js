@@ -32,7 +32,6 @@ export const MainPage = ({moveToGame = () => {}, callPopUp = () => {}, callButto
     }, [chosenSubject]);
 
     useEffect(() => {
-        serverController.getNews();
         function handleChosenSubject(){
             const current = serverController.userData.chosenTheme;
 

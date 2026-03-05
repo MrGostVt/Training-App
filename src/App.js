@@ -15,6 +15,8 @@ import { PaintModal } from "./Modals/PaintModal";
 import { ModalButton } from "./Modals/ModalButton";
 import { ProcessNewsModal } from "./Modals/ProcessNewsModal";
 import { ProcessThemeModal } from "./Modals/ProcessThemeModal";
+import { ExceptionModal } from "./Modals/ExceptionModal";
+import { LoadingPage } from "./pages/LoadingPage";
 
 const SavedInstance = {
     'tip': {callback: () => {}, others: {
@@ -27,6 +29,7 @@ const SavedInstance = {
 };
 
 const App = ({}) => {
+    const [loading, setLoading] = useState(true);
     const [pageId, setPage] = useState(0);
     const [modal, setModal] = useState(0);
     const [tipState, setTipState] = useState(false);
@@ -34,6 +37,7 @@ const App = ({}) => {
     const [chosenTheme, setTheme] = useState(clientController.theme);
     const [modalButton, setModalButton] = useState(false);
     const [,forceUpdate] = useState(0);
+
 
     useEffect(() => {
         function updateTheme(){
@@ -50,14 +54,21 @@ const App = ({}) => {
         function handleResize(type){
             setScreen(type);
         }
+        function onDoesntWork(){
+            console.log("On doenst work")
+            openModal(8, () => {})
+        }
+        function onLoadingDone(){
+            setLoading(false);
+        }
 
         clientController.subscribeOn('theme-switch', updateTheme);
         clientController.subscribeOn('unauthorized', onUnauthorized );
         clientController.subscribeOn('forbidden', onForbidden);
-        clientController.subscribeOn('show-tip', showTip); // добавить возможность выбирать цвет для подсказки.
+        clientController.subscribeOn('show-tip', showTip); 
         clientController.subscribeOn('resize', handleResize);
-
-        serverController.init();
+        clientController.subscribeOn('doesnt-work', onDoesntWork);
+        clientController.subscribeOn('loading-complete', onLoadingDone);
 
         return () => {
             clientController.unSubscribeOn('theme-switch', updateTheme);
@@ -65,6 +76,8 @@ const App = ({}) => {
             clientController.unSubscribeOn('forbidden', onForbidden);
             clientController.unSubscribeOn('show-tip', showTip);
             clientController.unSubscribeOn('resize', handleResize);
+            clientController.unSubscribeOn('doesnt-work', onDoesntWork);
+            clientController.unSubscribeOn('onLoadingDone', onLoadingDone);
         }
     }, []);
 
@@ -85,6 +98,7 @@ const App = ({}) => {
         case 5: modalWindow = <PaintModal closeCallback={SavedInstance[5].callback} tiptext={SavedInstance[5].others}/>; break;
         case 6: modalWindow = <ProcessNewsModal closeCallback={SavedInstance[6].callback} />; break;
         case 7: modalWindow = <ProcessThemeModal closeCallback={SavedInstance[7].callback} />; break;
+        case 8: modalWindow = <ExceptionModal closeCallback={SavedInstance[8].callback}/>; break;
         default: modalWindow = null; break;
     }
 
@@ -144,8 +158,20 @@ const App = ({}) => {
             setTipState(true);
         }
     }
+    
+    if(loading){
+        return(
+            <div className="App" style={{
+                backgroundColor: clientController.getColorSetting(chosenTheme, COLORS.main),
+                scrollbarColor: `${clientController.getColorSetting(chosenTheme, COLORS.functional)} ${clientController.getColorSetting(chosenTheme, COLORS.back)}`
+            }}>
+                <LoadingPage />
+                {modalWindow}
+            </div>
+        );
+    }
 
-    return(
+        return(
         <div className="App" style={{
             backgroundColor: clientController.getColorSetting(chosenTheme, COLORS.main),
             scrollbarColor: `${clientController.getColorSetting(chosenTheme, COLORS.functional)} ${clientController.getColorSetting(chosenTheme, COLORS.back)}`

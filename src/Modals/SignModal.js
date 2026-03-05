@@ -1,4 +1,4 @@
-import React, {  useRef, useState } from "react";
+import React, {  useEffect, useRef, useState } from "react";
 import { ModalWindow } from "./ModalWindow";
 import { InputField } from "../components/InputField"
 import clientController from "../application/ClientController";
@@ -9,7 +9,7 @@ import { DataStore } from "../application/Store";
 const messageStyles = {
     position: 'absolute',
     left: '5%',
-    bottom: '28%',
+    bottom: '90px',
     width: '90%',
     textAlign: 'center',
 };
@@ -24,25 +24,35 @@ export const SignModal = ({closeCallback = () => {}}) => {
         log: '',
         state: false,
     });
+
+    const [adminCode, setAdminCode] = useState({
+        code: '',
+        state: false,
+    });
     const passwordHandlerRef = useRef(() => {});
     const loginHandlerRef = useRef(() => {});
+    const adminCodeRef = useRef(() => {});
     const formRef = useRef(undefined);
 
+    useEffect(() => {
+        setAdminCode({code: '', state: false});
+    },[signType]);
+
     let signMessage = <div className="DefaultFont" style={{...messageStyles, color: clientController.getColorSettingDefault(COLORS.text)}} onClick={() => {
-        setSignType(0);
-        setTimeout(() => {
-            if(passInfo.pass.length !== 0){ passwordHandlerRef.current(passInfo.pass); }
-            if(logInfo.log.length !== 0){ loginHandlerRef.current(logInfo.log); }
-        }, 50);
+        setSignType(() => {
+            if(passInfo.pass.length !== 0) passwordHandlerRef.current(passInfo.pass); 
+            if(logInfo.log.length !== 0) loginHandlerRef.current(logInfo.log); 
+            adminCodeRef.current = '';
+            return 0;
+        });
     }}>New user? Sign Up</div>;
     if(signType === 0){
         signMessage = <div className="DefaultFont" style={{...messageStyles, color: clientController.getColorSettingDefault(COLORS.text)}} onClick={() => {
-            setSignType(1);
-            setTimeout(() => {
+            setSignType(() => {
                 if(passInfo.pass.length !== 0){ passwordHandlerRef.current(passInfo.pass); }
                 if(logInfo.log.length !== 0){ loginHandlerRef.current(logInfo.log); }
-            }, 50);
-
+                return 1;
+            });
         }}>Already have an account? Sign In</div>
     }
 
@@ -53,14 +63,18 @@ export const SignModal = ({closeCallback = () => {}}) => {
         });     
     }
     function onLogChange(val, state){
-        // serverController.isLoginExist(val);
+        if(val === serverController.getSecret()){
+            setAdminCode({code: '', state: true});
+        }
         setLogInfo({
             log: val,
             state: state === 2
         });
     }
+
     return(
         <ModalWindow title={signType === 1? 'Sign In': 'Sign Up'} closeCallback={closeCallback} isBackgroundClose={false}
+        size={signType === 0? adminCode.state? 3: 0: 0}
         defaultButton={{isActive: true, title:signType === 1? 'SIGN IN': 'SIGN UP', type:'submit', function: async () => {
                 const formData = new FormData(formRef.current);
                 const formLogin = formData.get('username');
@@ -70,15 +84,14 @@ export const SignModal = ({closeCallback = () => {}}) => {
                     clientController.triggerEvent('show-tip', ['Wait a second before submitting', clientController.getColorSetting(2, 'red')])
                     return false;
                 }
-                // await serverController.loading(1500)
-                // return passInfo.state && logInfo.state;
+
                 if(passInfo.state && logInfo.state){
                     if(signType === 1){
                         const isOk = await serverController.logIn(logInfo.log, passInfo.pass);
                         return isOk;
                     }
                     
-                    const isOk = await serverController.register(logInfo.log, passInfo.pass);
+                    const isOk = await serverController.register(logInfo.log, passInfo.pass, adminCode.state? adminCode.code: null);
                     return isOk;
                 }
                 return false;
@@ -103,7 +116,7 @@ export const SignModal = ({closeCallback = () => {}}) => {
                     return isSafe;
                 }}/>
                 <InputField typeID = {1} defaultValue={'Password'} pattern="password" max={50} min={5} autoComplete={signType === 1? "current-password": "new-password"}
-                handleFunctionRef={passwordHandlerRef}
+                handleFunctionRef={passwordHandlerRef} hideButton={true}
                 onValueChange={onPassChange} contextValidate={(value, asyncSetDanger) => {
                     if(signType === 1){
                         function onResult(){
@@ -129,6 +142,14 @@ export const SignModal = ({closeCallback = () => {}}) => {
                     }
                     return true;
                 }}/>
+                {
+                    signType === 0 && adminCode.state?
+                    <InputField typeID={0} ref={adminCodeRef} defaultValue={"Admin code"} onValueChange={(val, state) => {
+                        if(state === 2) setAdminCode({code: val, state: true});
+                        else setAdminCode({code: '', state: true});
+                    }}/>
+                    : null
+                }
             </form>
             
             {signMessage}
