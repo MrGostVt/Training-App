@@ -67,11 +67,13 @@ export const UserInfo = ({info, theme}) => {
     const name = info.name || 'undefined';
     const other = info.other || [];
 
+    console.log(info);
+
     return(
         <div className="UserInfoDefault">
             <div className="DefaultFont" style={{fontSize: '22px', fontWeight: 600, color: clientController.getColorSetting(chosenTheme, COLORS.text)}}>{name}</div>
-            {other.map(val => (
-                <div className="DefaultFont" style={{fontSize: '16px', color: clientController.getColorSetting(chosenTheme, COLORS.text2), ...val.styles}} key={val.text}>{val.text}</div>
+            {other.map((val,i) => (
+                <div key={`${val.text}-${i}`}className="DefaultFont" style={{fontSize: '16px', color: clientController.getColorSetting(chosenTheme, COLORS.text2), ...val.styles}}>{val.text}</div>
             ))}
         </div>
     )

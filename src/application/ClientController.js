@@ -194,6 +194,7 @@ class ClientController{
     }
     
     setSubject(subject){
+        if(!subject) return;
         console.log(subject);
         this.subjectTheme = subject;
         DataStore.Store(StoreKeys.subjectTheme, subject);
