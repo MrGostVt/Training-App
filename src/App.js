@@ -70,6 +70,8 @@ const App = ({}) => {
         clientController.subscribeOn('doesnt-work', onDoesntWork);
         clientController.subscribeOn('loading-complete', onLoadingDone);
 
+        serverController.init();
+
         return () => {
             clientController.unSubscribeOn('theme-switch', updateTheme);
             clientController.unSubscribeOn('unauthorized', onUnauthorized);

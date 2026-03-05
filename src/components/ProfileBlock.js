@@ -14,7 +14,14 @@ import { DefaultButton } from "./DefaultButton";
 export const ProfileBlock = ({openModal = () => {}}) => {
     const [cardState, setCardState] = useState(0);
     const [chosenTheme, setTheme] = useState(clientController.theme);
-    const [displayInfo, setInfo] = useState([`Level ${serverController.userData.accessLevel}`]);
+    const [displayInfo, setInfo] = useState(
+        [
+            {text: `Level: ${AccessLevels[serverController.userData.accessLevel]}`, styles: {
+            color: clientController.getColorSettingDefault(COLORS.button),
+            fontWeight: 600,}
+            }
+        ]
+    );
     const [username, setUsername] = useState(serverController.userData.username);
     const [screen, setScreen] = useState(clientController.identifyScreenType());
 
@@ -28,34 +35,36 @@ export const ProfileBlock = ({openModal = () => {}}) => {
             const level = serverController.userData.accessLevel;
             const points = serverController.userData.currentGrade;
 
-            setInfo([
-                {text: `Level: ${AccessLevels[level]}`, styles: {
-                    color: clientController.getColorSettingDefault(COLORS.button),
-                    fontWeight: 600,
-                }}, 
-                {text: `Theme: ${subject}`, styles: {
-                    color: clientController.getColorSettingDefault(COLORS.text3),
-                    fontWeight: 600,
-                }}, 
-                {text: `${points} Points`, styles: {
-                    color: clientController.getColorSettingDefault(COLORS.text),
-                    fontSize: '22px', fontWeight: 600
-                }}
-            ]);
+            // setInfo([
+            //     {text: `Level: ${AccessLevels[level]}`, styles: {
+            //         color: clientController.getColorSettingDefault(COLORS.button),
+            //         fontWeight: 600,
+            //     }}, 
+            //     {text: `Theme: ${subject}`, styles: {
+            //         color: clientController.getColorSettingDefault(COLORS.text3),
+            //         fontWeight: 600,
+            //     }}, 
+            //     {text: `${points} Points`, styles: {
+            //         color: clientController.getColorSettingDefault(COLORS.text),
+            //         fontSize: '22px', fontWeight: 600
+            //     }}
+            // ]);
             setCardState(1);
         }
         function onGameFinish(){
             const level = serverController.userData.accessLevel;
-            setInfo([{text: `Level: ${AccessLevels[level]}`, styles: {
-                color: clientController.getColorSettingDefault(COLORS.button),
-                fontWeight: 600,
-            }}]);
+            // setInfo([{text: `Level: ${AccessLevels[level]}`, styles: {
+            //     color: clientController.getColorSettingDefault(COLORS.button),
+            //     fontWeight: 600,
+            // }}]);
             setCardState(0);
         }
 
         function handleUserDataUpdate(){
             const data = serverController.userData;
             setUsername(data.username);
+            console.log('OTHER DATA!');
+            console.log(data)
             setInfo([{text: `Level: ${AccessLevels[data.accessLevel]}`, styles: {
                 color: clientController.getColorSettingDefault(COLORS.button),
                 fontWeight: 600,

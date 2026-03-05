@@ -82,9 +82,7 @@ class ServerController{
         }
         if(DataStore.checkStored('news')){
             this.news = DataStore.getStored('news');
-        }
-        
-        this.init();
+        }        
     }
 
     async init(){
