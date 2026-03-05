@@ -1,4 +1,5 @@
 const path = require('path');
+const WebpackObfuscator = require('webpack-obfuscator');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyPlugin = require("copy-webpack-plugin");
 
@@ -7,8 +8,11 @@ const dotenv = require('dotenv');
 
 const env = dotenv.config().parsed || {};
 
-const envKeys = Object.keys(env).reduce((prev, next) => {
-  prev[`process.env.${next}`] = JSON.stringify(env[next]);
+const mergedEnv = { ...env, ...process.env };
+
+
+const envKeys = Object.keys(mergedEnv).reduce((prev, next) => {
+  prev[`process.env.${next}`] = JSON.stringify(mergedEnv[next]);
   return prev;
 }, {});
 
@@ -18,6 +22,7 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
   },
+  mode: 'production',
   module: {
     rules: [
       {
@@ -61,6 +66,26 @@ module.exports = {
       ],
     }),
     new webpack.DefinePlugin(envKeys) //для работы с ENV.
+    new webpack.DefinePlugin(envKeys),
+    new WebpackObfuscator({
+      compact: true,
+      controlFlowFlattening: true,
+      controlFlowFlatteningThreshold: 0.75,
+      deadCodeInjection: true,
+      deadCodeInjectionThreshold: 0.4,
+      debugProtection: false,
+      debugProtectionInterval: 0,
+      disableConsoleOutput: true,
+      identifierNamesGenerator: "hexadecimal",
+      log: false,
+      renameGlobals: false,
+      rotateStringArray: true,
+      selfDefending: false,
+      stringArray: true,
+      stringArrayEncoding: ["base64"],
+      stringArrayThreshold: 0.75,
+      unicodeEscapeSequence: false
+    })
   ],
   devServer: {
     static: {
