@@ -65,7 +65,6 @@ module.exports = {
         },
       ],
     }),
-    new webpack.DefinePlugin(envKeys) //для работы с ENV.
     new webpack.DefinePlugin(envKeys),
     new WebpackObfuscator({
       compact: true,
