@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react"
 import clientController, { COLORS } from "../application/ClientController";
+import { DefaultButton } from "./DefaultButton";
 
 const inputStypes = {
     fontSize: '18px',
@@ -28,12 +29,14 @@ const patterns = {
     text: /^[a-zA-Z0-9\?\,\!\.\#_\/\ +\*\%\^\:\=\(\)\-\/\>\<\[\]\'\"]+$/,
     question: /^[a-zA-Z0-9\?\,\!\.\#_\/\ +\*\%\^\:\=\(\)\-\/\>\<\[\]]+$/,
     longText: /^[a-zA-Z0-9\?\,\!\.\#_\/\ +\*\%\^\:\=\(\)\-\/\>\<\[\]\'\|\@\"]+$/,
-    number: /^[0-9]+$/
+    number: /^[0-9]+$/,
+    'confirm_password': /^[a-zA-Zа-яА-ЯёЁ0-9]+$/,
 };
 
 //Добавить экранирование, или перепроверить
 export const InputField = ({typeID = 0, ref={}, defaultValue, clearFunctionRef = {}, handleFunctionRef = {},
     max = 30, min = 1, pattern = 'text', styles, autoComplete = 'off', isBigText = false,
+    hideButton = false,
     onValueChange = () => {}, contextValidate = async (value, asyncSetDanger) => {return true}}) => {
     const [type, setType] = useState(typeID);
     const [isTextArea] = useState(isBigText);
@@ -45,6 +48,16 @@ export const InputField = ({typeID = 0, ref={}, defaultValue, clearFunctionRef =
     handleFunctionRef.current = handleChanges;
 
     let inputType;
+    let showButton = null;
+    if(hideButton){
+        showButton = <DefaultButton text={type === 1? "👁️" : "🙈"} 
+        styles={{right: '2%', width: '7.5%', height: '60%', top: '20%'}}
+        onClick={(ev) => {
+            ev.preventDefault();
+            setType(prev => prev === 1? 0: 1);
+        }}
+        />; 
+    }
     switch(type){
         case 2: inputType = 'number'; break;
         case 1: inputType = 'password'; break;
@@ -110,6 +123,7 @@ export const InputField = ({typeID = 0, ref={}, defaultValue, clearFunctionRef =
                 }}
 
                 ></input>
+                
                 :
                 <textarea ref={setRefs} style={inputStypes} className="InputField"
                 id={'InputField' + pattern} type={inputType} required={true} maxLength={max} placeholder={defaultValue}
@@ -127,6 +141,7 @@ export const InputField = ({typeID = 0, ref={}, defaultValue, clearFunctionRef =
                 >
                 </textarea>
             }
+            {showButton}
         </div>
         
     );

@@ -1,10 +1,17 @@
 import React from "react";
+import { LoadedImages } from "../application/ImageLoad";
 
 export const LinkBlock = ({}) => {
 
     return(
-        <a className="LinkBlock">
-            <div></div>
-        </a>
+        <div className="LinkBlock">
+            <Link icon={LoadedImages['flaticon.png']} href={"https://www.flaticon.com"}/>
+        </div>
+    );
+}
+
+const Link = ({icon, href}) => {
+    return(
+        <a href={href}className="LinkIcon" style={{backgroundImage: `url(${icon})`}}></a>
     );
 }

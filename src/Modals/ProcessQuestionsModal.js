@@ -130,7 +130,9 @@ export const ProcessQuestionsModal = ({closeCallback = () => {}}) => {
 
 const InfoWrap = ({onClick = []}) => (
     <div className="InfoWrap" style={{
-        justifyContent: serverController.userData.accessLevel === 3? 'left': 'center'
+        justifyContent: serverController.userData.accessLevel === 3? 'left': 'center',
+        overflowY: 'hidden', 
+        overflowX:  serverController.userData.accessLevel === 3? 'scroll': 'hidden',
     }}>
             <InfoBlock title="Create a Question" button={{title: 'Create', function: onClick[0]}} icounUrl={LoadedImages['Idea.png']}
             text={'Create questions on the topic!'} statistics={[

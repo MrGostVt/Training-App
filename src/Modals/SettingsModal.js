@@ -22,6 +22,10 @@ export const SettingsModal = ({closeCallback = () => {}}) => {
                 {val: 0, prev: 'Light'}, 
                 {val: 1, prev: 'Dark'}]}
             />
+            <Switch title={"Target language"} callback={(val) => {
+            }} current={0}
+            values={[{val: 0, prev: 'UA'}]}
+            />
             <LinkBlock />
         </ModalWindow>
     );

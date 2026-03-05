@@ -4,11 +4,15 @@ import { DefaultButton } from "./DefaultButton";
 import '../assets/styles/InfoBlock.css'
 import { LoadedImages } from "../application/ImageLoad";
 
-export const InfoBlock = ({title= 'Undefined', text, statistics = [{title: '', score: 0}], icounUrl, button = {title: 'none', function: () => {}}}) => {
+export const InfoBlock = ({
+    title= 'Undefined', text, statistics = [{title: '', score: 0}], 
+    iconHeight='8vh',
+    icounUrl, button = {title: 'none', function: () => {}}
+}) => {
 
     let icon;
     if(!!icounUrl){
-        icon = <div className="InfoIcon" style={{backgroundImage: `url(${icounUrl})`}}>
+        icon = <div className="InfoIcon" style={{height: iconHeight,backgroundImage: `url(${icounUrl})`}}>
             </div>;
     }
 

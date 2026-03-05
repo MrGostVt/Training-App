@@ -5,9 +5,12 @@ import { DefaultButton } from "../components/DefaultButton";
 import clientController, {COLORS} from "../application/ClientController";
 
 
-export const ModalWindow = ({children, title = 'undefined', size = 0,
+export const ModalWindow = ({
+    children, title = 'undefined', size = 0,
     closeCallback, isBackgroundClose = true,
-    defaultButton = {title: '', type: '', function: () => {}, isActive: false}}) => {
+    defaultButton = {title: '', type: '', function: () => {}, isActive: false},
+    wrapStyles = {},
+}) => {
     
     const [chosenTheme, setTheme] = useState(clientController.theme);
     const [isLoading, setLoading] = useState(false);
@@ -25,6 +28,8 @@ export const ModalWindow = ({children, title = 'undefined', size = 0,
         }
     }, []);
 
+    useEffect(() => setSize(size),[size]);
+
     function exitFunction(isBackground){
         if(isLoading && (isBackgroundClose || !isBackground)){
             setLoading(false); 
@@ -41,14 +46,15 @@ export const ModalWindow = ({children, title = 'undefined', size = 0,
         backdropFilter = 'blur(3px)'
     }
     switch(sizeState){
+        case 3: modalStyles.height = '55vh'; if(isLoading) modalStyles.top = '0vh'; break;
         case 2: modalStyles.height = '85vh'; if(isLoading) modalStyles.top = '0vh'; break;
-        case 1: modalStyles.height = '65vh'; if(isLoading) modalStyles.top = '0vh';break;
+        case 1: modalStyles.height = '65vh'; if(isLoading) modalStyles.top = '0vh'; break;
         default: modalStyles.height = '45vh'; if(isLoading) modalStyles.top = '0vh';break;
     }
     
     let button;
     if(defaultButton.isActive){
-        button = <DefaultButton styles={{width: '90%', height: '8vh', left: '5%', bottom: '5%', fontWeight: '700',
+        button = <DefaultButton styles={{width: '90%', height: '8vh', left: '5%', bottom: '2.5vh', fontWeight: '700',
             backgroundColor: clientController.getColorSetting(chosenTheme, COLORS.button), color: 'var(--main-text-dark-color)'}} text={defaultButton.title}
             onClick={async () => {
                 let isCanExit = true;
@@ -65,7 +71,7 @@ export const ModalWindow = ({children, title = 'undefined', size = 0,
     
     return(
         <div className="ModalWindowBase" onClick={() => exitFunction(true)} style={{backdropFilter}}>
-            <div className="ModalWindow" style={modalStyles} onClick={(ev) => {
+            <div className="ModalWindow" style={{...modalStyles, ...wrapStyles}} onClick={(ev) => {
                     ev.stopPropagation();
                 }}>
                 <p className="ModalTitle DefaultFont" 
