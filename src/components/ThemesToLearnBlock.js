@@ -72,7 +72,7 @@ export const ThemesToLearnBlock = ({themesList = [{title: 'test', grade: 0, id: 
             ))}
             {createButton}
             {
-                themes.length === 0?
+                themes.length === 0 && serverController.userData.accessLevel !== 3?
                 <h1 className="DefaultFont" style={{
                     color: clientController.getColorSetting(colorTheme, COLORS.text3)
                 }}>Themes are not available</h1>
