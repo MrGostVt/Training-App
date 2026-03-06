@@ -31,40 +31,39 @@ export const ProfileBlock = ({openModal = () => {}}) => {
             handleUserDataUpdate();
         }
         function onGameStart(){
-            const subject = serverController.userData.chosenTheme.title;
-            const level = serverController.userData.accessLevel;
-            const points = serverController.userData.currentGrade;
+            const data = serverController.userData;
+            const subject = data.chosenTheme.title;
+            const level = data.accessLevel;
+            const points = serverController.subjectThemes.find(val => val.id === data.chosenTheme.id).grade;
 
-            // setInfo([
-            //     {text: `Level: ${AccessLevels[level]}`, styles: {
-            //         color: clientController.getColorSettingDefault(COLORS.button),
-            //         fontWeight: 600,
-            //     }}, 
-            //     {text: `Theme: ${subject}`, styles: {
-            //         color: clientController.getColorSettingDefault(COLORS.text3),
-            //         fontWeight: 600,
-            //     }}, 
-            //     {text: `${points} Points`, styles: {
-            //         color: clientController.getColorSettingDefault(COLORS.text),
-            //         fontSize: '22px', fontWeight: 600
-            //     }}
-            // ]);
+            setInfo([
+                {text: `Level: ${AccessLevels[level]}`, styles: {
+                    color: clientController.getColorSettingDefault(COLORS.button),
+                    fontWeight: 600,
+                }}, 
+                {text: `Theme: ${subject}`, styles: {
+                    color: clientController.getColorSettingDefault(COLORS.text3),
+                    fontWeight: 600,
+                }}, 
+                {text: `${points} Points`, styles: {
+                    color: clientController.getColorSettingDefault(COLORS.text),
+                    fontSize: '22px', fontWeight: 600
+                }}
+            ]);
             setCardState(1);
         }
         function onGameFinish(){
             const level = serverController.userData.accessLevel;
-            // setInfo([{text: `Level: ${AccessLevels[level]}`, styles: {
-            //     color: clientController.getColorSettingDefault(COLORS.button),
-            //     fontWeight: 600,
-            // }}]);
+            setInfo([{text: `Level: ${AccessLevels[level]}`, styles: {
+                color: clientController.getColorSettingDefault(COLORS.button),
+                fontWeight: 600,
+            }}]);
             setCardState(0);
         }
 
         function handleUserDataUpdate(){
             const data = serverController.userData;
             setUsername(data.username);
-            console.log('OTHER DATA!');
-            console.log(data)
             setInfo([{text: `Level: ${AccessLevels[data.accessLevel]}`, styles: {
                 color: clientController.getColorSettingDefault(COLORS.button),
                 fontWeight: 600,

@@ -36,21 +36,19 @@ export const SignModal = ({closeCallback = () => {}}) => {
 
     useEffect(() => {
         setAdminCode({code: '', state: false});
+        if(passInfo.pass.length !== 0){ passwordHandlerRef.current(passInfo.pass); }
+        if(logInfo.log.length !== 0){ loginHandlerRef.current(logInfo.log); }
+        adminCodeRef.current = '';
     },[signType]);
 
     let signMessage = <div className="DefaultFont" style={{...messageStyles, color: clientController.getColorSettingDefault(COLORS.text)}} onClick={() => {
         setSignType(() => {
-            if(passInfo.pass.length !== 0) passwordHandlerRef.current(passInfo.pass); 
-            if(logInfo.log.length !== 0) loginHandlerRef.current(logInfo.log); 
-            adminCodeRef.current = '';
             return 0;
         });
     }}>New user? Sign Up</div>;
     if(signType === 0){
         signMessage = <div className="DefaultFont" style={{...messageStyles, color: clientController.getColorSettingDefault(COLORS.text)}} onClick={() => {
             setSignType(() => {
-                if(passInfo.pass.length !== 0){ passwordHandlerRef.current(passInfo.pass); }
-                if(logInfo.log.length !== 0){ loginHandlerRef.current(logInfo.log); }
                 return 1;
             });
         }}>Already have an account? Sign In</div>

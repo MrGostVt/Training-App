@@ -67,8 +67,6 @@ export const UserInfo = ({info, theme}) => {
     const name = info.name || 'undefined';
     const other = info.other || [];
 
-    console.log(info);
-
     return(
         <div className="UserInfoDefault">
             <div className="DefaultFont" style={{fontSize: '22px', fontWeight: 600, color: clientController.getColorSetting(chosenTheme, COLORS.text)}}>{name}</div>

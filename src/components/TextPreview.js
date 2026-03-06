@@ -5,13 +5,14 @@ export const TextPreview = ({text, textStyles = {}, wrapStyles = {}, highlightMa
     const [editedText, updateText] = useState([text]);
     
     useEffect(() => {
-        if (!highlightMath) return;
-      
+        if (!highlightMath) return updateText([text]);
+        
+        const math = /[0-9\-+/*^%]/;
         const result = [];
         let buffer = "";
-        let isMath = /[0-9\-+/*^]/.test(text[0]);
+        let isMath = math.test(text[0]);
         for (let char of text) {
-            const charIsMath = /[0-9\-+/*^]/.test(char);
+            const charIsMath = math.test(char);
             if(charIsMath === isMath || char === ' '){
                 buffer += char;
             }
@@ -48,9 +49,9 @@ export const TextPreview = ({text, textStyles = {}, wrapStyles = {}, highlightMa
             <div style={{
                 ...textStyles,
                 display: 'inline',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
+                // whiteSpace: 'nowrap',
+                // overflow: 'hidden',
+                // textOverflow: 'ellipsis',
             }}>
                 {editedText.map(val => (
                     val

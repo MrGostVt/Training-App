@@ -1,22 +1,4 @@
 import { Question } from "./Question";
-// {
-//     "id": "59b42c62-19ed-4d8d-ac9d-09450a2754e9",
-//     "title": "Где найти полярного медведя4",
-//     "level": 1,
-//     "maxPoints": 4,
-//     "type": 0,
-//     "answers": [
-//         "test1",
-//         "test2",
-//         "test3",
-//         "test4"
-//     ],
-//     "rightAnswers": [
-//         "1",
-//         "2",
-//         "3"
-//     ]
-// },
 
 export class QuestionEngine{
     questions = [];

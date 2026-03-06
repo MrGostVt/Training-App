@@ -22,7 +22,7 @@ export const MainPage = ({moveToGame = () => {}, callPopUp = () => {}, callButto
             zIndex: '10',
             backdropFilter: 'blur(3px)',
             transform: 'translateY(-5%)',
-            top: 0,
+            top: '10px',
         }}></div>
     }
 
