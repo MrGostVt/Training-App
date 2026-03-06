@@ -39,7 +39,7 @@ export const SignModal = ({closeCallback = () => {}}) => {
         if(passInfo.pass.length !== 0){ passwordHandlerRef.current(passInfo.pass); }
         if(logInfo.log.length !== 0){ loginHandlerRef.current(logInfo.log); }
         adminCodeRef.current = '';
-    },[signType]);
+    }, [signType]);
 
     let signMessage = <div className="DefaultFont" style={{...messageStyles, color: clientController.getColorSettingDefault(COLORS.text)}} onClick={() => {
         setSignType(() => {
@@ -61,7 +61,8 @@ export const SignModal = ({closeCallback = () => {}}) => {
         });     
     }
     function onLogChange(val, state){
-        if(val === serverController.getSecret()){
+        console.log('onLogChange!', val);
+        if(signType === 0 && val === serverController.getSecret()){
             setAdminCode({code: '', state: true});
         }
         setLogInfo({
@@ -141,8 +142,8 @@ export const SignModal = ({closeCallback = () => {}}) => {
                     return true;
                 }}/>
                 {
-                    signType === 0 && adminCode.state?
-                    <InputField typeID={0} ref={adminCodeRef} defaultValue={"Admin code"} onValueChange={(val, state) => {
+                    signType === 0 && adminCode.state === true?
+                    <InputField typeID={0} ref={adminCodeRef} max={150} defaultValue={"Admin code"} onValueChange={(val, state) => {
                         if(state === 2) setAdminCode({code: val, state: true});
                         else setAdminCode({code: '', state: true});
                     }}/>

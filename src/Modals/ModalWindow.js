@@ -15,16 +15,22 @@ export const ModalWindow = ({
     const [chosenTheme, setTheme] = useState(clientController.theme);
     const [isLoading, setLoading] = useState(false);
     const [sizeState, setSize] = useState(size);
+    const [screen, setScreen] = useState(clientController.screenType);
 
     useEffect(() => {
         setTimeout(() => {setLoading(true)}, 50);
         function updateTheme(){
             setTheme(clientController.theme);
         }
+        function handleResize(type){
+            setScreen(type);
+        }
         clientController.subscribeOn('theme-switch', updateTheme);
+        clientController.subscribeOn('resize', handleResize);
 
         return () => {
             clientController.unSubscribeOn('theme-switch', updateTheme);
+            clientController.unSubscribeOn('resize', handleResize);
         }
     }, []);
 
@@ -46,10 +52,10 @@ export const ModalWindow = ({
         backdropFilter = 'blur(3px)'
     }
     switch(sizeState){
-        case 3: modalStyles.height = '55vh'; if(isLoading) modalStyles.top = '0vh'; break;
-        case 2: modalStyles.height = '85vh'; if(isLoading) modalStyles.top = '0vh'; break;
-        case 1: modalStyles.height = '65vh'; if(isLoading) modalStyles.top = '0vh'; break;
-        default: modalStyles.height = '45vh'; if(isLoading) modalStyles.top = '0vh';break;
+        case 3: modalStyles.height = screen === 'Desktop'? '55vh':'380px'; if(isLoading) modalStyles.top = '0vh'; break;
+        case 2: modalStyles.height = screen === 'Desktop'? '85vh':'680px'; if(isLoading) modalStyles.top = '0vh'; break;
+        case 1: modalStyles.height = screen === 'Desktop'? '65vh':'480px'; if(isLoading) modalStyles.top = '0vh'; break;
+        default: modalStyles.height = screen === 'Desktop'? '45vh':'300px'; if(isLoading) modalStyles.top = '0vh';break;
     }
     
     let button;

@@ -29,6 +29,7 @@ const SavedInstance = {
 
 const App = ({}) => {
     const [loading, setLoading] = useState(true);
+    const [lightLoading, setLightLoading] = useState(false);
     const [pageId, setPage] = useState(0);
     const [modal, setModal] = useState(0);
     const [tipState, setTipState] = useState(false);
@@ -86,8 +87,8 @@ const App = ({}) => {
     let page;
     const buttonRef = useRef();
     switch(pageId){
-        case 1: page = <InGamePage moveOut = {moveOutFromGame}/>; break;
-        case 0: page = <MainPage callPopUp={openModal} moveToGame={moveToGame} callButton={showModalButton} moveButtonAway={() => buttonRef.current.close()}/>; break;
+        case 1: page = <InGamePage moveOut = {moveOutFromGame} setLoading={setLightLoading}/>; break;
+        case 0: page = <MainPage callPopUp={openModal} moveToGame={moveToGame} setLoading={setLightLoading} callButton={showModalButton} moveButtonAway={() => buttonRef.current.close()}/>; break;
         default: page = null;
     }
 
@@ -176,11 +177,18 @@ const App = ({}) => {
         );
     }
 
-        return(
+    let lightLoadingComponent;
+    if(lightLoading){
+        lightLoadingComponent = <LoadingPage />
+    }
+
+
+    return(
         <div className="App" style={{
             backgroundColor: clientController.getColorSetting(chosenTheme, COLORS.main),
             scrollbarColor: `${clientController.getColorSetting(chosenTheme, COLORS.functional)} ${clientController.getColorSetting(chosenTheme, COLORS.back)}`
         }}>
+            {lightLoadingComponent}
             <PagePreview text="Trainee-App"/>
             <ProfileBlock openModal = {openModal}/>
             <div className="WideBlock" style={{

@@ -8,7 +8,7 @@ import serverController from "../application/ServerController";
 import clientController, { COLORS } from "../application/ClientController";
 import { NewsBlock } from "../components/NewsBlock";
 
-export const MainPage = ({moveToGame = () => {}, callPopUp = () => {}, callButton = () => {}, moveButtonAway = () => {}}) =>{
+export const MainPage = ({moveToGame = () => {}, setLoading= () => {}, callPopUp = () => {}, callButton = () => {}, moveButtonAway = () => {}}) =>{
     const [chosenSubject, setSubject] = useState(clientController.subjectTheme);
     const [chosenGame, setGame] = useState(undefined);
     const [news, setNews] = useState(serverController.news);
@@ -63,7 +63,10 @@ export const MainPage = ({moveToGame = () => {}, callPopUp = () => {}, callButto
             setGame(undefined);
             onNew();
             if(type == 2) clientController.triggerEvent('show-tip', ['Coming soon!', clientController.getColorSetting(2, 'yellow')])
-            else moveToGame(type);
+            else {
+                setLoading(true);
+                moveToGame(type);
+            }
         }, 'Start', {color: clientController.getColorSettingDefault(COLORS.text4)});
         return true;
     }

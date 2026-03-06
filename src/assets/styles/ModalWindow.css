@@ -147,7 +147,10 @@
     width: 90%;
     left: 5%;
     height: auto;
-    height: 6vh;
+    height: 8vh;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
 }
 
 .LinkIcon{

@@ -6,7 +6,7 @@ import clientController, { COLORS } from "../application/ClientController";
 import { QuestionComponent } from "../components/QuestionComponent";
 import serverController from "../application/ServerController";
 
-export const InGamePage = ({moveOut = () => {}}) => {
+export const InGamePage = ({moveOut = () => {}, setLoading = () => {}}) => {
     const [chosenTheme, setTheme] = useState(clientController.theme);
     const [question, setQuestion] = useState(null);
     const [currentQuest, setCurrent] = useState(0);
@@ -27,9 +27,11 @@ export const InGamePage = ({moveOut = () => {}}) => {
                 setCurrent(1);
                 setQuestion(nextQuestion);
                 setAnswers(nextQuestion.answers);
+                setLoading(false);
             }
             else{
                 setTimeout(() => {
+                    setLoading(false);
                     moveOut(0, false);
                     clientController.triggerEvent('show-tip', ['Questions is not loaded, try again later!', clientController.getColorSetting(2, 'red')])    
                     serverController.finishGame(0);
@@ -66,7 +68,7 @@ export const InGamePage = ({moveOut = () => {}}) => {
             }}/>
             
             <DefaultButton styles={{ 
-                position:'sticky', bottom: '5vh', 
+                position: question?'sticky':'absolute', bottom: '5vh', 
                 width: '90%', left: 0, right: 0, margin: '0 auto',
                 backgroundColor: clientController.getColorSetting(chosenTheme, COLORS.button),
                 color: clientController.getColorSetting(chosenTheme, COLORS.text4),

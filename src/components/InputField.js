@@ -70,12 +70,12 @@ export const InputField = ({typeID = 0, ref={}, defaultValue, clearFunctionRef =
     }
 
     async function handleChanges(value){
-        if(inputState != 0){
+        if(value.length === 0){
+            onValueChange(value, min===0?2:1);
             setInputState(0);
-            if(value.length === 0){
-                return;
-            }
+            return;
         }
+        console.log(inputState);
         const isSafe = validateInput(value, pattern, max, min) && await contextValidate(value, (onEnd = () => {}) => {
             setInputState(1);
             onValueChange(value,1);
@@ -116,6 +116,8 @@ export const InputField = ({typeID = 0, ref={}, defaultValue, clearFunctionRef =
                 autoComplete={autoComplete} name={pattern}
                 style={inputStypes}
                 onChange={(ev) => {
+                    console.log('CHANGE!')
+
                     clearTimeout(lastTimeOutRef.current);
                     lastTimeOutRef.current = setTimeout(() => {
                         handleChanges(ev.target.value);
