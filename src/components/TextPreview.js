@@ -5,6 +5,7 @@ export const TextPreview = ({text, textStyles = {}, wrapStyles = {}, highlightMa
     const [editedText, updateText] = useState([text]);
     
     useEffect(() => {
+        console.log(text);
         if (!highlightMath) return updateText([text]);
         
         const math = /[0-9\-+/*^%]/;

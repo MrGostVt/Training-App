@@ -5,13 +5,14 @@ import { ModalWindow } from "./ModalWindow";
 import { LinkBlock } from "../components/LinkBlock";
 import serverController from "../application/ServerController";
 import { Switch } from "../components/Switch";
+import { TextPreview } from "../components/TextPreview";
 
 export const SettingsModal = ({closeCallback = () => {}}) => {
     const [chosenTheme, setTheme] = useState(clientController.theme);
 
 
     return(
-        <ModalWindow title="Settings" closeCallback={closeCallback} defaultButton={{isActive: true, title: 'SIGN OUT', function: () => {
+        <ModalWindow title="Settings" size={3} closeCallback={closeCallback} defaultButton={{isActive: true, title: 'SIGN OUT', function: () => {
             serverController.signOut();
         }}}>
             <Switch title={"Theme"} callback={(val) => {

@@ -5,6 +5,7 @@ export const LinkBlock = ({}) => {
 
     return(
         <div className="LinkBlock">
+            <Link icon={LoadedImages['github.png']} href={"https://github.com/MrGostVt"}/>
             <Link icon={LoadedImages['flaticon.png']} href={"https://www.flaticon.com"}/>
         </div>
     );

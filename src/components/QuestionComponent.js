@@ -46,7 +46,7 @@ export const QuestionComponent = ({question, number, qty, answers, theme}) => {
                 );
             });
         }
-        return !quest? 'Loading': quest.question;
+        return (quest && !quest.question) || !quest? 'Loading...': quest.question;
             
     }, [quest, chosenAnswers, qty, number]);
 
@@ -65,7 +65,10 @@ export const QuestionComponent = ({question, number, qty, answers, theme}) => {
     }, [questionText]);
     
     return(
-        <div className="DefaultFont Question" style={{color: clientController.getColorSetting(theme, COLORS.text)}}>   
+        <div className="DefaultFont Question" style={{
+            color: clientController.getColorSetting(theme, COLORS.text),
+            backgroundColor: clientController.getColorSetting(theme, COLORS.back)
+            }}>   
             <p className="QuestionInfoPreview">{`Question ${number}/${qty}. Choose ${answerCount} ${answerCount === 1? 'answer':'answers'}`}</p>
             <TextPreview text={questionText} wrapStyles={{
                 width: 'auto', height: 'auto', margin: 0,
