@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import './assets/styles/App.css';
 import { MainPage } from "./pages/MainPage";
 import { PagePreview } from "./components/PagePreview";
@@ -25,7 +25,6 @@ const SavedInstance = {
     'modalButton': {callback: () => {}, others: {
         text: '', color: undefined
     }},
-    1: () => {},
 };
 
 const App = ({}) => {
@@ -37,6 +36,8 @@ const App = ({}) => {
     const [chosenTheme, setTheme] = useState(clientController.theme);
     const [modalButton, setModalButton] = useState(false);
     const [,forceUpdate] = useState(0);
+
+    const [modalData, setModalData] = useState({callback: null, others: null});
 
 
     useEffect(() => {
@@ -55,7 +56,6 @@ const App = ({}) => {
             setScreen(type);
         }
         function onDoesntWork(){
-            console.log("On doenst work")
             openModal(8, () => {})
         }
         function onLoadingDone(){
@@ -91,18 +91,19 @@ const App = ({}) => {
         default: page = null;
     }
 
-    let modalWindow;
-    switch(modal){
-        case 1: modalWindow = <SettingsModal closeCallback={SavedInstance[1].callback} />; break;
-        case 2: modalWindow = <SignModal closeCallback={SavedInstance[2].callback}/>; break;
-        case 3: modalWindow = <ResultsModal type={"Practice"} results={SavedInstance[3].others} closeCallback={SavedInstance[3].callback}/>; break;
-        case 4: modalWindow = <ProcessQuestionsModal closeCallback={SavedInstance[4].callback} />; break;
-        case 5: modalWindow = <PaintModal closeCallback={SavedInstance[5].callback} tiptext={SavedInstance[5].others}/>; break;
-        case 6: modalWindow = <ProcessNewsModal closeCallback={SavedInstance[6].callback} />; break;
-        case 7: modalWindow = <ProcessThemeModal closeCallback={SavedInstance[7].callback} />; break;
-        case 8: modalWindow = <ExceptionModal closeCallback={SavedInstance[8].callback}/>; break;
-        default: modalWindow = null; break;
-    }
+    const modalWindow = useMemo(() => {
+        switch(modal){
+            case 1: return <SettingsModal closeCallback={modalData.callback} />;
+            case 2: return <SignModal closeCallback={modalData.callback}/>;
+            case 3: return <ResultsModal type="Practice" results={modalData.others} closeCallback={modalData.callback}/>;
+            case 4: return <ProcessQuestionsModal closeCallback={modalData.callback} />;
+            case 5: return <PaintModal closeCallback={modalData.callback} tiptext={modalData.others}/>;
+            case 6: return <ProcessNewsModal closeCallback={modalData.callback} />;
+            case 7: return <ProcessThemeModal closeCallback={modalData.callback} />;
+            case 8: return <ExceptionModal closeCallback={modalData.callback} />;
+            default: return null;
+        }
+    }, [modal, modalData]);
 
     let tip;
     if(tipState){
@@ -129,13 +130,14 @@ const App = ({}) => {
         if(flag) forceUpdate(v => v + 1);
     }
     function openModal(id, callback, others){
-        SavedInstance[id] = {
-            callback: () =>{
+        setModalData({
+            callback: () => {
                 setModal(0);
-                callback();
-            }
-        };
-        SavedInstance[id].others = others;
+                if(callback !== null) callback();
+            },
+            others
+        });
+
         setModal(id);
     }
     function moveToGame(id){
@@ -169,6 +171,7 @@ const App = ({}) => {
             }}>
                 <LoadingPage />
                 {modalWindow}
+                {tip}
             </div>
         );
     }

@@ -1,62 +1,68 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Fragment, useRef, useState, useEffect } from "react";
 import clientController, { COLORS } from "../application/ClientController";
 import { TextPreview } from "./TextPreview";
 
+const selectedStyles = {
+    backgroundColor: clientController.getColorSettingDefault(COLORS.functionalA),
+    marginLeft: '0.5%',
+    marginRight: '0.5%',
+    width: 'auto',
+    minWidth: '50px',
+    borderRadius: '8px',
+    height: '100%',
+    flexShrink: '0',
+    display: 'inline-block'
+};
+
 export const QuestionComponent = ({question, number, qty, answers, theme}) => {
-    const [quest, setQuest] = useState(question);
+    const [quest, setQuest] = useState(null);
     const [chosenAnswers, setAnswers] = useState(answers);
+    const [answerCount, setAnswerCount] = useState(0);
 
-    let questionText;
-    let answerCount;
-    if(!!quest){
-        questionText = quest.type === 0? 
-        quest.question: 
-        quest.question.split("__").map((val, id, array) => {
-            const answer = quest.answers.filter((val) => val.id === chosenAnswers[id])[0];
-            let selected = id + 1 !== array.length? `${chosenAnswers[id] !== undefined? answer.title: '-'}`: '';
 
-            let element = null;
-            if(selected.length > 0){
-                element = <div style={{
-                    backgroundColor: clientController.getColorSettingDefault(COLORS.functional),
-                    marginLeft: '0.5%',
-                    marginRight: '0.5%',
-                    width: 'auto',
-                    minWidth: '50px',
-                    borderRadius: '8px',
-                    height: '100%',
-                    flexShrink: '0',
-                }}>{selected}</div>;
-            }
-            return(
-                <Fragment key={val+id}>
-                    <div style={{
-                        marginRight: '0.5%',
-                        flexShrink: '0',
-                    }}>{val}</div>
-                    {element}
-                </Fragment>
-            );
-        });
+    const questionText = useMemo(() => {
+        if(!!quest && quest.type === 1){
+            const textComponents = quest.question.split("__");
+            return textComponents.map((val, id, array) => {
+                const answer = quest.answers.find(answer => answer.id === chosenAnswers[id]);
+
+                let selected = id + 1 !== array.length
+                ? `${chosenAnswers[id] !== undefined? answer.title: '-'}`
+                : '';
     
-        answerCount = quest.correctCount;
-    }
-    else{
-        questionText = 'Loading.'
-        answerCount = 0;
-    }
+                const element = selected.length > 0
+                ? <span style={selectedStyles}>{selected}</span>
+                : null;
+
+                return(
+                    <Fragment key={val+id}>
+                        <span style={{
+                            marginRight: '0.5%',
+                            flexShrink: '0',
+                        }}>{val}</span>
+                        {element}
+                    </Fragment>
+                );
+            });
+        }
+        return !quest? 'Loading': quest.question;
+            
+    }, [quest, chosenAnswers, qty, number]);
+
     
     
     useEffect(() => {
-        setQuest(question);
+        const clone = {...question};
+        setQuest(clone);
+        setAnswerCount(clone.correctCount);
     },[question]);
     useEffect(() => {
-        setAnswers(answers);
+        setAnswers([...answers]);
     }, [answers])
     useEffect(() => {
         clientController.store['currentQuestion'] = questionText;
-    }, [questionText])
+    }, [questionText]);
     
     return(
         <div className="DefaultFont Question" style={{color: clientController.getColorSetting(theme, COLORS.text)}}>   
@@ -65,7 +71,7 @@ export const QuestionComponent = ({question, number, qty, answers, theme}) => {
                 width: 'auto', height: 'auto', margin: 0,
                 backgroundColor: clientController.getColorSettingDefault(COLORS.functional),
                 }} 
-                highlightMath={true} hightlightColor={clientController.getColorSettingDefault(COLORS.textA)}
+                highlightMath={quest && quest.type === 0} hightlightColor={clientController.getColorSettingDefault(COLORS.textA)}
                 textStyles={{display: 'flex', flexDirection: 'row', justifyContent: 'center', textAlign: 'center', 
                 color: clientController.getColorSettingDefault(COLORS.text3),
             }}/>

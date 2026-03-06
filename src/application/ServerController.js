@@ -217,11 +217,13 @@ class ServerController{
     }
 
     async register(login, password, adminCode ){
-        const body = {
+        let body = {
             userName: login,
             password: password,
         };
-        if(adminCode !== null && adminCode.length !== 0) body['adminCode'] = adminCode;
+        if(adminCode !== null && adminCode.length !== 0) body = {...body, adminCode};
+        console.log(adminCode);
+        console.log(typeof adminCode);
         
         const result = await this.#makeRequest(endpoints.register, 'POST', body, (status) => {
             switch(status){
