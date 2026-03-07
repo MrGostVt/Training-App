@@ -8,7 +8,11 @@ import serverController from "../application/ServerController";
 import clientController, { COLORS } from "../application/ClientController";
 import { NewsBlock } from "../components/NewsBlock";
 
-export const MainPage = ({moveToGame = () => {}, setLoading= () => {}, callPopUp = () => {}, callButton = () => {}, moveButtonAway = () => {}}) =>{
+export const MainPage = ({
+    moveToGame = () => {}, setLoading= () => {}, 
+    callPopUp = () => {}, callButton = () => {}, 
+    moveButtonAway = () => {}, screen
+}) =>{
     const [chosenSubject, setSubject] = useState(clientController.subjectTheme);
     const [chosenGame, setGame] = useState(undefined);
     const [news, setNews] = useState(serverController.news);
@@ -17,12 +21,13 @@ export const MainPage = ({moveToGame = () => {}, setLoading= () => {}, callPopUp
     if(chosenSubject <= 0){
         barrier = <div style={{
             position: 'absolute', 
-            width: '100%', 
-            height: '100%',
+            width: '110%', 
+            height: '105%',
             zIndex: '10',
             backdropFilter: 'blur(3px)',
             transform: 'translateY(-5%)',
             top: '10px',
+            left: '-5%'
         }}></div>
     }
 
@@ -94,6 +99,11 @@ export const MainPage = ({moveToGame = () => {}, setLoading= () => {}, callPopUp
                 }} setActive={HandleChoose}/>
                 {barrier}
             </div>
+            {
+                screen === 'Mobile'
+                ?<div style={{marginTop: '5px'}}></div>
+                :null
+            }
         </>
     );
 }

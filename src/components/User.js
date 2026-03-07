@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import '../assets/styles/User.css'
 import { LoadedImages } from "../application/ImageLoad";
 import clientController, { COLORS } from "../application/ClientController";
@@ -7,7 +7,7 @@ import serverController from "../application/ServerController";
 import { UsePreviousState } from "./customHooks/UsePreviousState";
 
 
-export const UserIcon = ({userIconUrl}) => {
+export const UserIcon = memo(({userIconUrl}) => {
     const [splash, setSplash] = useState(false);
     const [icon, setIcon] = useState(userIconUrl);
     const [previousIcon, setPrevious] = UsePreviousState(icon);
@@ -37,7 +37,7 @@ export const UserIcon = ({userIconUrl}) => {
             }
         }
     }, [icon]);
-    
+
     return(
         <div className="UserIconDefault" onMouseEnter={() => {setSplash(true)}} onMouseLeave={() => {setSplash(false)}} >
             <div className="IconImage"  style={{backgroundImage: `url(${icon? icon: LoadedImages['UndefinedUser.png']})`}} 
@@ -56,16 +56,16 @@ export const UserIcon = ({userIconUrl}) => {
             />
         </div>
     );
-}
+})
 
-export const UserInfo = ({info, theme}) => {
+export const UserInfo = memo(({username = '', info = [], theme}) => {
     const [chosenTheme, setTheme] = useState(theme);
 
     useEffect(() => {
         setTheme(theme);
     }, [theme]);
-    const name = info.name || 'undefined';
-    const other = info.other || [];
+    const name = username;
+    const other = info;
 
     return(
         <div className="UserInfoDefault">
@@ -75,4 +75,4 @@ export const UserInfo = ({info, theme}) => {
             ))}
         </div>
     )
-}
+})

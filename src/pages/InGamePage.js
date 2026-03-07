@@ -6,6 +6,12 @@ import clientController, { COLORS } from "../application/ClientController";
 import { QuestionComponent } from "../components/QuestionComponent";
 import serverController from "../application/ServerController";
 
+const confirmStyles = {
+    bottom: '5vh', width: '90%', 
+    left: 0, right: 0, margin: '0 auto',
+    fontWeight: 500, fontSize: '16px'
+}
+
 export const InGamePage = ({moveOut = () => {}, setLoading = () => {}}) => {
     const [chosenTheme, setTheme] = useState(clientController.theme);
     const [question, setQuestion] = useState(null);
@@ -16,7 +22,6 @@ export const InGamePage = ({moveOut = () => {}, setLoading = () => {}}) => {
     const controllerRef = useRef(null);
 
     useEffect(() => {
-        // const questions = new QuestionEngine(LIST);
         async function getQuestionList() {
             const list = await serverController.getQuestions();
 
@@ -68,11 +73,12 @@ export const InGamePage = ({moveOut = () => {}, setLoading = () => {}}) => {
             }}/>
             
             <DefaultButton styles={{ 
-                position: question?'sticky':'absolute', bottom: '5vh', 
-                width: '90%', left: 0, right: 0, margin: '0 auto',
+                ...confirmStyles,
+                position: screen === 'Desktop'?
+                question?'sticky':'absolute'
+                :'fixed', 
                 backgroundColor: clientController.getColorSetting(chosenTheme, COLORS.button),
                 color: clientController.getColorSetting(chosenTheme, COLORS.text4),
-                fontWeight: 500, fontSize: '16px'
             }} 
             onClick={() => {
                 if(controllerRef.current !== null && chosenAnswer.length == question.correctCount){
@@ -104,6 +110,10 @@ export const InGamePage = ({moveOut = () => {}, setLoading = () => {}}) => {
 }
 
 
+const answerStyles = {
+    position: 'relative', margin: '0 auto', 
+    marginBottom: '25px', width: '100%', maxWidth: '500px',
+}
 
 const Answers = ({answers = [{title, id}], correctCount, theme, screen, setCurrentAnswer = () => {}}) => {
     const [chosen, setChosen] = useState([]);
@@ -122,10 +132,13 @@ const Answers = ({answers = [{title, id}], correctCount, theme, screen, setCurre
 
     return(
         <div className="AnswersList" style={{color: clientController.getColorSetting(theme, COLORS.text)}}>
+            {   screen === 'Mobile'
+                ?<div style={{marginTop: '10px'}}></div>
+                :null
+            }
             {answers.map((val, id) => (
                 <DefaultButton text={val.title} key={val.id} styles={{
-                    position: 'relative', margin: '0 auto', 
-                    marginBottom: '25px', width: '100%', maxWidth: '500px',
+                    ...answerStyles,
                     border: chosen.includes(val.id)? border: '', 
                     backgroundColor: colors[id],
                     ...desktopStyles

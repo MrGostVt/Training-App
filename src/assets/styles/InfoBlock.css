@@ -21,16 +21,14 @@
     .InfoBlock{
         width: 50%;
     }
-    /* .InfoBlock{
-        width: 90%;
-        height: 19vh;
+    .NewsBlock{
+        aspect-ratio: 16/9;
     }
-    .InfoWrap{
-        flex-direction: column;
+}
+@media (min-width: 520px){
+    .NewsBlock{
+        height: 30vh;
     }
-    .InfoWrap>.InfoBlock>.InfoIcon{
-        display: none;
-    } */
 }
 
 .InfoIcon{
@@ -62,7 +60,6 @@
 
 .NewsBlock{
     width: 90%;
-    height: 30vh;
     margin-left: 5%;
     margin-bottom: 3vh;
     position: relative;

@@ -8,7 +8,7 @@ import clientController, {COLORS} from "../application/ClientController";
 export const ModalWindow = ({
     children, title = 'undefined', size = 0,
     closeCallback, isBackgroundClose = true,
-    defaultButton = {title: '', type: '', function: () => {}, isActive: false},
+    defaultButton = {title: '', type: '', function: () => {}, isActive: false, styles: {}},
     wrapStyles = {},
 }) => {
     
@@ -52,16 +52,18 @@ export const ModalWindow = ({
         backdropFilter = 'blur(3px)'
     }
     switch(sizeState){
-        case 3: modalStyles.height = screen === 'Desktop'? '55vh':'380px'; if(isLoading) modalStyles.top = '0vh'; break;
-        case 2: modalStyles.height = screen === 'Desktop'? '85vh':'680px'; if(isLoading) modalStyles.top = '0vh'; break;
-        case 1: modalStyles.height = screen === 'Desktop'? '65vh':'480px'; if(isLoading) modalStyles.top = '0vh'; break;
-        default: modalStyles.height = screen === 'Desktop'? '45vh':'300px'; if(isLoading) modalStyles.top = '0vh';break;
+        case 3: modalStyles.height = screen === 'Desktop'? '55vh':'390px'; if(isLoading) modalStyles.top = '0vh'; break;
+        case 2: modalStyles.height = screen === 'Desktop'? '85vh':'690px'; if(isLoading) modalStyles.top = '0vh'; break;
+        case 1: modalStyles.height = screen === 'Desktop'? '65vh':'490px'; if(isLoading) modalStyles.top = '0vh'; break;
+        default: modalStyles.height = screen === 'Desktop'? '45vh':'310px'; if(isLoading) modalStyles.top = '0vh';break;
     }
     
     let button;
     if(defaultButton.isActive){
         button = <DefaultButton styles={{width: '90%', height: '8vh', left: '5%', bottom: '2.5vh', fontWeight: '700',
-            backgroundColor: clientController.getColorSetting(chosenTheme, COLORS.button), color: 'var(--main-text-dark-color)'}} text={defaultButton.title}
+            backgroundColor: clientController.getColorSetting(chosenTheme, COLORS.button),
+             color: 'var(--main-text-dark-color)', ...defaultButton.styles}} 
+            text={defaultButton.title}
             onClick={async () => {
                 let isCanExit = true;
                 

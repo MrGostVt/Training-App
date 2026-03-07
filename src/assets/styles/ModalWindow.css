@@ -56,6 +56,7 @@
     display: flex;
     flex-direction: row;
     width: 47%;
+    min-height: 5vh;
     justify-content: space-between;
     /* background-color: var(--functional-active-dark-color); */
     border-radius: 8px;
@@ -126,9 +127,13 @@
 .NewsForm{
     margin-left: 5%;   
     margin-right: 5%; 
-    height: calc(6vh * 4);
     overflow-y: scroll;
     scrollbar-width: none;
+}
+@media (min-width: 520px) {
+    .NewsForm{
+        height: calc(6vh * 4);
+    }
 }
 
 .IntegrationForm{
