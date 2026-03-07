@@ -27,7 +27,7 @@ export const ProcessThemeModal = ({closeCallback = () => {}}) => {
         }}
         size={1}>
             <Switch title={'Choose form'} values={[
-                {val: 0, prev: 'Theme'}, {val: 1, prev: 'Integration'}
+                {val: 0, prev: 'Theme'}, {val: 1, prev: 'Integration', buttonStyles:{width: 'auto'}}
             ]} current={0} callback={SetForm}/>
             
             {currentForm}
@@ -51,7 +51,7 @@ const ThemeForm = ({setButtonCallback = () => {}}) => {
         setButtonCallback(() => async () => {
             let info;
 
-            var promise = await new Promise((resolve) => {
+            await new Promise((resolve) => {
                 setData((prev) => {
                     info = {...prev};
                     resolve();
@@ -59,11 +59,14 @@ const ThemeForm = ({setButtonCallback = () => {}}) => {
                 });
             });
             
-            console.log(info);
 
             const {title, maxPoints} = info;
             if(title === null || maxPoints === null) return false;
-            const result = serverController.createTheme(info);
+            const result = serverController.createTheme(info, () => {
+                clientController.triggerEvent('show-tip', ['Wrong!', clientController.getColorSetting(2, 'red')]);
+            });
+
+            if(result) clientController.triggerEvent('show-tip', ['Success!', clientController.getColorSetting(2, 'green')]);
             return result;
         });
     }, []);
@@ -147,7 +150,11 @@ const IntegrationForm = ({setButtonCallback = () => {}}) => {
             
             const {name, service} = info;
             if(name ===  null || service === null) return false;
-            const result = serverController.createIntegration(info);
+            const result = serverController.createIntegration(info, (status, message) => {
+                clientController.triggerEvent('show-tip', ['Wrong', clientController.getColorSetting(2, 'red')]);
+            });
+            
+            if(result) clientController.triggerEvent('show-tip', ['Success!', clientController.getColorSetting(2, 'green')]);
             return result;
         });
     }, []);
@@ -184,7 +191,6 @@ const IntegrationForm = ({setButtonCallback = () => {}}) => {
             onUpdate={(val) => UpdateData('params', val)}/>
             <DynamicList ref={scrollRefs.headers} defaultValue="Headers: Key:Value" min={3} max={500} verify={(val) => validate(val, 'headers')}
             onUpdate={(val) => UpdateData('headers', val)}/>
-            {/* <div ref={scrollRef}></div> */}
         </form>
     );
 }

@@ -27,10 +27,10 @@ export const PaintModal = ({closeCallback = () => {}, tiptext = ''}) => {
             <TextPreview text={title} 
             wrapStyles={{
                 position: 'absolute', bottom: '0%', left: '5%', right: '5%', width: 'auto', 
-                backgroundColor: clientController.getColorSettingDefault(COLORS['borderA']),
-                }}
+                backgroundColor: clientController.getColorSettingDefault(COLORS.main),
+            }}
             textStyles={{display: 'flex', flexDirection: 'row', justifyContent: 'center', textAlign: 'center'}}
-                />
+            />
 
         </ModalWindow>
     )

@@ -4,7 +4,6 @@ import clientController, { COLORS } from "../application/ClientController";
 import { TextPreview } from "./TextPreview";
 
 const selectedStyles = {
-    backgroundColor: clientController.getColorSettingDefault(COLORS.functionalA),
     marginLeft: '0.5%',
     marginRight: '0.5%',
     width: 'auto',
@@ -32,7 +31,10 @@ export const QuestionComponent = ({question, number, qty, answers, theme}) => {
                 : '';
     
                 const element = selected.length > 0
-                ? <span style={selectedStyles}>{selected}</span>
+                ? <span style={{
+                    ...selectedStyles,
+                    backgroundColor: clientController.getColorSettingDefault(COLORS.functionalA),
+                }}>{selected}</span>
                 : null;
 
                 return(

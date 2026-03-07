@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { memo, useEffect } from "react";
 import { useState } from "react";
 import { UserIcon, UserInfo } from "./User";
 import { LoadedImages } from "../application/ImageLoad";
@@ -11,19 +11,22 @@ import { AccessLevels } from "../application/ServerController";
 import { DefaultButton } from "./DefaultButton";
  
 
-export const ProfileBlock = ({openModal = () => {}}) => {
+export const ProfileBlock = (({openModal = () => {}}) => {
+    console.log('rerender', new Date().toLocaleTimeString());
+
     const [cardState, setCardState] = useState(0);
     const [chosenTheme, setTheme] = useState(clientController.theme);
     const [displayInfo, setInfo] = useState(
         [
-            {text: `Level: ${AccessLevels[serverController.userData.accessLevel]}`, styles: {
-            color: clientController.getColorSettingDefault(COLORS.button),
-            fontWeight: 600,}
+            {text: `Level: ${AccessLevels[serverController.userData.accessLevel]}`, 
+            styles: {
+                    color: clientController.getColorSettingDefault(COLORS.button),
+                    fontWeight: 600,
+                }
             }
         ]
     );
     const [username, setUsername] = useState(serverController.userData.username);
-    const [screen, setScreen] = useState(clientController.identifyScreenType());
 
     useEffect(() => {
         function updateTheme(){
@@ -70,21 +73,16 @@ export const ProfileBlock = ({openModal = () => {}}) => {
             }}]);
         }
 
-        function handleScreenUpdate(type){
-            setScreen(type);
-        }
 
         clientController.subscribeOn('userdata-loaded', handleUserDataUpdate);
         clientController.subscribeOn('theme-switch', updateTheme);
         clientController.subscribeOn('game-start', onGameStart);
         clientController.subscribeOn('game-finish', onGameFinish);
-        clientController.subscribeOn('resize', handleScreenUpdate);
         return () => {
             clientController.unSubscribeOn('userdata-loaded', handleUserDataUpdate);
             clientController.unSubscribeOn('theme-switch', updateTheme);
             clientController.unSubscribeOn('game-start', onGameStart);
             clientController.unSubscribeOn('game-finish', onGameFinish);
-            clientController.unSubscribeOn('resize', handleScreenUpdate);
         }
     }, []);
 
@@ -139,12 +137,7 @@ export const ProfileBlock = ({openModal = () => {}}) => {
     return(
         <div className="ProfileBlock">
             <UserIcon userIconUrl={serverController.userData.icon && serverController.getStaticLink(serverController.userData.icon)}/>
-            <UserInfo info={
-                {
-                    name: username,
-                    other: displayInfo,
-                }
-            } theme={chosenTheme}/>
+            <UserInfo username={username} info={displayInfo} theme={chosenTheme}/>
             <div className="SmallButtonsBlock">
                 {smallButtons.map(val => (
                     val
@@ -152,7 +145,7 @@ export const ProfileBlock = ({openModal = () => {}}) => {
             </div>
         </div>
     );
-}
+})
 
 const Button = ({onClick = (onExit) => {}, getAnimation = (state) => (''), theme,
     children, text = ''}) => {

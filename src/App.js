@@ -84,19 +84,25 @@ const App = ({}) => {
         }
     }, []);
 
-    let page;
     const buttonRef = useRef();
-    switch(pageId){
-        case 1: page = <InGamePage moveOut = {moveOutFromGame} setLoading={setLightLoading}/>; break;
-        case 0: page = <MainPage callPopUp={openModal} moveToGame={moveToGame} setLoading={setLightLoading} callButton={showModalButton} moveButtonAway={() => buttonRef.current.close()}/>; break;
-        default: page = null;
-    }
+    const page = (() => {
+        switch(pageId){
+            case 1: return <InGamePage moveOut = {moveOutFromGame} setLoading={setLightLoading}/>;
+            case 0: 
+                return <MainPage screen={screen} callPopUp={openModal} moveToGame={moveToGame} 
+                setLoading={setLightLoading} callButton={showModalButton} 
+                moveButtonAway={() => buttonRef.current.close()}
+                />;
+            default: return null;
+        }
+    })();
+
 
     const modalWindow = useMemo(() => {
         switch(modal){
             case 1: return <SettingsModal closeCallback={modalData.callback} />;
             case 2: return <SignModal closeCallback={modalData.callback}/>;
-            case 3: return <ResultsModal type="Practice" results={modalData.others} closeCallback={modalData.callback}/>;
+            case 3: return <ResultsModal screen={screen} type="Practice" results={modalData.others} closeCallback={modalData.callback}/>;
             case 4: return <ProcessQuestionsModal closeCallback={modalData.callback} />;
             case 5: return <PaintModal closeCallback={modalData.callback} tiptext={modalData.others}/>;
             case 6: return <ProcessNewsModal closeCallback={modalData.callback} />;
@@ -104,7 +110,7 @@ const App = ({}) => {
             case 8: return <ExceptionModal closeCallback={modalData.callback} />;
             default: return null;
         }
-    }, [modal, modalData]);
+    }, [modal, modalData,screen]);
 
     let tip;
     if(tipState){
@@ -181,7 +187,6 @@ const App = ({}) => {
     if(lightLoading){
         lightLoadingComponent = <LoadingPage />
     }
-
 
     return(
         <div className="App" style={{
