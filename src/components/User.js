@@ -9,7 +9,8 @@ import { UsePreviousState } from "./customHooks/UsePreviousState";
 
 export const UserIcon = memo(({userIconUrl}) => {
     const [splash, setSplash] = useState(false);
-    const [icon, setIcon] = useState(userIconUrl);
+    const [icon, setIcon] = useState(null);
+    const [defaultIcon] = useState(LoadedImages['UndefinedUser.png'])
     const [previousIcon, setPrevious] = UsePreviousState(icon);
 
     const HandleUpload = async (ev) => {
@@ -35,13 +36,15 @@ export const UserIcon = memo(({userIconUrl}) => {
                 console.log(icon);
                 setIcon(null);
             }
+            img.onload = () => {
+                setIcon(userIconUrl);
+            }
         }
-    }, [icon]);
+    }, [userIconUrl]);
 
     return(
         <div className="UserIconDefault" onMouseEnter={() => {setSplash(true)}} onMouseLeave={() => {setSplash(false)}} >
-            <div className="IconImage"  style={{backgroundImage: `url(${icon? icon: LoadedImages['UndefinedUser.png']})`}} 
-            onError={() => {console.log("ALEKESY")}}></div>
+            <div className="IconImage"  style={{backgroundImage: `url(${icon? icon: defaultIcon})`}} ></div>
             <div className="IconSplash" style={{bottom: splash? '0%': '-30%'}}>
                 <CameraIcon style={{
                     fill: clientController.getColorSetting(1,COLORS.text),

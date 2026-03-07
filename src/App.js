@@ -28,7 +28,7 @@ const SavedInstance = {
 };
 
 const App = ({}) => {
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [lightLoading, setLightLoading] = useState(false);
     const [pageId, setPage] = useState(0);
     const [modal, setModal] = useState(0);
